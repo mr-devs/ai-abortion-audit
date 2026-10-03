@@ -211,3 +211,7 @@ __marimo__/
 
 # Mac files
 .DS_Store
+
+# Data directory is a machine-specific symlink to Google Drive
+# Each collaborator creates this symlink once using the /setup-data-symlink skill
+/data
