@@ -1,0 +1,33 @@
+compute_response_measures.py report
+
+response_measures rows: 270
+
+Mean per response by provider and location
+(searched = share of responses with any search):
+                       n_words  searched  n_searches  n_cited_urls  n_retrieved_urls  n_resources
+provider  location                                                                               
+anthropic houston-tx    396.73      1.00        2.43          0.00             20.13         5.23
+          none          380.70      0.37        0.73          0.00              6.43         3.47
+          portland-or   337.27      0.97        2.03          0.00             18.90         4.20
+gemini    houston-tx    418.33      0.17        0.17          1.33              0.00         6.53
+          none          464.57      0.07        0.07          0.37              0.00         3.43
+          portland-or   406.97      0.43        0.43          3.30              0.00         4.00
+openai    houston-tx    224.03      1.00        1.57          4.13             49.40         2.47
+          none          185.10      1.00        1.17          2.90             35.97         1.13
+          portland-or   178.70      1.00        1.50          3.37             45.57         1.00
+
+Share of responses naming each resource (keyword lexicon):
+provider                                anthropic                       gemini                       openai                  
+location                               houston-tx  none portland-or houston-tx  none portland-or houston-tx  none portland-or
+AbortionFinder                               0.70  0.33        0.40       0.87  0.53        0.50       0.53  0.27        0.17
+I Need An A                                  0.60  0.33        0.50       0.87  0.50        0.50       0.27  0.13        0.00
+Planned Parenthood                           0.13  0.50        1.00       0.30  0.47        0.90       0.47  0.20        0.60
+National Abortion Federation / hotline       0.73  0.47        0.37       0.47  0.40        0.13       0.00  0.10        0.00
+Abortion funds                               0.57  0.50        0.57       0.47  0.50        0.43       0.10  0.20        0.03
+Plan C                                       0.00  0.00        0.00       0.40  0.07        0.00       0.27  0.00        0.00
+Aid Access                                   0.07  0.20        0.03       0.30  0.10        0.30       0.13  0.07        0.00
+M+A Hotline                                  0.20  0.10        0.03       0.60  0.07        0.00       0.07  0.00        0.00
+Repro Legal Helpline                         0.90  0.13        0.03       0.73  0.10        0.00       0.53  0.03        0.00
+Telehealth abortion                          0.40  0.60        0.73       0.67  0.37        0.57       0.10  0.13        0.20
+Shield laws                                  0.30  0.00        0.07       0.57  0.10        0.33       0.00  0.00        0.00
+Crisis pregnancy centers                     0.63  0.30        0.47       0.30  0.23        0.33       0.00  0.00        0.00

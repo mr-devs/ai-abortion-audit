@@ -1,0 +1,16 @@
+build_pilot_explorer_data.py report
+
+Bundle: ../../data/processed/pilot_explorer_data.js (1.11 MB)
+
+Records per key:
+  providers: 3
+  locations: 3
+  queries: 10
+  resources: 12
+  metrics: 7
+  responses: 270
+  cell_means: 90
+  resource_shares: 1188
+  search_rates: 9
+  domains: 224
+  search_queries: 429

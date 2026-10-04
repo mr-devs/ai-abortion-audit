@@ -1,0 +1,1213 @@
+<!doctype html>
+<!--
+  Pilot response explorer.
+
+  Reads the bundle written by code/generate_figures/build_pilot_explorer_data.py
+  (data/processed/pilot_explorer_data.js). Every number on this page is
+  computed in Python; the page only filters and draws. Open the file directly
+  in a browser; no server is needed.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pilot Response Explorer</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js"></script>
+<script src="../../../data/processed/pilot_explorer_data.js"></script>
+<style>
+  :root {
+    color-scheme: light;
+    --theme: light;
+    --page: #f9f9f7;
+    --surface: #fcfcfb;
+    --surface-2: #f2f1ed;
+    --ink: #0b0b0b;
+    --ink-2: #52514e;
+    --muted: #898781;
+    --grid: #e1e0d9;
+    --axis: #c3c2b7;
+    --border: rgba(11, 11, 11, 0.10);
+    --focus: #2a78d6;
+    --p-anthropic: #2a78d6;
+    --p-gemini: #eb6834;
+    --p-openai: #1baf7a;
+    --mark-res: rgba(237, 161, 0, 0.30);
+    --mark-search: rgba(42, 120, 214, 0.25);
+    --shadow: 0 1px 2px rgba(11, 11, 11, 0.06);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --theme: dark;
+      --page: #0d0d0d;
+      --surface: #1a1a19;
+      --surface-2: #232321;
+      --ink: #ffffff;
+      --ink-2: #c3c2b7;
+      --muted: #898781;
+      --grid: #2c2c2a;
+      --axis: #383835;
+      --border: rgba(255, 255, 255, 0.10);
+      --focus: #3987e5;
+      --p-anthropic: #3987e5;
+      --p-gemini: #d95926;
+      --p-openai: #199e70;
+      --mark-res: rgba(201, 133, 0, 0.40);
+      --mark-search: rgba(57, 135, 229, 0.40);
+      --shadow: none;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --theme: dark;
+    --page: #0d0d0d;
+    --surface: #1a1a19;
+    --surface-2: #232321;
+    --ink: #ffffff;
+    --ink-2: #c3c2b7;
+    --muted: #898781;
+    --grid: #2c2c2a;
+    --axis: #383835;
+    --border: rgba(255, 255, 255, 0.10);
+    --focus: #3987e5;
+    --p-anthropic: #3987e5;
+    --p-gemini: #d95926;
+    --p-openai: #199e70;
+    --mark-res: rgba(201, 133, 0, 0.40);
+    --mark-search: rgba(57, 135, 229, 0.40);
+    --shadow: none;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background: var(--page);
+    color: var(--ink);
+    font: 14px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  button, input, select { font: inherit; color: inherit; }
+  a { color: var(--focus); }
+  :focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+  /* ---------- Header & global controls ---------- */
+  .top {
+    position: sticky; top: 0; z-index: 20;
+    background: var(--page);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 24px;
+    display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: center;
+  }
+  .title h1 { font-size: 17px; margin: 0; font-weight: 650; letter-spacing: -0.01em; }
+  .title p { margin: 0; color: var(--ink-2); font-size: 12.5px; }
+  .top .spacer { flex: 1; }
+  .seg {
+    display: inline-flex; background: var(--surface-2); border-radius: 8px; padding: 3px; gap: 2px;
+    flex-wrap: wrap;
+  }
+  .seg button {
+    border: 0; background: transparent; padding: 4px 11px; border-radius: 6px;
+    cursor: pointer; color: var(--ink-2); white-space: nowrap;
+  }
+  .seg button:hover { color: var(--ink); }
+  .seg button[aria-pressed="true"] {
+    background: var(--surface); color: var(--ink); box-shadow: var(--shadow);
+    outline: 1px solid var(--border);
+  }
+  .ctl-label { font-size: 12px; color: var(--muted); margin-right: 6px; }
+  .icon-btn {
+    border: 1px solid var(--border); background: var(--surface); border-radius: 8px;
+    padding: 4px 10px; cursor: pointer;
+  }
+
+  /* ---------- Layout ---------- */
+  .layout { display: grid; grid-template-columns: 290px minmax(0, 1fr); min-height: calc(100vh - 64px); }
+  .rail {
+    border-right: 1px solid var(--border); padding: 16px; position: sticky; top: 64px;
+    align-self: start; max-height: calc(100vh - 64px); overflow-y: auto;
+  }
+  .content { padding: 16px 24px 48px; min-width: 0; }
+
+  .search { position: relative; margin-bottom: 14px; }
+  .search input {
+    width: 100%; padding: 7px 30px 7px 10px; border-radius: 8px;
+    border: 1px solid var(--border); background: var(--surface);
+  }
+  .search .clear {
+    position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
+    border: 0; background: transparent; cursor: pointer; color: var(--muted); font-size: 16px;
+  }
+  .rail h3 {
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted);
+    margin: 0 0 6px; font-weight: 600;
+  }
+  .qlist { list-style: none; margin: 0; padding: 0; }
+  .qlist button {
+    width: 100%; text-align: left; border: 0; background: transparent; cursor: pointer;
+    padding: 7px 8px; border-radius: 8px; display: grid; grid-template-columns: 26px 1fr auto;
+    gap: 6px; align-items: baseline;
+  }
+  .qlist button:hover { background: var(--surface-2); }
+  .qlist button[aria-current="true"] { background: var(--surface); outline: 1px solid var(--border); box-shadow: var(--shadow); }
+  .qlist .qn { color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+  .qlist .badge {
+    font-size: 11px; color: var(--ink-2); background: var(--surface-2); border-radius: 10px;
+    padding: 0 7px; font-variant-numeric: tabular-nums;
+  }
+  .qlist button.nomatch { opacity: 0.45; }
+  .rail .hint { margin-top: 14px; font-size: 12px; color: var(--muted); }
+  kbd {
+    font: 11px ui-monospace, SFMono-Regular, Menlo, monospace; border: 1px solid var(--border);
+    border-radius: 4px; padding: 0 4px; background: var(--surface);
+  }
+
+  .tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border); margin-bottom: 18px; flex-wrap: wrap; }
+  .tabs button {
+    border: 0; background: transparent; padding: 8px 12px; cursor: pointer; color: var(--ink-2);
+    border-bottom: 2px solid transparent; margin-bottom: -1px;
+  }
+  .tabs button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--ink); font-weight: 600; }
+
+  .panel[hidden] { display: none; }
+  .panel h2 { font-size: 16px; margin: 0 0 4px; font-weight: 650; }
+  .panel .sub { color: var(--ink-2); margin: 0 0 14px; max-width: 80ch; }
+  .note { color: var(--muted); font-size: 12.5px; max-width: 90ch; }
+  .row { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; margin-bottom: 14px; }
+
+  /* ---------- Responses ---------- */
+  .qhead { display: flex; gap: 16px; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; }
+  .qhead .eyebrow { font-size: 12px; color: var(--muted); }
+  .qhead h2 { font-size: 20px; margin: 2px 0 2px; letter-spacing: -0.01em; }
+  .qhead .asked { color: var(--ink-2); font-size: 13px; }
+  .pager { display: flex; gap: 6px; }
+  .chip {
+    display: inline-flex; align-items: center; gap: 6px; font-size: 12px;
+    border: 1px solid var(--border); border-radius: 999px; padding: 1px 4px 1px 10px; background: var(--surface);
+  }
+  .chip button { border: 0; background: transparent; cursor: pointer; color: var(--muted); padding: 0 4px; }
+  label.toggle { display: inline-flex; gap: 6px; align-items: center; cursor: pointer; font-size: 13px; color: var(--ink-2); }
+  .legend-inline { font-size: 12px; color: var(--muted); display: inline-flex; gap: 10px; align-items: center; }
+  .sw { display: inline-block; width: 18px; height: 12px; border-radius: 3px; vertical-align: -1px; }
+
+  .rgrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  .colhead { padding: 4px 2px 0; }
+  .colhead .name { font-weight: 650; display: flex; align-items: center; gap: 7px; }
+  .colhead .meta { font-size: 12px; color: var(--muted); }
+  .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; flex: none; }
+
+  .card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+    box-shadow: var(--shadow); display: flex; flex-direction: column; min-width: 0;
+    border-top: 3px solid var(--pc, var(--axis));
+  }
+  .card.dim { opacity: 0.4; }
+  .card header {
+    display: flex; gap: 8px; align-items: baseline; padding: 9px 12px 7px;
+    border-bottom: 1px solid var(--border); flex-wrap: wrap;
+  }
+  .card header b { font-size: 13px; }
+  .card .stats { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .md {
+    padding: 4px 14px 10px; max-height: 26rem; overflow-y: auto; font-size: 13.5px;
+    overflow-wrap: anywhere; position: relative;
+  }
+  .expanded .md { max-height: none; }
+  /* Fade over the bottom of a truncated response, with a button to expand. */
+  .md-wrap { position: relative; }
+  .md-fade {
+    position: absolute; left: 0; right: 0; bottom: 0; height: 76px;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0), var(--surface) 80%);
+    display: flex; align-items: flex-end; justify-content: center; padding-bottom: 8px;
+    pointer-events: none; transition: opacity 0.15s;
+  }
+  .md-fade button {
+    pointer-events: auto; cursor: pointer; font-size: 12px; color: var(--ink-2);
+    background: var(--surface); border: 1px solid var(--border); border-radius: 999px;
+    padding: 2px 12px; box-shadow: var(--shadow);
+  }
+  .md-fade button:hover { color: var(--ink); border-color: var(--axis); }
+  .md-wrap.at-end .md-fade { opacity: 0; }
+  .md-wrap.at-end .md-fade button { pointer-events: none; }
+  .md h1, .md h2, .md h3, .md h4 { font-size: 14px; margin: 12px 0 4px; }
+  .md p { margin: 8px 0; }
+  .md ul, .md ol { padding-left: 20px; margin: 6px 0; }
+  .md li { margin: 2px 0; }
+  .md hr { border: 0; border-top: 1px solid var(--grid); margin: 10px 0; }
+  .md table { border-collapse: collapse; font-size: 12.5px; display: block; overflow-x: auto; }
+  .md th, .md td { border: 1px solid var(--grid); padding: 3px 6px; text-align: left; vertical-align: top; }
+  .md blockquote { margin: 6px 0; padding-left: 10px; border-left: 3px solid var(--grid); color: var(--ink-2); }
+  mark { color: inherit; border-radius: 2px; padding: 0 1px; }
+  mark.hl-res { background: var(--mark-res); }
+  mark.hl-search { background: var(--mark-search); outline: 1px solid var(--focus); }
+  .card footer { border-top: 1px solid var(--border); padding: 8px 12px 10px; font-size: 12.5px; }
+  .card footer .rtags { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 6px; }
+  .rtag {
+    font-size: 11px; padding: 0 7px; border-radius: 999px; background: var(--surface-2); color: var(--ink-2);
+    border: 1px solid transparent; cursor: pointer;
+  }
+  .rtag.on { border-color: var(--ink-2); color: var(--ink); }
+  details { margin-top: 4px; }
+  summary { cursor: pointer; color: var(--ink-2); }
+  details ol, details ul { margin: 4px 0 2px; padding-left: 18px; }
+  details li { margin: 2px 0; }
+  .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; }
+  .src-title { color: var(--muted); }
+  .empty { color: var(--muted); font-style: italic; }
+
+  /* ---------- Charts ---------- */
+  .chart-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+    padding: 16px 18px; margin-bottom: 18px; box-shadow: var(--shadow);
+  }
+  .chart-card h3 { margin: 0 0 2px; font-size: 14.5px; font-weight: 650; }
+  .scroll-x { overflow-x: auto; }
+  svg text { fill: var(--ink-2); font-size: 12px; }
+  svg .label-strong { fill: var(--ink); font-weight: 600; }
+  svg .muted { fill: var(--muted); }
+  svg .grid line { stroke: var(--grid); }
+  svg .axis path, svg .axis line { stroke: var(--axis); }
+  .cell { cursor: pointer; }
+  .legend { display: flex; flex-wrap: wrap; gap: 6px 16px; align-items: center; font-size: 12.5px; color: var(--ink-2); margin: 6px 0 8px; }
+  .legend-grid {
+    display: grid; grid-template-columns: max-content 1fr; gap: 2px 14px; align-items: center;
+    margin: 10px 0 12px; padding: 8px 12px; background: var(--surface-2); border-radius: 8px; width: fit-content; max-width: 100%;
+  }
+  .legend-grid .legend { margin: 0; }
+  .legend-key { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); font-weight: 600; }
+  .legend .item { display: inline-flex; align-items: center; gap: 6px; }
+  .multiples { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+  .multiples h4 { margin: 0 0 6px; font-size: 13px; display: flex; align-items: center; gap: 7px; }
+  table.data { border-collapse: collapse; font-size: 12.5px; margin-top: 8px; font-variant-numeric: tabular-nums; }
+  table.data th, table.data td { border-bottom: 1px solid var(--grid); padding: 4px 8px; text-align: right; }
+  table.data th:first-child, table.data td:first-child { text-align: left; }
+  table.data thead th { color: var(--muted); font-weight: 600; }
+  .sq-list { list-style: none; padding: 0; margin: 0; }
+  .sq-list li { padding: 3px 0; border-bottom: 1px solid var(--grid); display: flex; gap: 8px; justify-content: space-between; }
+  .sq-list .k { color: var(--muted); font-size: 12px; white-space: nowrap; }
+  .sq-loc { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin: 10px 0 2px; }
+
+  .tooltip {
+    position: fixed; pointer-events: none; z-index: 50; background: var(--surface); color: var(--ink);
+    border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; font-size: 12.5px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.14); max-width: 300px; opacity: 0; transition: opacity 0.08s;
+  }
+  .tooltip .tt-title { font-weight: 600; margin-bottom: 2px; }
+  .tooltip .tt-muted { color: var(--muted); }
+
+  .fatal { max-width: 640px; margin: 80px auto; padding: 0 16px; }
+  .fatal code { background: var(--surface-2); padding: 2px 6px; border-radius: 4px; }
+
+  @media (max-width: 1100px) {
+    .rgrid, .multiples { grid-template-columns: minmax(0, 1fr); }
+    .rgrid .colhead { display: none; }
+    .card .who { display: inline-flex !important; }
+  }
+  @media (max-width: 760px) {
+    .top { padding: 10px 16px; position: static; }
+    .layout { grid-template-columns: minmax(0, 1fr); }
+    .rail { position: static; max-height: none; border-right: 0; border-bottom: 1px solid var(--border); }
+    .content { padding: 16px 16px 40px; }
+  }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div class="tooltip" id="tooltip" role="tooltip"></div>
+
+<script>
+(function () {
+  "use strict";
+
+  const D = window.PILOT_EXPLORER_DATA;
+  const app = document.getElementById("app");
+  if (!D || !window.d3) {
+    app.innerHTML = `<div class="fatal"><h1>Data not found</h1>
+      <p>${window.d3 ? "" : "D3 failed to load (are you offline?). "}
+      This page reads <code>data/processed/pilot_explorer_data.js</code>, which is not in git.
+      Build it from the project root with:</p>
+      <p><code>uv run python code/analysis/compute_response_measures.py</code><br>
+      <code>uv run python code/generate_figures/build_pilot_explorer_data.py</code></p>
+      <p>The <code>data/</code> symlink must point at the project data folder.</p></div>`;
+    return;
+  }
+
+  // ------------------------------------------------------------------
+  // Lookups
+  // ------------------------------------------------------------------
+  const PROVIDERS = D.providers;
+  const LOCATIONS = D.locations;
+  const QUERIES = D.queries;
+  const RESOURCES = D.resources;
+  const METRICS = D.metrics;
+  const provById = new Map(PROVIDERS.map((p) => [p.id, p]));
+  const locById = new Map(LOCATIONS.map((l) => [l.id, l]));
+  const resById = new Map(RESOURCES.map((r) => [r.id, r]));
+  const LOC_SHORT = { none: "None", "houston-tx": "Houston", "portland-or": "Portland" };
+  // Same patterns, same flags as toolkit/resources.py (re.IGNORECASE).
+  const resRegex = new Map(RESOURCES.map((r) => [r.id, new RegExp(r.pattern, "gi")]));
+
+  // responses[query][location][provider] -> array sorted by repeat
+  const cells = d3.group(D.responses, (r) => r.query, (r) => r.location, (r) => r.provider);
+  cells.forEach((byLoc) => byLoc.forEach((byProv) => byProv.forEach((arr) => arr.sort((a, b) => a.repeat - b.repeat))));
+  const cellResponses = (q, loc, p) => cells.get(q)?.get(loc)?.get(p) || [];
+
+  const fmtPct = (v) => (v == null ? "n/a" : `${Math.round(v * 100)}%`);
+  const fmtNum = (v, unit) => {
+    if (v == null) return "n/a";
+    if (unit === "share") return fmtPct(v);
+    if (unit === "words" || Number.isInteger(v)) return d3.format(",.0f")(v);
+    return d3.format(".1f")(v);
+  };
+  const cssVar = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  const provColor = (id) => cssVar(`--p-${id}`);
+  const isDark = () => cssVar("--theme") === "dark";
+
+  // ------------------------------------------------------------------
+  // State (mirrored to the URL hash so a view can be linked)
+  // ------------------------------------------------------------------
+  const state = {
+    tab: "responses",
+    q: QUERIES[0].id,
+    loc: "none",          // a location id, or "compare"
+    cprov: PROVIDERS[0].id, // provider shown in compare mode
+    search: "",
+    hlRes: true,
+    resFocus: null,       // a resource id the rail and cards filter on
+    expand: false,
+    metric: "n_words",
+    resScope: "all",
+    domKind: "cited",
+    tables: false,
+  };
+  const HASH_KEYS = ["tab", "q", "loc", "cprov", "metric", "resScope", "domKind"];
+
+  function readHash() {
+    const params = new URLSearchParams(location.hash.slice(1));
+    for (const k of HASH_KEYS) if (params.has(k)) state[k] = params.get(k);
+    if (params.has("res")) state.resFocus = resById.has(params.get("res")) ? params.get("res") : null;
+    if (!QUERIES.some((q) => q.id === state.q)) state.q = QUERIES[0].id;
+    if (state.loc !== "compare" && !locById.has(state.loc)) state.loc = "none";
+    if (!provById.has(state.cprov)) state.cprov = PROVIDERS[0].id;
+  }
+  function writeHash() {
+    const params = new URLSearchParams();
+    for (const k of HASH_KEYS) params.set(k, state[k]);
+    if (state.resFocus) params.set("res", state.resFocus);
+    history.replaceState(null, "", `#${params}`);
+  }
+  function setState(patch) {
+    Object.assign(state, patch);
+    writeHash();
+    render();
+  }
+
+  // ------------------------------------------------------------------
+  // Static shell
+  // ------------------------------------------------------------------
+  const nResp = D.responses.length;
+  app.innerHTML = `
+    <header class="top">
+      <div class="title">
+        <h1>Pilot response explorer</h1>
+        <p>${nResp} responses · ${QUERIES.length} queries × ${LOCATIONS.length} locations × ${PROVIDERS.length} providers × 3 repeats · built ${D.generated_at}</p>
+      </div>
+      <div class="spacer"></div>
+      <div><span class="ctl-label">Location</span><div class="seg" id="locSeg" role="group" aria-label="Location"></div></div>
+      <button class="icon-btn" id="themeBtn" aria-label="Toggle dark mode">◐</button>
+    </header>
+    <div class="layout">
+      <aside class="rail">
+        <div class="search">
+          <input id="searchInput" type="text" placeholder="Search response text…" aria-label="Search response text">
+          <button class="clear" id="searchClear" aria-label="Clear search" hidden>×</button>
+        </div>
+        <h3>Queries</h3>
+        <ul class="qlist" id="qlist"></ul>
+        <p class="hint"><kbd>↑</kbd> <kbd>↓</kbd> or <kbd>j</kbd> <kbd>k</kbd> step through queries. Badges count matching responses.</p>
+      </aside>
+      <main class="content">
+        <nav class="tabs" role="tablist" id="tabs"></nav>
+        <section class="panel" id="panel-responses"></section>
+        <section class="panel" id="panel-overview" hidden></section>
+        <section class="panel" id="panel-resources" hidden></section>
+        <section class="panel" id="panel-search" hidden></section>
+      </main>
+    </div>`;
+
+  const TABS = [
+    { id: "responses", label: "Responses" },
+    { id: "overview", label: "Overview" },
+    { id: "resources", label: "Resources named" },
+    { id: "search", label: "Search & sources" },
+  ];
+
+  d3.select("#tabs").selectAll("button").data(TABS).join("button")
+    .attr("role", "tab").text((d) => d.label)
+    .on("click", (e, d) => setState({ tab: d.id }));
+
+  d3.select("#locSeg").selectAll("button")
+    .data([...LOCATIONS, { id: "compare", label: "Compare locations" }])
+    .join("button").text((d) => d.label)
+    .on("click", (e, d) => setState({ loc: d.id }));
+
+  const searchInput = document.getElementById("searchInput");
+  const searchClear = document.getElementById("searchClear");
+  let searchTimer;
+  searchInput.addEventListener("input", () => {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => setState({ search: searchInput.value.trim() }), 150);
+  });
+  searchClear.addEventListener("click", () => {
+    searchInput.value = "";
+    setState({ search: "" });
+  });
+
+  // Theme: the toggle wins over the OS setting; remembered per browser.
+  const themeBtn = document.getElementById("themeBtn");
+  try {
+    const saved = localStorage.getItem("pilot-explorer-theme");
+    if (saved) document.documentElement.dataset.theme = saved;
+  } catch (e) { /* storage unavailable */ }
+  themeBtn.addEventListener("click", () => {
+    const next = isDark() ? "light" : "dark";
+    document.documentElement.dataset.theme = next;
+    try { localStorage.setItem("pilot-explorer-theme", next); } catch (e) { /* ignore */ }
+    render();
+  });
+  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", render);
+
+  document.addEventListener("keydown", (e) => {
+    if (e.target.closest("input, select, textarea") || e.metaKey || e.ctrlKey || e.altKey) return;
+    const i = QUERIES.findIndex((q) => q.id === state.q);
+    if (e.key === "ArrowDown" || e.key === "j") { e.preventDefault(); setState({ q: QUERIES[Math.min(i + 1, QUERIES.length - 1)].id }); }
+    if (e.key === "ArrowUp" || e.key === "k") { e.preventDefault(); setState({ q: QUERIES[Math.max(i - 1, 0)].id }); }
+  });
+
+  // ------------------------------------------------------------------
+  // Tooltip
+  // ------------------------------------------------------------------
+  const tip = d3.select("#tooltip");
+  function showTip(event, html) {
+    tip.html(html).style("opacity", 1);
+    const { innerWidth: w, innerHeight: h } = window;
+    const box = tip.node().getBoundingClientRect();
+    let x = event.clientX + 14, y = event.clientY + 14;
+    if (x + box.width > w - 8) x = event.clientX - box.width - 14;
+    if (y + box.height > h - 8) y = event.clientY - box.height - 14;
+    tip.style("left", `${x}px`).style("top", `${y}px`);
+  }
+  const hideTip = () => tip.style("opacity", 0);
+
+  // ------------------------------------------------------------------
+  // Filtering (text search and resource focus)
+  // ------------------------------------------------------------------
+  const escapeRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const scopeLocations = () => (state.loc === "compare" ? LOCATIONS.map((l) => l.id) : [state.loc]);
+  const filterActive = () => Boolean(state.search || state.resFocus);
+  function matches(r) {
+    if (state.search && !r.text.toLowerCase().includes(state.search.toLowerCase())) return false;
+    if (state.resFocus && !r.resources.includes(state.resFocus)) return false;
+    return true;
+  }
+  function queryMatchCount(qid) {
+    let k = 0, n = 0;
+    for (const loc of scopeLocations()) {
+      for (const p of PROVIDERS) {
+        for (const r of cellResponses(qid, loc, p.id)) { n++; if (matches(r)) k++; }
+      }
+    }
+    return { k, n };
+  }
+
+  // Wrap regex matches in text nodes with <mark>, leaving markup intact.
+  function highlight(root, regex, className, titleText) {
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    const nodes = [];
+    while (walker.nextNode()) nodes.push(walker.currentNode);
+    for (const node of nodes) {
+      const text = node.nodeValue;
+      regex.lastIndex = 0;
+      if (!regex.test(text)) continue;
+      regex.lastIndex = 0;
+      const frag = document.createDocumentFragment();
+      let last = 0, m;
+      while ((m = regex.exec(text)) !== null) {
+        if (m[0].length === 0) { regex.lastIndex++; continue; }
+        frag.append(text.slice(last, m.index));
+        const mark = document.createElement("mark");
+        mark.className = className;
+        if (titleText) mark.title = titleText;
+        mark.textContent = m[0];
+        frag.append(mark);
+        last = m.index + m[0].length;
+      }
+      frag.append(text.slice(last));
+      node.replaceWith(frag);
+    }
+  }
+
+  const mdCache = new Map();
+  function renderMarkdown(r) {
+    if (!mdCache.has(r.id)) {
+      mdCache.set(r.id, DOMPurify.sanitize(marked.parse(r.text, { gfm: true })));
+    }
+    return mdCache.get(r.id);
+  }
+
+  // ------------------------------------------------------------------
+  // Render: global controls and rail
+  // ------------------------------------------------------------------
+  function renderControls() {
+    d3.select("#locSeg").selectAll("button").attr("aria-pressed", (d) => d.id === state.loc);
+    d3.select("#tabs").selectAll("button").attr("aria-selected", (d) => d.id === state.tab);
+    for (const t of TABS) document.getElementById(`panel-${t.id}`).hidden = t.id !== state.tab;
+    searchClear.hidden = !state.search;
+  }
+
+  function renderRail() {
+    const items = d3.select("#qlist").selectAll("li").data(QUERIES, (d) => d.id).join((enter) => {
+      const li = enter.append("li");
+      const b = li.append("button").on("click", (e, d) => setState({ q: d.id }));
+      b.append("span").attr("class", "qn");
+      b.append("span").attr("class", "qt");
+      b.append("span").attr("class", "badge");
+      return li;
+    });
+    items.select("button")
+      .attr("aria-current", (d) => d.id === state.q)
+      .classed("nomatch", (d) => filterActive() && queryMatchCount(d.id).k === 0);
+    items.select(".qn").text((d, i) => `Q${i + 1}`);
+    items.select(".qt").text((d) => d.text);
+    items.select(".badge")
+      .style("display", filterActive() ? null : "none")
+      .text((d) => { const c = queryMatchCount(d.id); return `${c.k}/${c.n}`; })
+      .attr("title", "Responses matching the search or resource filter, in the selected location(s)");
+  }
+
+  // ------------------------------------------------------------------
+  // Panel: responses
+  // ------------------------------------------------------------------
+  function renderResponses() {
+    const panel = d3.select("#panel-responses").html("");
+    const qi = QUERIES.findIndex((q) => q.id === state.q);
+    const query = QUERIES[qi];
+    const compare = state.loc === "compare";
+
+    const head = panel.append("div").attr("class", "qhead");
+    const left = head.append("div");
+    left.append("div").attr("class", "eyebrow").text(`Query ${qi + 1} of ${QUERIES.length}`);
+    left.append("h2").text(query.text);
+    if (compare) {
+      left.append("div").attr("class", "asked")
+        .text("Asked as: " + LOCATIONS.map((l) => `“${query.variants[l.id]}”`).join(" · "));
+    } else if (state.loc !== "none") {
+      left.append("div").attr("class", "asked").text(`Asked as: “${query.variants[state.loc]}”`);
+    }
+    const pager = head.append("div").attr("class", "pager");
+    pager.append("button").attr("class", "icon-btn").text("← Prev").property("disabled", qi === 0)
+      .on("click", () => setState({ q: QUERIES[qi - 1].id }));
+    pager.append("button").attr("class", "icon-btn").text("Next →").property("disabled", qi === QUERIES.length - 1)
+      .on("click", () => setState({ q: QUERIES[qi + 1].id }));
+
+    // Toolbar
+    const bar = panel.append("div").attr("class", "row").style("margin-top", "14px");
+    if (compare) {
+      const g = bar.append("div");
+      g.append("span").attr("class", "ctl-label").text("Provider");
+      g.append("div").attr("class", "seg").selectAll("button").data(PROVIDERS).join("button")
+        .text((d) => d.label).attr("aria-pressed", (d) => d.id === state.cprov)
+        .on("click", (e, d) => setState({ cprov: d.id }));
+    }
+    const t1 = bar.append("label").attr("class", "toggle");
+    t1.append("input").attr("type", "checkbox").property("checked", state.hlRes)
+      .on("change", (e) => setState({ hlRes: e.target.checked }));
+    t1.append("span").text("Highlight resources");
+    const t2 = bar.append("label").attr("class", "toggle");
+    t2.append("input").attr("type", "checkbox").property("checked", state.expand)
+      .on("change", (e) => setState({ expand: e.target.checked }));
+    t2.append("span").text("Show full length");
+    if (state.resFocus) {
+      const chip = bar.append("span").attr("class", "chip");
+      chip.append("span").text(`Names: ${resById.get(state.resFocus).label}`);
+      chip.append("button").attr("aria-label", "Clear resource filter").text("×")
+        .on("click", () => setState({ resFocus: null }));
+    }
+    const lg = bar.append("span").attr("class", "legend-inline");
+    if (state.hlRes) lg.html(`<span><span class="sw" style="background:var(--mark-res)"></span> resource name</span>`);
+    if (state.search) lg.append("span").html(`<span class="sw" style="background:var(--mark-search)"></span> search match`);
+
+    // Grid: columns are providers (one location) or locations (compare).
+    const columns = compare
+      ? LOCATIONS.map((l) => ({ key: l.id, title: l.label, meta: `“${query.variants[l.id]}”`, provider: state.cprov, loc: l.id }))
+      : PROVIDERS.map((p) => ({ key: p.id, title: p.label, meta: p.model, provider: p.id, loc: state.loc }));
+
+    const grid = panel.append("div").attr("class", "rgrid");
+    for (const c of columns) {
+      const h = grid.append("div").attr("class", "colhead");
+      const n = h.append("div").attr("class", "name");
+      n.append("span").attr("class", "dot").style("background", provColor(c.provider));
+      n.append("span").text(compare ? `${provById.get(c.provider).label} · ${c.title}` : c.title);
+      h.append("div").attr("class", "meta").text(c.meta);
+    }
+    const searchRe = state.search ? new RegExp(escapeRe(state.search), "gi") : null;
+    for (let rep = 0; rep < 3; rep++) {
+      for (const c of columns) {
+        const r = cellResponses(state.q, c.loc, c.provider)[rep];
+        if (!r) { grid.append("div").attr("class", "card").append("p").attr("class", "md empty").text("No response."); continue; }
+        renderCard(grid, r, compare ? `${provById.get(c.provider).label} · ${LOC_SHORT[c.loc]}` : provById.get(c.provider).label, searchRe);
+      }
+    }
+    panel.append("p").attr("class", "note").style("margin-top", "14px").html(
+      "Stats per card: words (URLs removed) · seconds to respond · web-search calls · distinct URLs cited in the answer. " +
+      "Anthropic attaches no citations to its answer text, so its cited count is n/a; its sources appear under “Search & sources”. " +
+      "Resource highlights are keyword matches (<span class='mono'>toolkit/resources.py</span>), not endorsements.");
+  }
+
+  // When a response is cut off, fade its bottom edge and offer a button that
+  // turns on "Show full length". The fade hides once the text is scrolled to its end.
+  function addFade(wrap, mdNode, cardNode, id) {
+    if (mdNode.scrollHeight <= mdNode.clientHeight + 1) return;
+    const fade = wrap.append("div").attr("class", "md-fade");
+    fade.append("button").attr("type", "button").text("Show full length ↓")
+      .on("click", () => {
+        // Keep the clicked card where it was on screen after the re-render.
+        const top = cardNode.getBoundingClientRect().top;
+        setState({ expand: true });
+        const again = document.querySelector(`.card[data-id="${CSS.escape(id)}"]`);
+        if (again) window.scrollBy(0, again.getBoundingClientRect().top - top);
+      });
+    const update = () => wrap.classed("at-end", mdNode.scrollTop + mdNode.clientHeight >= mdNode.scrollHeight - 4);
+    mdNode.addEventListener("scroll", update, { passive: true });
+    update();
+  }
+
+  function renderCard(grid, r, who, searchRe) {
+    const card = grid.append("article").attr("class", "card").attr("data-id", r.id)
+      .classed("expanded", state.expand)
+      .classed("dim", filterActive() && !matches(r))
+      .style("--pc", provColor(r.provider));
+    const h = card.append("header");
+    h.append("span").attr("class", "who").style("display", "none").style("align-items", "center").style("gap", "6px")
+      .html(`<span class="dot" style="background:${provColor(r.provider)}"></span><b>${who}</b>`);
+    h.append("b").text(`Run ${r.repeat + 1}`);
+    const cited = r.n_cited_urls == null ? "cited n/a" : `${r.n_cited_urls} cited`;
+    h.append("span").attr("class", "stats")
+      .text(`${r.n_words} words · ${r.latency_s} s · ${r.n_searches} search${r.n_searches === 1 ? "" : "es"} · ${cited}`);
+
+    const wrap = card.append("div").attr("class", "md-wrap");
+    const md = wrap.append("div").attr("class", "md").html(renderMarkdown(r));
+    md.selectAll("a").attr("target", "_blank").attr("rel", "noopener noreferrer");
+    if (state.hlRes) {
+      const ids = state.resFocus ? [state.resFocus] : r.resources;
+      for (const id of ids) highlight(md.node(), resRegex.get(id), "hl-res", resById.get(id).label);
+    }
+    if (searchRe) {
+      highlight(md.node(), searchRe, "hl-search");
+      // Scroll the card so its first search match is in view.
+      const first = md.node().querySelector("mark.hl-search");
+      if (first && !state.expand) md.node().scrollTop = Math.max(0, first.offsetTop - 60);
+    }
+    if (!state.expand) addFade(wrap, md.node(), card.node(), r.id);
+
+    const f = card.append("footer");
+    const tags = f.append("div").attr("class", "rtags");
+    if (r.resources.length === 0) tags.append("span").attr("class", "empty").text("No lexicon resources named");
+    tags.selectAll("button").data(r.resources).join("button").attr("class", "rtag")
+      .classed("on", (d) => d === state.resFocus)
+      .attr("title", "Filter to responses naming this resource")
+      .text((d) => resById.get(d).label)
+      .on("click", (e, d) => setState({ resFocus: state.resFocus === d ? null : d, hlRes: true }));
+
+    const s = f.append("details");
+    s.append("summary").text(`Search queries (${d3.sum(r.searches, (x) => x.length)})`);
+    if (r.searches.length === 0) s.append("div").attr("class", "empty").text("No web search.");
+    else s.append("ol").selectAll("li").data(r.searches).join("li").attr("class", "mono").text((d) => d.join(" | ") || "(no query text)");
+
+    const c = f.append("details");
+    c.append("summary").text(r.n_cited_urls == null ? "Cited sources (not reported)" : `Cited sources (${r.cited.length})`);
+    if (r.cited.length === 0) {
+      c.append("div").attr("class", "empty").text(r.n_cited_urls == null
+        ? "Anthropic does not attach citations to its answer text." : "No citations attached.");
+    } else {
+      const li = c.append("ul").selectAll("li").data(r.cited).join("li");
+      li.append("a").attr("href", (d) => d.url).attr("target", "_blank").attr("rel", "noopener noreferrer").text((d) => d.domain || d.url);
+      li.append("span").attr("class", "src-title").text((d) => (d.title && d.title !== d.domain ? ` — ${d.title}` : ""));
+    }
+  }
+
+  // ------------------------------------------------------------------
+  // Shared column layout (resource matrix)
+  // ------------------------------------------------------------------
+  function columnLayout(locs, colW, groupGap) {
+    const cols = [];
+    let x = 0;
+    PROVIDERS.forEach((p, pi) => {
+      if (pi > 0) x += groupGap;
+      locs.forEach((l) => { cols.push({ provider: p.id, loc: l, x }); x += colW; });
+    });
+    return { cols, width: x };
+  }
+
+  function drawColumnHeaders(g, cols, locs, colW) {
+    const groups = d3.groups(cols, (c) => c.provider);
+    for (const [pid, cs] of groups) {
+      const x0 = cs[0].x, x1 = cs[cs.length - 1].x + colW;
+      const gh = g.append("g").attr("transform", `translate(${(x0 + x1) / 2},0)`);
+      const label = provById.get(pid).label;
+      gh.append("circle").attr("cx", -label.length * 3.6 - 10).attr("cy", -4).attr("r", 5).attr("fill", provColor(pid));
+      gh.append("text").attr("class", "label-strong").attr("text-anchor", "middle").text(label);
+      if (locs.length > 1) {
+        g.selectAll(null).data(cs).join("text").attr("class", "muted").attr("text-anchor", "middle")
+          .attr("x", (c) => c.x + colW / 2).attr("y", 17).style("font-size", "11px")
+          .text((c) => LOC_SHORT[c.loc]);
+      }
+    }
+  }
+
+  // ------------------------------------------------------------------
+  // Panel: overview dot plots (one panel per location)
+  // ------------------------------------------------------------------
+  // Each repeat gets its own hollow marker shape; the mean is a filled dot.
+  const RUN_SYMBOLS = [d3.symbolCircle, d3.symbolSquare, d3.symbolTriangle];
+  const RUN_SYMBOL_SIZE = 70;
+  const RUN_OPACITY = 0.7;
+  // The mean is the headline mark: larger than a run marker, filled, with an ink outline.
+  const MEAN_R = 5.5;
+  const runPath = (i) => d3.symbol(RUN_SYMBOLS[i], RUN_SYMBOL_SIZE)();
+  const metricValue = (r, id) => (r[id] == null ? null : Number(r[id]));
+
+  // Split a label into lines of at most `max` characters, on word breaks.
+  function wrapWords(text, max) {
+    const lines = [];
+    let line = "";
+    for (const w of text.split(" ")) {
+      if (line && (line + " " + w).length > max) { lines.push(line); line = w; } else line = line ? `${line} ${w}` : w;
+    }
+    if (line) lines.push(line);
+    return lines;
+  }
+
+  // Legend in two labeled rows: what the colors mean, then what the shapes mean.
+  function overviewLegend(card, metric) {
+    const legend = card.append("div").attr("class", "legend-grid");
+    legend.append("span").attr("class", "legend-key").text("Provider");
+    const prov = legend.append("div").attr("class", "legend");
+    PROVIDERS.forEach((p) => {
+      const reported = D.cell_means.some((d) => d.provider === p.id && d[metric.id] != null);
+      prov.append("span").attr("class", "item")
+        .html(`<span class="dot" style="background:${provColor(p.id)}"></span>${p.label}${reported ? "" : " (not reported)"}`);
+    });
+    legend.append("span").attr("class", "legend-key").text("Markers");
+    const marks = legend.append("div").attr("class", "legend");
+    const ink = cssVar("--ink-2");
+    [0, 1, 2].forEach((i) => marks.append("span").attr("class", "item")
+      .html(`<svg width="14" height="14" viewBox="-7 -7 14 14"><path d="${runPath(i)}" fill="none" stroke="${ink}" stroke-width="1.4" opacity="${RUN_OPACITY}"/></svg>Run ${i + 1}`));
+    marks.append("span").attr("class", "item")
+      .html(`<svg width="16" height="16" viewBox="-8 -8 16 16"><circle r="${MEAN_R}" fill="${cssVar("--muted")}" stroke="${cssVar("--ink")}" stroke-width="1.5"/></svg>Mean of 3 runs`);
+  }
+
+  // Open a query's responses from the overview. In compare mode the Responses tab
+  // shows one provider across locations, so focus the clicked provider.
+  const openResponses = (qid, pid) =>
+    setState(state.loc === "compare" ? { q: qid, cprov: pid, tab: "responses" } : { q: qid, tab: "responses" });
+
+  function renderOverview() {
+    const panel = d3.select("#panel-overview").html("");
+    const metric = METRICS.find((m) => m.id === state.metric) || METRICS[0];
+    // Skip the unit when it is a share or already in the label ("Search calls (calls)").
+    const unitText = metric.unit === "share" || metric.label.toLowerCase().includes(metric.unit) ? "" : ` (${metric.unit})`;
+    panel.append("h2").text("Overview by query and provider");
+    // Follow the global location control: one panel, or all three when comparing.
+    const compare = state.loc === "compare";
+    const shownLocs = compare ? LOCATIONS : [locById.get(state.loc)];
+    panel.append("p").attr("class", "sub").text(
+      "Each row is a query; within it, each provider has a line showing its three runs (hollow markers) and their mean (filled dot). " +
+      (compare ? "One panel per location, all on one axis. " : "Choose “Compare locations” above to see every location side by side. ") +
+      "Click a marker to read that response.");
+
+    const row = panel.append("div").attr("class", "row");
+    const lab = row.append("label");
+    lab.append("span").attr("class", "ctl-label").text("Metric");
+    lab.append("select").on("change", (e) => setState({ metric: e.target.value }))
+      .selectAll("option").data(METRICS).join("option")
+      .attr("value", (d) => d.id).property("selected", (d) => d.id === metric.id)
+      .text((d) => `${d.label} (${d.unit})`);
+    const tg = row.append("label").attr("class", "toggle");
+    tg.append("input").attr("type", "checkbox").property("checked", state.tables).on("change", (e) => setState({ tables: e.target.checked }));
+    tg.append("span").text("Show as table");
+
+    const card = panel.append("div").attr("class", "chart-card");
+    card.append("h3").text(metric.label + unitText);
+    card.append("p").attr("class", "note").style("margin", "0").text(metric.note);
+    overviewLegend(card, metric);
+
+    const means = new Map(D.cell_means.map((d) => [`${d.query}|${d.provider}|${d.location}`, d]));
+    if (state.tables) { renderOverviewTable(card, metric, means, shownLocs); return; }
+
+    // Layout: query labels, then one panel per shown location.
+    // Each location panel sits in its own framed box; `gap` separates the boxes.
+    // A lone panel is capped in width so the axis stays readable.
+    const labelW = 220, gap = 36, rowH = 58, subStep = 15, headH = 56, footH = 30, pad = 18;
+    const avail = Math.max(card.node().clientWidth - 36, 0);
+    const panelW = Math.min(720, Math.max(200, Math.floor((avail - labelW - gap * shownLocs.length) / shownLocs.length)));
+    const rowsEnd = headH + QUERIES.length * rowH;
+    const W = labelW + shownLocs.length * (panelW + gap);
+    const H = rowsEnd + footH + 2;
+    const panelX = (li) => labelW + gap + li * (panelW + gap);
+    const frameTop = 26;
+    const subY = (pi) => rowH / 2 + (pi - 1) * subStep;
+
+    // One x scale for every panel, spanning every run and every mean.
+    const allValues = D.responses.map((r) => metricValue(r, metric.id))
+      .concat(D.cell_means.map((d) => d[metric.id])).filter((v) => v != null);
+    const xMax = metric.unit === "share" ? 1 : d3.max(allValues) || 1;
+    // Inner padding keeps markers and tick labels inside each panel's frame.
+    const x = d3.scaleLinear().domain([0, xMax]).range([pad, panelW - pad]);
+    if (metric.unit !== "share") x.nice(4);
+    const ticks = metric.unit === "share" ? [0, 0.5, 1] : x.ticks(4);
+
+    const svg = card.append("div").attr("class", "scroll-x").append("svg")
+      .attr("width", W).attr("height", H).attr("role", "img")
+      .attr("aria-label", `Dot plots of ${metric.label} by query, provider, and location`);
+
+    // Panel frames, drawn first so everything else sits on top.
+    shownLocs.forEach((loc, li) => {
+      svg.append("rect").attr("x", panelX(li) + 0.5).attr("y", frameTop + 0.5)
+        .attr("width", panelW - 1).attr("height", H - frameTop - 1).attr("rx", 8)
+        .attr("fill", "none").attr("stroke", cssVar("--axis"));
+    });
+
+    // Row bands: alternate shading, stronger for the selected query. They are
+    // drawn per region (labels, then each panel) so the gaps between panels stay clear.
+    const body = svg.append("g").attr("transform", `translate(0,${headH})`);
+    const regions = [[0, labelW]].concat(shownLocs.map((l, li) => [panelX(li) + 1, panelW - 2]));
+    QUERIES.forEach((q, qi) => {
+      const selected = q.id === state.q;
+      if (selected || qi % 2 === 0) {
+        for (const [rx, rw] of regions) {
+          body.append("rect").attr("x", rx).attr("y", qi * rowH).attr("width", rw).attr("height", rowH)
+            .attr("rx", rx === 0 ? 6 : 0).attr("fill", cssVar("--surface-2")).attr("opacity", selected ? 1 : 0.45);
+        }
+      }
+      const lines = wrapWords(q.text, 30);
+      const t = body.append("text").attr("x", 8).attr("y", qi * rowH + rowH / 2 - (lines.length - 1) * 7.5)
+        .attr("dy", "0.35em").attr("class", selected ? "label-strong" : null).style("cursor", "pointer")
+        .on("click", () => setState({ q: q.id }));
+      t.append("tspan").attr("class", "muted").text(`Q${qi + 1}  `);
+      t.append("tspan").text(lines[0]);
+      // Continuation lines align under the text, past the "Qn" prefix.
+      lines.slice(1).forEach((ln) => t.append("tspan").attr("x", 34).attr("dy", "1.25em").text(ln));
+    });
+
+    shownLocs.forEach((loc, li) => {
+      const g = svg.append("g").attr("transform", `translate(${panelX(li)},0)`);
+      g.append("text").attr("class", "label-strong").attr("x", panelW / 2).attr("y", 16)
+        .attr("text-anchor", "middle").text(loc.label);
+      // Gridlines and tick labels (top and bottom).
+      const grid = g.append("g").attr("class", "grid");
+      grid.selectAll("line").data(ticks).join("line")
+        .attr("x1", x).attr("x2", x).attr("y1", headH - 4).attr("y2", rowsEnd + 4);
+      for (const [yy, cls] of [[headH - 10, "top"], [rowsEnd + 19, "bottom"]]) {
+        g.append("g").attr("class", cls).selectAll("text").data(ticks).join("text").attr("class", "muted")
+          .attr("x", x).attr("y", yy).attr("text-anchor", "middle").style("font-size", "11px")
+          .style("font-variant-numeric", "tabular-nums").text((v) => fmtNum(v, metric.unit));
+      }
+
+      const pg = g.append("g").attr("transform", `translate(0,${headH})`);
+      QUERIES.forEach((q, qi) => {
+        PROVIDERS.forEach((p, pi) => {
+          const y = qi * rowH + subY(pi);
+          const color = provColor(p.id);
+          const runs = cellResponses(q.id, loc.id, p.id);
+          const mean = means.get(`${q.id}|${p.id}|${loc.id}`);
+          const meanV = mean ? mean[metric.id] : null;
+          // Not reported by this provider: the legend says so; leave the line empty.
+          if (meanV == null) return;
+          // Hairline spanning the runs makes the spread visible at a glance.
+          const vals = runs.map((r) => metricValue(r, metric.id)).filter((v) => v != null);
+          pg.append("line").attr("x1", x(d3.min(vals))).attr("x2", x(d3.max(vals))).attr("y1", y).attr("y2", y)
+            .attr("stroke", color).attr("stroke-width", 1.5).attr("opacity", 0.45);
+          runs.forEach((r) => {
+            const v = metricValue(r, metric.id);
+            const m = pg.append("g").attr("class", "cell").attr("transform", `translate(${x(v)},${y})`)
+              .on("mousemove", (e) => showTip(e, `<div class="tt-title">Q${qi + 1} · ${p.label} · Run ${r.repeat + 1}</div>
+                  <div class="tt-muted">“${q.variants[loc.id]}”</div>
+                  <div>${metric.label}: <b>${fmtNum(v, metric.unit)}</b>${metric.unit === "share" ? "" : " " + metric.unit}</div>
+                  <div class="tt-muted">Click to read this response</div>`))
+              .on("mouseleave", hideTip)
+              .on("click", () => { hideTip(); openResponses(q.id, p.id); });
+            m.append("circle").attr("r", 8).attr("fill", "transparent");
+            m.append("path").attr("d", runPath(r.repeat)).attr("fill", "none")
+              .attr("stroke", color).attr("stroke-width", 1.4).attr("opacity", RUN_OPACITY);
+          });
+          // Mean on top. A run equal to the mean sits under it; the tooltip lists every run.
+          pg.append("circle").attr("cx", x(meanV)).attr("cy", y).attr("r", MEAN_R).attr("fill", color)
+            .attr("stroke", cssVar("--ink")).attr("stroke-width", 1.5).attr("class", "cell")
+            .on("mousemove", (e) => showTip(e, `<div class="tt-title">Q${qi + 1} · ${p.label} · mean</div>
+                <div class="tt-muted">“${q.variants[loc.id]}”</div>
+                <div>${metric.label}: <b>${fmtNum(meanV, metric.unit)}</b>${metric.unit === "share" ? "" : " " + metric.unit}</div>
+                <div class="tt-muted">Runs: ${vals.map((v) => fmtNum(v, metric.unit)).join(", ")}</div>`))
+            .on("mouseleave", hideTip)
+            .on("click", () => { hideTip(); openResponses(q.id, p.id); });
+        });
+      });
+    });
+  }
+
+  function renderOverviewTable(card, metric, means, shownLocs) {
+    const table = card.append("div").attr("class", "scroll-x").append("table").attr("class", "data");
+    const hr = table.append("thead").append("tr");
+    hr.append("th").text("Query");
+    hr.append("th").text("Provider");
+    shownLocs.forEach((l) => hr.append("th").text(`${l.label}: runs (mean)`));
+    const tb = table.append("tbody");
+    QUERIES.forEach((q, qi) => PROVIDERS.forEach((p) => {
+      const tr = tb.append("tr");
+      tr.append("td").text(`Q${qi + 1} ${q.text}`);
+      tr.append("td").text(p.label);
+      shownLocs.forEach((l) => {
+        const mean = means.get(`${q.id}|${p.id}|${l.id}`)?.[metric.id];
+        const runs = cellResponses(q.id, l.id, p.id).map((r) => fmtNum(metricValue(r, metric.id), metric.unit));
+        tr.append("td").text(mean == null ? "not reported" : `${runs.join(", ")} (${fmtNum(mean, metric.unit)})`);
+      });
+    }));
+  }
+
+  // ------------------------------------------------------------------
+  // Panel: resource-mention matrix
+  // ------------------------------------------------------------------
+  function renderResources() {
+    const panel = d3.select("#panel-resources").html("");
+    const qi = QUERIES.findIndex((q) => q.id === state.q);
+    const scope = state.resScope === "query" ? state.q : "all";
+    panel.append("h2").text("Which resources do responses name?");
+    panel.append("p").attr("class", "sub").text(
+      "Share of responses that name each resource, for every provider and location. Dot area is proportional to the share; the faint ring marks 100%. " +
+      "Click a row or dot to read the responses that name it.");
+
+    const row = panel.append("div").attr("class", "row");
+    const sc = row.append("div");
+    sc.append("span").attr("class", "ctl-label").text("Queries");
+    sc.append("div").attr("class", "seg").selectAll("button")
+      .data([{ id: "all", label: "All 10 queries" }, { id: "query", label: `Selected: Q${qi + 1}` }]).join("button")
+      .text((d) => d.label).attr("aria-pressed", (d) => d.id === state.resScope)
+      .on("click", (e, d) => setState({ resScope: d.id }));
+    const tg = row.append("label").attr("class", "toggle");
+    tg.append("input").attr("type", "checkbox").property("checked", state.tables).on("change", (e) => setState({ tables: e.target.checked }));
+    tg.append("span").text("Show as table");
+
+    const card = panel.append("div").attr("class", "chart-card");
+    card.append("h3").text(scope === "all" ? "All queries (n = 30 responses per column)" : `Q${qi + 1}: ${QUERIES[qi].text} (n = 3 per column)`);
+    const legend = card.append("div").attr("class", "legend");
+    PROVIDERS.forEach((p) => legend.append("span").attr("class", "item")
+      .html(`<span class="dot" style="background:${provColor(p.id)}"></span>${p.label}`));
+    legend.append("span").attr("class", "item tt-muted").text("Columns: None · Houston · Portland");
+
+    const rows = D.resource_shares.filter((d) => d.scope === scope);
+    const lookup = new Map(rows.map((d) => [`${d.resource}|${d.provider}|${d.location}`, d]));
+    const locs = LOCATIONS.map((l) => l.id);
+
+    if (state.tables) {
+      const table = card.append("div").attr("class", "scroll-x").append("table").attr("class", "data");
+      const hr = table.append("thead").append("tr");
+      hr.append("th").text("Resource");
+      PROVIDERS.forEach((p) => locs.forEach((l) => hr.append("th").text(`${p.label} · ${LOC_SHORT[l]}`)));
+      const tb = table.append("tbody");
+      RESOURCES.forEach((res) => {
+        const tr = tb.append("tr");
+        tr.append("td").text(res.label);
+        PROVIDERS.forEach((p) => locs.forEach((l) => {
+          const d = lookup.get(`${res.id}|${p.id}|${l}`);
+          tr.append("td").text(d ? `${fmtPct(d.share)} (${d.k}/${d.n})` : "—");
+        }));
+      });
+    } else {
+      const colW = 54, rowH = 32, labelW = 270, headH = 36, rMax = 12.5;
+      const { cols, width } = columnLayout(locs, colW, 16);
+      const W = labelW + width + 4, H = headH + RESOURCES.length * rowH + 4;
+      const r = d3.scaleSqrt().domain([0, 1]).range([0, rMax]);
+      const svg = card.append("div").attr("class", "scroll-x").append("svg").attr("width", W).attr("height", H)
+        .attr("role", "img").attr("aria-label", "Dot matrix of resource mentions by provider and location");
+      drawColumnHeaders(svg.append("g").attr("transform", `translate(${labelW},12)`), cols, locs, colW);
+
+      // Shade the selected location's columns.
+      if (state.loc !== "compare") {
+        svg.append("g").selectAll("rect").data(cols.filter((c) => c.loc === state.loc)).join("rect")
+          .attr("x", (c) => labelW + c.x).attr("y", headH - 6).attr("width", colW)
+          .attr("height", RESOURCES.length * rowH + 8).attr("rx", 6).attr("fill", cssVar("--surface-2"));
+      }
+      const body = svg.append("g").attr("transform", `translate(0,${headH})`);
+      body.append("g").attr("class", "grid").selectAll("line").data(RESOURCES).join("line")
+        .attr("x1", labelW - 8).attr("x2", W).attr("y1", (d, i) => i * rowH + rowH / 2).attr("y2", (d, i) => i * rowH + rowH / 2);
+      RESOURCES.forEach((res, ri) => {
+        const y = ri * rowH + rowH / 2;
+        body.append("text").attr("x", labelW - 14).attr("y", y).attr("dy", "0.35em").attr("text-anchor", "end")
+          .attr("class", res.id === state.resFocus ? "label-strong" : null).style("cursor", "pointer")
+          .text(res.label)
+          .on("click", () => setState({ resFocus: res.id, hlRes: true, tab: "responses" }));
+        for (const c of cols) {
+          const d = lookup.get(`${res.id}|${c.provider}|${c.loc}`);
+          const g = body.append("g").attr("class", "cell").attr("transform", `translate(${labelW + c.x + colW / 2},${y})`)
+            .on("mousemove", (e) => showTip(e, `<div class="tt-title">${res.label}</div>
+                <div>${provById.get(c.provider).label} · ${locById.get(c.loc).label}</div>
+                <div><b>${fmtPct(d?.share)}</b> of responses (${d?.k ?? 0} of ${d?.n ?? 0})</div>`))
+            .on("mouseleave", hideTip)
+            .on("click", () => { hideTip(); setState({ resFocus: res.id, hlRes: true, tab: "responses", loc: state.loc === "compare" ? "compare" : c.loc, cprov: c.provider }); });
+          g.append("rect").attr("x", -colW / 2).attr("y", -rowH / 2).attr("width", colW).attr("height", rowH).attr("fill", "transparent");
+          g.append("circle").attr("r", rMax).attr("fill", "none").attr("stroke", cssVar("--grid"));
+          if (d && d.share > 0) {
+            g.append("circle").attr("r", r(d.share)).attr("fill", provColor(c.provider))
+              .attr("stroke", cssVar("--surface")).attr("stroke-width", 1);
+          } else {
+            g.append("circle").attr("r", 1.5).attr("fill", cssVar("--muted"));
+          }
+        }
+      });
+    }
+    card.append("p").attr("class", "note").html(
+      "Matches come from the keyword lexicon in <span class='mono'>code/toolkit/toolkit/resources.py</span>. " +
+      "A match means the response names the resource, not that it recommends it. " +
+      "“Crisis pregnancy centers” counts any mention, including warnings about them.");
+  }
+
+  // ------------------------------------------------------------------
+  // Panel: search & sources
+  // ------------------------------------------------------------------
+  function renderSearch() {
+    const panel = d3.select("#panel-search").html("");
+    const qi = QUERIES.findIndex((q) => q.id === state.q);
+    panel.append("h2").text("Web search and sources");
+    panel.append("p").attr("class", "sub").text("How often each model searched, which sites it cited or retrieved, and the search strings it sent.");
+
+    // 1. Search rate, grouped bars.
+    const c1 = panel.append("div").attr("class", "chart-card");
+    c1.append("h3").text("Share of responses that ran a web search");
+    c1.append("p").attr("class", "note").style("margin", "0").text("All 10 queries; n = 30 responses per bar.");
+    const legend = c1.append("div").attr("class", "legend");
+    PROVIDERS.forEach((p) => legend.append("span").attr("class", "item")
+      .html(`<span class="dot" style="background:${provColor(p.id)}"></span>${p.label}`));
+
+    const rates = new Map(D.search_rates.map((d) => [`${d.provider}|${d.location}`, d]));
+    const m = { top: 18, right: 10, bottom: 28, left: 40 }, w = 560, h = 210;
+    const x0 = d3.scaleBand().domain(LOCATIONS.map((l) => l.id)).range([0, w]).paddingInner(0.28).paddingOuter(0.1);
+    const x1 = d3.scaleBand().domain(PROVIDERS.map((p) => p.id)).range([0, x0.bandwidth()]).padding(0.06);
+    const y = d3.scaleLinear().domain([0, 1]).range([h, 0]);
+    const svg = c1.append("div").attr("class", "scroll-x").append("svg")
+      .attr("width", w + m.left + m.right).attr("height", h + m.top + m.bottom)
+      .attr("role", "img").attr("aria-label", "Bar chart of search rates by location and provider");
+    const g = svg.append("g").attr("transform", `translate(${m.left},${m.top})`);
+    g.append("g").attr("class", "grid").selectAll("line").data(y.ticks(4)).join("line")
+      .attr("x1", 0).attr("x2", w).attr("y1", y).attr("y2", y);
+    g.append("g").selectAll("text").data(y.ticks(4)).join("text").attr("class", "muted")
+      .attr("x", -8).attr("y", y).attr("dy", "0.35em").attr("text-anchor", "end").text((d) => fmtPct(d));
+    g.append("g").selectAll("text").data(LOCATIONS).join("text").attr("class", "label-strong")
+      .attr("x", (d) => x0(d.id) + x0.bandwidth() / 2).attr("y", h + 20).attr("text-anchor", "middle").text((d) => d.label);
+    for (const l of LOCATIONS) {
+      for (const p of PROVIDERS) {
+        const d = rates.get(`${p.id}|${l.id}`);
+        const bx = x0(l.id) + x1(p.id), bw = x1.bandwidth(), by = y(d.share), bh = h - by;
+        const bar = g.append("g").attr("class", "cell")
+          .on("mousemove", (e) => showTip(e, `<div class="tt-title">${p.label} · ${l.label}</div>
+              <div><b>${fmtPct(d.share)}</b> searched (${d.k} of ${d.n})</div>
+              <div class="tt-muted">${d.mean_searches} search calls per response</div>`))
+          .on("mouseleave", hideTip);
+        bar.append("rect").attr("x", bx).attr("y", 0).attr("width", bw).attr("height", h).attr("fill", "transparent");
+        // Rounded data end, square at the baseline.
+        const rr = Math.min(4, bh, bw / 2);
+        bar.append("path").attr("fill", provColor(p.id)).attr("d", bh <= 0 ? "" :
+          `M${bx},${h}V${by + rr}Q${bx},${by} ${bx + rr},${by}H${bx + bw - rr}Q${bx + bw},${by} ${bx + bw},${by + rr}V${h}Z`);
+        bar.append("text").attr("x", bx + bw / 2).attr("y", by - 5).attr("text-anchor", "middle")
+          .style("font-size", "11px").style("fill", cssVar("--ink")).text(fmtPct(d.share));
+      }
+    }
+    g.append("line").attr("x1", 0).attr("x2", w).attr("y1", h).attr("y2", h).attr("stroke", cssVar("--axis"));
+
+    // 2. Top domains, small multiples (one per provider).
+    const pooled = state.loc === "compare";
+    const domLoc = pooled ? "all" : state.loc;
+    const c2 = panel.append("div").attr("class", "chart-card");
+    c2.append("h3").text(`Most frequent domains · ${pooled ? "all locations pooled" : locById.get(state.loc).label}`);
+    const r2 = c2.append("div").attr("class", "row").style("margin", "8px 0 10px");
+    r2.append("div").attr("class", "seg").selectAll("button")
+      .data([{ id: "cited", label: "Cited in the answer" }, { id: "retrieved", label: "Returned by search" }]).join("button")
+      .text((d) => d.label).attr("aria-pressed", (d) => d.id === state.domKind)
+      .on("click", (e, d) => setState({ domKind: d.id }));
+    r2.append("span").attr("class", "note").text(
+      state.domKind === "cited"
+        ? "Share of responses whose answer text cites the domain at least once."
+        : "Share of responses whose searches returned the domain at least once, whether or not it was cited.");
+    const mult = c2.append("div").attr("class", "multiples");
+    const TOP = 10;
+    for (const p of PROVIDERS) {
+      const col = mult.append("div");
+      col.append("h4").html(`<span class="dot" style="background:${provColor(p.id)}"></span>${p.label}`);
+      const rows = D.domains.filter((d) => d.kind === state.domKind && d.provider === p.id && d.location === domLoc && d.rank <= TOP);
+      if (rows.length === 0) {
+        const why = state.domKind === "cited" && p.id === "anthropic" ? "Anthropic attaches no citations to its answer text; switch to “Returned by search”."
+          : state.domKind === "retrieved" && p.id === "gemini" ? "Gemini’s search results expose no source URLs; switch to “Cited in the answer”."
+          : "No domains in this selection.";
+        col.append("p").attr("class", "empty").text(why);
+        continue;
+      }
+      const bw = 300, lw = 150, rh = 22;
+      const xs = d3.scaleLinear().domain([0, 1]).range([0, bw - lw - 40]);
+      const s = col.append("svg").attr("width", "100%").attr("viewBox", `0 0 ${bw} ${rows.length * rh + 4}`)
+        .attr("role", "img").attr("aria-label", `Top domains for ${p.label}`);
+      rows.forEach((d, i) => {
+        const yy = i * rh;
+        const gg = s.append("g").attr("class", "cell")
+          .on("mousemove", (e) => showTip(e, `<div class="tt-title">${d.domain}</div><div>${p.label}: <b>${fmtPct(d.share)}</b> of responses (${d.k} of ${d.n})</div>`))
+          .on("mouseleave", hideTip);
+        gg.append("rect").attr("x", 0).attr("y", yy).attr("width", bw).attr("height", rh).attr("fill", "transparent");
+        gg.append("text").attr("x", lw - 8).attr("y", yy + rh / 2).attr("dy", "0.35em").attr("text-anchor", "end")
+          .text(d.domain.length > 22 ? d.domain.slice(0, 21) + "…" : d.domain);
+        const wbar = Math.max(xs(d.share), 2);
+        gg.append("path").attr("fill", provColor(p.id)).attr("d",
+          `M${lw},${yy + 4}H${lw + wbar - 3}Q${lw + wbar},${yy + 4} ${lw + wbar},${yy + 7}V${yy + rh - 7}Q${lw + wbar},${yy + rh - 4} ${lw + wbar - 3},${yy + rh - 4}H${lw}Z`);
+        gg.append("text").attr("x", lw + wbar + 6).attr("y", yy + rh / 2).attr("dy", "0.35em")
+          .style("font-variant-numeric", "tabular-nums").text(fmtPct(d.share));
+      });
+    }
+
+    // 3. Search strings for the selected query.
+    const c3 = panel.append("div").attr("class", "chart-card");
+    c3.append("h3").text(`Search strings sent for Q${qi + 1}: “${QUERIES[qi].text}”`);
+    c3.append("p").attr("class", "note").style("margin", "0 0 10px").text(
+      "Distinct strings (ignoring case and spacing); ×k is how many of the 3 repeats sent it.");
+    const sq = D.search_queries.filter((d) => d.query === state.q);
+    const mult3 = c3.append("div").attr("class", "multiples");
+    const locs = state.loc === "compare" ? LOCATIONS.map((l) => l.id) : [state.loc];
+    for (const p of PROVIDERS) {
+      const col = mult3.append("div");
+      col.append("h4").html(`<span class="dot" style="background:${provColor(p.id)}"></span>${p.label}`);
+      for (const l of locs) {
+        if (locs.length > 1) col.append("div").attr("class", "sq-loc").text(locById.get(l).label);
+        const rows = sq.filter((d) => d.provider === p.id && d.location === l);
+        const nSearched = cellResponses(state.q, l, p.id).filter((r) => r.searched).length;
+        if (rows.length === 0) { col.append("p").attr("class", "empty").style("margin", "2px 0").text("No searches in any repeat."); continue; }
+        col.append("div").attr("class", "note").text(`${nSearched} of 3 repeats searched`);
+        const li = col.append("ul").attr("class", "sq-list").selectAll("li").data(rows).join("li");
+        li.append("span").attr("class", "mono").text((d) => d.search);
+        li.append("span").attr("class", "k").text((d) => `×${d.k}`);
+      }
+    }
+  }
+
+  // ------------------------------------------------------------------
+  function render() {
+    hideTip();
+    renderControls();
+    renderRail();
+    if (state.tab === "responses") renderResponses();
+    if (state.tab === "overview") renderOverview();
+    if (state.tab === "resources") renderResources();
+    if (state.tab === "search") renderSearch();
+  }
+
+  readHash();
+  render();
+})();
+</script>
+</body>
+</html>

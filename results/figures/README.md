@@ -5,4 +5,4 @@ Figures may include plots, charts, diagrams, and other graphical representations
 
 ## Contents
 
-Currently empty. Generated figures will be stored here.
+- [`interactive/`](interactive/): Browser-based interactive explorers (D3) that read data bundles from `data/processed/`
