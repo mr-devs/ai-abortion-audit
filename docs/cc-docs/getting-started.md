@@ -24,7 +24,6 @@ The following command-line tools are required:
 | `uv` | Python environment management | [docs.astral.sh/uv](https://docs.astral.sh/uv/) |
 | `pdftotext` | Extract text from PDFs | `brew install poppler` |
 | `fbib` (via [`fetchbib`](https://github.com/mr-devs/fetchbib)) | Fetch BibTeX from DOI or title | `uv tool install fetchbib` |
-| `snakemake` *(optional)* | Workflow orchestration | `uv tool install snakemake` |
 
 Set up the Python environment:
 
@@ -52,7 +51,7 @@ fbib --help
 
 1. **Set up the environment**: Run `uv venv && source .venv/bin/activate && uv sync`. Add packages with `uv add <package>` so dependencies are tracked in `pyproject.toml`.
 2. **Create scripts**: `/create-script` — Guides you through creating a new script in the appropriate `code/` subdirectory, pre-populated with the project-standard header and a `main()` stub. Structure based on [`.claude/skills/create-script/reference-script.py`](../../.claude/skills/create-script/reference-script.py), alter for your own preferences.
-3. **Run analyses**: Conduct your study/analyses and generate figures/tables for the paper. Save figures to `results/figures/`, generate LaTeX tables to `results/tables/`, and other statistical reports in `results/reports/`. For complex, multi-step pipelines, use the Snakemake workflows in `workflow/` to orchestrate execution.
+3. **Run analyses**: Conduct your study/analyses and generate figures/tables for the paper. Save figures to `results/figures/`, generate LaTeX tables to `results/tables/`, and other statistical reports in `results/reports/`.
 4. **Integrate results into the paper**: Use `/write-paper` to draft sections from your outline, pointing it to the relevant scripts, reports, and figures.
 5. **Prepare for publication**: `/generate-venv-report` — Documents all installed packages and versions to ensure the environment is reproducible.
 
