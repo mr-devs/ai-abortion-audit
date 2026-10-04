@@ -31,9 +31,8 @@ Create **`VENV_REPORT.md`** in the project root: a concise report following the 
 ### Step 2 — Identify the core pipeline
 
 - Look for pipeline entry points in:
-  - Snakemake workflows (`Snakefile`) under `workflow/`
   - Shell scripts under `code/`
-- Note main entry scripts/workflows and their typical invocation commands (e.g., `snakemake -j`, `bash run_all.sh`).
+- Note main entry scripts and their typical invocation commands (e.g., `bash run_all.sh`).
 - Only code reachable from these entry points is **in-scope** for the report.
 
 ### Step 3 — Inspect the virtual environment without activation
@@ -60,7 +59,7 @@ Create **`VENV_REPORT.md`** in the project root: a concise report following the 
 ### Step 6 — Identify local packages and other software
 
 - **Local packages**: look for `toolkit/`, `src/`, editable installs (`-e .`), or `[tool.uv.sources]` entries pointing to local paths.
-- **Other software**: scan pipeline scripts/workflows for non-Python tools (e.g., Snakemake CLI, R, LaTeX, `ffmpeg`, `graphviz`).
+- **Other software**: scan pipeline scripts/workflows for non-Python tools (e.g., R, LaTeX, `ffmpeg`, `graphviz`).
 
 ### Step 7 — Check for existing `VENV_REPORT.md` and generate the updated report
 

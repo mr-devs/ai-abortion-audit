@@ -15,7 +15,7 @@ Use **AskUserQuestion** to ask for the absolute path to the project's Google Dri
 Suggested question: *"Where is this project's data folder on your machine? It should be the Google Drive Desktop folder named after this repository, inside `Project Data`."*
 
 Options to offer:
-- `~/Google Drive/My Drive/Project Data/<repo-name>` — default path; replace `<repo-name>` with the project folder name (e.g. `health-search-audit`)
+- `~/Google Drive/My Drive/Project Data/<repo-name>` — default path; replace `<repo-name>` with the project folder name (e.g. `ai-abortion-audit`)
 - Other — user types their own absolute path
 
 ### Step 2: Ask for the symlink name

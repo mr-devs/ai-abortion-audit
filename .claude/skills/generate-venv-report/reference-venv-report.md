@@ -6,7 +6,7 @@ High-level next steps that the reader of this report should take:
 - [example] Ensure `pyproject.toml` and `uv.lock` are committed to the repository as the source of truth for dependencies.
 - [example] Add instructions in the project root `README.md` for replicating the environment with `uv venv && uv sync`.
 - [example] Add instructions in the project root `README.md` for installing any local project packages.
-- [example] Add brief notes in the project root `README.md` about other required software (e.g., Snakemake, R, system tools).
+- [example] Add brief notes in the project root `README.md` about other required software (e.g., R, system tools).
 
 (Replace the examples above with project-specific bullets.)
 
@@ -62,7 +62,7 @@ This project leverages **M** local packages used in the core pipeline:
 
 Other software used to replicate the code in this repository (beyond Python packages) should be listed here:
 
-- `software_1` (e.g., Snakemake CLI, R, `ffmpeg`, `graphviz`, LaTeX)
+- `software_1` (e.g., R, `ffmpeg`, `graphviz`, LaTeX)
 - `software_2`
 
 ### Next steps
