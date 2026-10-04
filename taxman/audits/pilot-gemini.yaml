@@ -1,0 +1,150 @@
+# This is an `ai-taxman` audit file.
+#
+# Collect data based on this audit file by running:
+#   taxman collect pilot-gemini
+
+# This audit's name, which must match this file's name.
+#   Type:     string
+#   Required: yes
+audit: pilot-gemini
+
+# The AI provider this audit sends messages to.
+#   Type:     string
+#   Required: yes
+provider: gemini
+
+# The name of the environment variable that holds the API key to use for this audit.
+#   Type:     string
+#   Required: yes
+#   Example:  GEMINI_API_KEY
+api_key_env: SML_GEMINI_API_KEY
+
+# A filepath, relative to the project root, of messages to send.
+#   Type:     string
+#   Required: yes
+messages: taxman/messages/pilot-queries.txt
+
+# A filepath, relative to the project root, of a system prompt to send with every message.
+#   Type:     string
+#   Default:  blank (no system prompt)
+#   Example:  taxman/prompts/neutral.txt
+system_prompt:
+
+# Where output files are written.
+output:
+  # Where responses and manifest are written to, relative to the project root.
+  # {audit} and {run_id} are filled in at run time.
+  #   Type:     string
+  #   Required: yes
+  dir: data/raw/audits/{audit}/{run_id}
+
+  # Filename for the responses file in the `output` directory.
+  #   Type:     string
+  #   Default:  responses.jsonl
+  filename: responses.jsonl
+
+  # Gzip the responses file as it is written, adding .gz.
+  #   Type:     boolean
+  #   Default:  false
+  compress: false
+
+  # Path to directory where the log file is written, saved as <run_id>.log, and relative to the
+  # project root.
+  # {audit} and {run_id} are filled in at run time.
+  #   Type:     string
+  #   Required: yes
+  log_dir: data/logs/taxman/{audit}
+
+# How the messages are sent.
+execution:
+  # How many times each message is sent.
+  #   Type:     integer, 1 or more
+  #   Default:  1
+  repeats: 3
+
+  # Max number of simultaneous requests.
+  #   Type:     integer, 1 or more
+  #   Default:  8
+  max_concurrency: 4
+
+  # Send the messages through the provider's batch API instead of one request at a time.
+  # Not available yet: true is refused before anything is sent.
+  #   Type:     boolean
+  #   Default:  false
+  batch: false
+
+  # Seconds to wait for a response before an attempt fails.
+  #   Type:     float, more than 0
+  #   Default:  120
+  timeout_s: 120
+
+  # How many times to retry a request after a rate limit, timeout, or server error.
+  #   Type:     integer, 0 or more
+  #   Default:  5
+  max_retries: 5
+
+  # What to do when a request fails after all retries.
+  #   Options:  continue  record the failure and keep going
+  #             stop      stop sending; the run ends as stopped_early
+  #   Default:  continue
+  on_error: continue
+
+  # Send requests in random order instead of file order.
+  #   Type:     boolean
+  #   Default:  false
+  shuffle: false
+
+# Settings below are specific to the 'gemini' provider.
+model:
+  # The model to send every message to.
+  #   Type:     string
+  #   Required: yes
+  #   Docs:     https://ai.google.dev/gemini-api/docs/models
+  name: gemini-3.8-flash
+
+  # Sampling randomness, from focused to varied.
+  #   Type:     float, 0 to 2
+  #   Default:  blank (model default)
+  #   Docs:     https://ai.google.dev/gemini-api/docs/text-generation
+  temperature:
+
+  # Nucleus sampling threshold.
+  #   Type:     float, 0 to 1
+  #   Default:  blank (model default)
+  #   Docs:     https://ai.google.dev/gemini-api/docs/text-generation
+  top_p:
+
+  # Max tokens per response, thinking included.
+  #   Type:     integer, 1 or more
+  #   Default:  blank (model default)
+  #   Docs:     https://ai.google.dev/gemini-api/docs/text-generation
+  max_output_tokens:
+
+  # How much the model thinks before answering.
+  # Levels vary by model.
+  #   Options:  minimal | low | medium | high
+  #   Default:  blank (model default)
+  #   Docs:     https://ai.google.dev/gemini-api/docs/thinking
+  thinking_level:
+
+  # Whether to return a summary of the model's thinking.
+  #   Options:  auto  return a summary
+  #             none  no summary
+  #   Default:  blank (none)
+  #   Docs:     https://ai.google.dev/gemini-api/docs/thinking
+  thinking_summaries:
+
+  # Let Google keep the interaction: 55 days on the paid tier, 1 day on the free tier.
+  #   Type:     boolean
+  #   Default:  false
+  #   Docs:     https://ai.google.dev/gemini-api/docs/interactions-overview
+  store:
+
+  # Grounding with Google Search.
+  # Google's search_types and tool_choice are not offered: tested live, both stopped the search.
+  #   Docs:     https://ai.google.dev/gemini-api/docs/google-search
+  search:
+    # Ground answers with Google Search.
+    #   Type:     boolean
+    #   Default:  false
+    web_search: true

@@ -7,8 +7,8 @@
 # `audits`.
 taxman_project: 1
 paths:
-  audits:   data/taxman/audits    # Audit files
-  messages: data/taxman/messages  # Message files
-  prompts:  data/taxman/prompts   # System prompts
-  data:     data/taxman/data      # Collected data
-  logs:     data/taxman/logs      # Run logs
+  audits:   taxman/audits     # Audit files
+  messages: taxman/messages   # Message files
+  prompts:  taxman/prompts    # System prompts
+  data:     data/raw/audits   # Collected data
+  logs:     data/logs/taxman  # Run logs
