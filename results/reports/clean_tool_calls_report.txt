@@ -1,0 +1,24 @@
+clean_tool_calls.py report
+
+tool_calls rows: 518
+
+Tool calls by provider and tool_type:
+provider   tool_type           
+anthropic  code_execution          187
+           web_search              156
+gemini     google_search            20
+openai     web_search.open_page     28
+           web_search.search       127
+
+Search calls per response by provider and location:
+                       total  mean_per_response  share_with_any
+provider  location                                             
+anthropic houston-tx    73.0               2.43            1.00
+          none          22.0               0.73            0.37
+          portland-or   61.0               2.03            0.97
+gemini    houston-tx     5.0               0.17            0.17
+          none           2.0               0.07            0.07
+          portland-or   13.0               0.43            0.43
+openai    houston-tx    47.0               1.57            1.00
+          none          35.0               1.17            1.00
+          portland-or   45.0               1.50            1.00

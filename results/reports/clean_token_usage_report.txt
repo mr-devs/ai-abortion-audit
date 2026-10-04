@@ -1,0 +1,37 @@
+clean_token_usage.py report
+
+token_usage rows: 2660
+
+Mean and sum by provider, token_type, and unit:
+                                                                             mean        sum
+provider  token_type                                              unit                      
+anthropic cache_creation.ephemeral_1h_input_tokens                tokens      0.0        0.0
+          cache_creation.ephemeral_5m_input_tokens                tokens      0.0        0.0
+          cache_creation_input_tokens                             tokens      0.0        0.0
+          cache_read_input_tokens                                 tokens      0.0        0.0
+          input_tokens                                            tokens  23211.4  2089026.0
+          output_tokens                                           tokens   1415.9   127435.0
+          output_tokens_details.thinking_tokens                   tokens    286.0    25743.0
+          server_tool_use.web_fetch_requests                      count       0.0        0.0
+          server_tool_use.web_search_requests                     count       2.2      156.0
+gemini    raw_prompt_token                                        tokens   1757.7   158197.0
+          total_cached_tokens                                     tokens      0.0        0.0
+          total_input_tokens                                      tokens     85.2     7667.0
+          total_output_tokens                                     tokens    735.5    66195.0
+          total_thought_tokens                                    tokens    721.8    64964.0
+          total_tokens                                            tokens   1542.5   138826.0
+          total_tool_use_tokens                                   tokens      0.0        0.0
+openai    input_tokens                                            tokens  16375.5  1473795.0
+          input_tokens_details.cache_write_tokens                 tokens    101.4     9128.0
+          input_tokens_details.cached_tokens                      tokens   4280.7   385261.0
+          output_tokens                                           tokens    473.9    42649.0
+          output_tokens_details.reasoning_tokens                  tokens    134.9    12142.0
+          tool_usage.image_gen.input_tokens                       tokens      0.0        0.0
+          tool_usage.image_gen.input_tokens_details.image_tokens  tokens      0.0        0.0
+          tool_usage.image_gen.input_tokens_details.text_tokens   tokens      0.0        0.0
+          tool_usage.image_gen.output_tokens                      tokens      0.0        0.0
+          tool_usage.image_gen.output_tokens_details.image_tokens tokens      0.0        0.0
+          tool_usage.image_gen.output_tokens_details.text_tokens  tokens      0.0        0.0
+          tool_usage.image_gen.total_tokens                       tokens      0.0        0.0
+          tool_usage.web_search.num_requests                      count       1.4      127.0
+          total_tokens                                            tokens  16849.4  1516444.0

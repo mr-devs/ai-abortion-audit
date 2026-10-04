@@ -5,4 +5,23 @@ description = "Audit of AI model responses on abortion"
 requires-python = ">=3.14"
 dependencies = [
     "ai-taxman[all]==0.1.1",
+    "pandas>=3.0.6",
+    "pyarrow>=25.0.1",
+    "requests>=2.34.2",
+    "tenacity>=9.1.4",
+    "tldextract>=5.4.0",
+    "toolkit",
 ]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+]
+
+[tool.uv.workspace]
+members = [
+    "code/toolkit",
+]
+
+[tool.uv.sources]
+toolkit = { workspace = true, editable = true }

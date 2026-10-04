@@ -1,0 +1,36 @@
+clean_citations.py report
+
+text_citations rows: 829
+tool_citations rows: 5487
+
+Text citations by provider and location:
+                       total  mean_per_response  share_with_any
+provider  location                                             
+anthropic houston-tx     0.0               0.00            0.00
+          none           0.0               0.00            0.00
+          portland-or    0.0               0.00            0.00
+gemini    houston-tx    95.0               3.17            0.17
+          none          40.0               1.33            0.07
+          portland-or  291.0               9.70            0.43
+openai    houston-tx   149.0               4.97            1.00
+          none         123.0               4.10            1.00
+          portland-or  131.0               4.37            1.00
+
+Tool citations by provider and location:
+                        total  mean_per_response  share_with_any
+provider  location                                              
+anthropic houston-tx    689.0              22.97            1.00
+          none          199.0               6.63            0.37
+          portland-or   573.0              19.10            0.97
+gemini    houston-tx      0.0               0.00            0.00
+          none            0.0               0.00            0.00
+          portland-or     0.0               0.00            0.00
+openai    houston-tx   1541.0              51.37            1.00
+          none         1083.0              36.10            1.00
+          portland-or  1402.0              46.73            1.00
+
+Gemini text citations resolved: 426 of 426
+
+Rows dropped for a null url:
+  text_citations: 0
+  tool_citations: 0

@@ -11,7 +11,6 @@ See the [docs/cc-docs/getting-started.md](docs/cc-docs/getting-started.md) file 
 - `code/`: All source code including analysis scripts, data collection, cleaning, and utilities
 - `data/`: Data files organized by processing stage (raw, interim, processed, external)
 - `results/`: Output files generated from analysis (tables and figures)
-- `workflow/`: Snakemake workflow files for data collection and analysis pipelines
 - `lit_review/`: PDF papers and AI-generated summaries for the literature review phase
 - `paper/`: LaTeX manuscript files (outline, bibliography, and main document)
 - [`CLAUDE.md`](CLAUDE.md): Claude Code-specific instructions and context

@@ -1,0 +1,20 @@
+clean_metadata_text.py report
+
+metadata rows:      270
+response_text rows: 270
+audit_runs rows:    9
+
+Responses per provider and location (status counts):
+status                 ok
+provider  location       
+anthropic houston-tx   30
+          none         30
+          portland-or  30
+gemini    houston-tx   30
+          none         30
+          portland-or  30
+openai    houston-tx   30
+          none         30
+          portland-or  30
+
+Successful responses without text: 0
