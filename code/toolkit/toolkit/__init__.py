@@ -1,7 +1,8 @@
 """
-Name of Example Package
+toolkit
 
-A package for [insert project name/description].
+Shared code for the AI abortion audit: taxman response models, run loading,
+and utilities.
 """
 
 __version__ = "0.1.0"

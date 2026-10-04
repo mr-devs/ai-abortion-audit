@@ -11,10 +11,5 @@ This promotes code reuse and maintains consistency across the project.
 
 ## Installation
 
-To install the package in development mode (editable install), navigate to this directory and run:
-
-```bash
-pip install -e .
-```
-
-This will work with both the modern `pyproject.toml` and legacy `setup.py` configurations.
+The package is an editable dependency of the project (a uv workspace member, declared in the root [`pyproject.toml`](../../pyproject.toml)), so `uv sync` from the project root installs it.
+Edits to the package take effect without reinstalling.
