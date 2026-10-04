@@ -1,0 +1,14 @@
+# Marks the root of a taxman project: every taxman command run in this
+# directory or below it works on this project.
+#
+# The folders taxman uses, relative to this directory. `taxman audits new`
+# writes them into each audit it creates, so a change here applies to
+# audits created afterwards. Audits themselves are always looked up in
+# `audits`.
+taxman_project: 1
+paths:
+  audits:   data/taxman/audits    # Audit files
+  messages: data/taxman/messages  # Message files
+  prompts:  data/taxman/prompts   # System prompts
+  data:     data/taxman/data      # Collected data
+  logs:     data/taxman/logs      # Run logs

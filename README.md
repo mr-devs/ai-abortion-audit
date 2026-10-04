@@ -15,3 +15,11 @@ See the [docs/cc-docs/getting-started.md](docs/cc-docs/getting-started.md) file 
 - `lit_review/`: PDF papers and AI-generated summaries for the literature review phase
 - `paper/`: LaTeX manuscript files (outline, bibliography, and main document)
 - [`CLAUDE.md`](CLAUDE.md): Claude Code-specific instructions and context
+- [`pyproject.toml`](pyproject.toml): Project metadata and Python dependencies (managed with [uv](https://docs.astral.sh/uv/))
+- [`uv.lock`](uv.lock): Pinned versions of every dependency, for reproducing the environment
+- [`.python-version`](.python-version): The Python version uv uses for this project
+
+## Environment setup
+
+Dependencies are managed with [uv](https://docs.astral.sh/uv/).
+Run `uv sync` to create `.venv/` and install the pinned dependencies, then run scripts with `uv run python <script.py>`.
