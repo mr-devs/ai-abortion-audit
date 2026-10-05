@@ -22,7 +22,7 @@ Input:
       this prefix (e.g. "pilot-").
 
 Output:
-    - data/processed/metadata.parquet - one row per response
+    - data/processed/audits/metadata.parquet - one row per response
         Columns:
             - response_id (str): "<audit>__<run_id>__<message_id>__r<repeat>";
               primary key, joins all tables.
@@ -48,12 +48,12 @@ Output:
             - stop_reason (str or None): Why generation ended (anthropic:
               stop_reason; openai/gemini: response status).
             - stop_detail (str or None): Further stop details (JSON string).
-    - data/processed/response_text.parquet - one row per response
+    - data/processed/audits/response_text.parquet - one row per response
         Columns:
             - response_id (str): Primary key.
             - provider (str): Provider name.
             - text (str or None): Response text shown to the user.
-    - data/processed/audit_runs.parquet - one row per taxman run
+    - data/processed/audits/audit_runs.parquet - one row per taxman run
         Columns:
             - audit (str), study (str), location (str), run_id (str),
               provider (str), model (str): As in metadata.
@@ -86,7 +86,7 @@ from toolkit.loading import discover_runs, load_run_responses, parse_audit_name
 os.chdir(Path(__file__).resolve().parent)
 
 AUDITS_DIR = Path("../../data/raw/audits")
-OUTPUT_DIR = Path("../../data/processed")
+OUTPUT_DIR = Path("../../data/processed/audits")
 REPORT_PATH = Path("../../results/reports/clean_metadata_text_report.txt")
 
 RUN_COLUMNS = [

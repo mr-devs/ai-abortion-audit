@@ -1,7 +1,7 @@
 # Interactive
 
 This directory contains interactive, browser-based views of the audit data.
-Each page reads a data bundle that a Python script writes to `data/processed/`; the pages compute nothing themselves.
+Each page reads a data bundle that a Python script writes to `data/processed/explorer/`; the pages compute nothing themselves.
 
 ## Contents
 
@@ -20,6 +20,6 @@ uv run python code/analysis/compute_response_measures.py
 uv run python code/generate_figures/build_pilot_explorer_data.py
 ```
 
-The page loads `../../../data/processed/pilot_explorer_data.js`, so the `data/` symlink must exist (see the `setup-data-symlink` skill).
+The page loads `../../../data/processed/explorer/pilot_explorer_data.js`, so the `data/` symlink must exist (see the `setup-data-symlink` skill).
 D3, marked, and DOMPurify load from cdnjs, so the page needs an internet connection.
 The view (tab, query, location, and so on) is kept in the URL hash, so a link reopens the same view.

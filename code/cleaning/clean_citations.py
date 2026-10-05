@@ -23,7 +23,7 @@ Input:
       this prefix (e.g. "pilot-").
 
 Output:
-    - data/processed/text_citations.parquet - one row per URL cited in the
+    - data/processed/audits/text_citations.parquet - one row per URL cited in the
       response text
         Columns:
             - response_id (str): Joins to metadata. (response_id, index) is
@@ -42,7 +42,7 @@ Output:
             - start_index (int or None): openai/gemini - start offset of the
               cited span in the response text.
             - end_index (int or None): openai/gemini - end offset.
-    - data/processed/tool_citations.parquet - one row per URL a search tool
+    - data/processed/audits/tool_citations.parquet - one row per URL a search tool
       returned
         Columns:
             - response_id (str): Joins to metadata. (response_id, index) is
@@ -79,7 +79,7 @@ from toolkit.utils import extract_domain
 os.chdir(Path(__file__).resolve().parent)
 
 AUDITS_DIR = Path("../../data/raw/audits")
-OUTPUT_DIR = Path("../../data/processed")
+OUTPUT_DIR = Path("../../data/processed/audits")
 REPORT_PATH = Path("../../results/reports/clean_citations_report.txt")
 
 TEXT_COLUMNS = [

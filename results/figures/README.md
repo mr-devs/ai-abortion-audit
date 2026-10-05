@@ -5,4 +5,4 @@ Figures may include plots, charts, diagrams, and other graphical representations
 
 ## Contents
 
-- [`interactive/`](interactive/): Browser-based interactive explorers (D3) that read data bundles from `data/processed/`
+- [`interactive/`](interactive/): Browser-based interactive explorers (D3) that read data bundles from `data/processed/explorer/`

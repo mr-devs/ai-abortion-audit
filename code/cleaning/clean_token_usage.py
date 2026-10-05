@@ -22,7 +22,7 @@ Input:
       this prefix (e.g. "pilot-").
 
 Output:
-    - data/processed/token_usage.parquet - one row per (response, token_type)
+    - data/processed/audits/token_usage.parquet - one row per (response, token_type)
         Columns:
             - response_id (str): Joins to metadata. (response_id,
               token_type) is the primary key.
@@ -47,7 +47,7 @@ from toolkit.loading import discover_runs, load_run_responses
 os.chdir(Path(__file__).resolve().parent)
 
 AUDITS_DIR = Path("../../data/raw/audits")
-OUTPUT_DIR = Path("../../data/processed")
+OUTPUT_DIR = Path("../../data/processed/audits")
 REPORT_PATH = Path("../../results/reports/clean_token_usage_report.txt")
 
 # (provider, token_type) -> unit. Every type observed in the pilot data.

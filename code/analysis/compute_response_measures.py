@@ -28,14 +28,14 @@ Notes:
       exploratory keyword hits, not validated content codes.
 
 Input:
-    - data/processed/metadata.parquet
-    - data/processed/response_text.parquet
-    - data/processed/tool_calls.parquet
-    - data/processed/text_citations.parquet
-    - data/processed/tool_citations.parquet
+    - data/processed/audits/metadata.parquet
+    - data/processed/audits/response_text.parquet
+    - data/processed/audits/tool_calls.parquet
+    - data/processed/audits/text_citations.parquet
+    - data/processed/audits/tool_citations.parquet
 
 Output:
-    - data/processed/response_measures.parquet - one row per response
+    - data/processed/audits/response_measures.parquet - one row per response
         Columns:
             - response_id (str): Joins to metadata.
             - provider (str): anthropic | gemini | openai.
@@ -72,7 +72,7 @@ from toolkit.resources import RESOURCES, find_resources
 
 os.chdir(Path(__file__).resolve().parent)
 
-PROCESSED_DIR = Path("../../data/processed")
+PROCESSED_DIR = Path("../../data/processed/audits")
 OUTPUT_PATH = PROCESSED_DIR / "response_measures.parquet"
 REPORT_PATH = Path("../../results/reports/compute_response_measures_report.txt")
 

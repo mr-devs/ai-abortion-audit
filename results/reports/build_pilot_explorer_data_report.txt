@@ -1,6 +1,6 @@
 build_pilot_explorer_data.py report
 
-Bundle: ../../data/processed/pilot_explorer_data.js (1.11 MB)
+Bundle: ../../data/processed/explorer/pilot_explorer_data.js (1.11 MB)
 
 Records per key:
   providers: 3

@@ -3,7 +3,7 @@
   Pilot response explorer.
 
   Reads the bundle written by code/generate_figures/build_pilot_explorer_data.py
-  (data/processed/pilot_explorer_data.js). Every number on this page is
+  (data/processed/explorer/pilot_explorer_data.js). Every number on this page is
   computed in Python; the page only filters and draws. Open the file directly
   in a browser; no server is needed.
 -->
@@ -15,7 +15,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js"></script>
-<script src="../../../data/processed/pilot_explorer_data.js"></script>
+<script src="../../../data/processed/explorer/pilot_explorer_data.js"></script>
 <style>
   :root {
     color-scheme: light;
@@ -324,7 +324,7 @@
   if (!D || !window.d3) {
     app.innerHTML = `<div class="fatal"><h1>Data not found</h1>
       <p>${window.d3 ? "" : "D3 failed to load (are you offline?). "}
-      This page reads <code>data/processed/pilot_explorer_data.js</code>, which is not in git.
+      This page reads <code>data/processed/explorer/pilot_explorer_data.js</code>, which is not in git.
       Build it from the project root with:</p>
       <p><code>uv run python code/analysis/compute_response_measures.py</code><br>
       <code>uv run python code/generate_figures/build_pilot_explorer_data.py</code></p>

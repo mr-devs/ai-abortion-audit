@@ -22,7 +22,7 @@ Input:
       this prefix (e.g. "pilot-").
 
 Output:
-    - data/processed/tool_calls.parquet - one row per tool invocation
+    - data/processed/audits/tool_calls.parquet - one row per tool invocation
         Columns:
             - response_id (str): Joins to metadata. (response_id, index) is
               the primary key.
@@ -64,7 +64,7 @@ from toolkit.loading import discover_runs, load_run_responses, parse_audit_name
 os.chdir(Path(__file__).resolve().parent)
 
 AUDITS_DIR = Path("../../data/raw/audits")
-OUTPUT_DIR = Path("../../data/processed")
+OUTPUT_DIR = Path("../../data/processed/audits")
 REPORT_PATH = Path("../../results/reports/clean_tool_calls_report.txt")
 
 COLUMNS = [
