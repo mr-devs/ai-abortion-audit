@@ -4,27 +4,25 @@ Purpose:
     and towns (sub-est2025.csv) and the PDF documenting its columns.
 
 Notes:
-    Source:
-    - Landing page: https://www.census.gov/data/datasets/time-series/demo/popest/2020s-total-cities-and-towns.html
+    How we got the URLs:
+    - We went to this landing page: 
+        - https://www.census.gov/data/datasets/time-series/demo/popest/2020s-total-cities-and-towns.html
     - From that page, we clicked "Datasets" at the bottom of the page, then
       2020-2025 > cities/ > totals/ > sub-est2025.csv. The directory listing
-      shows that file as last modified on 2026-05-14 08:45 (the server's
-      Last-Modified header says 2026-05-14 12:45:32 GMT, the same moment).
-      The script logs the Last-Modified header of every file it downloads.
-    - The file layout (column definitions and codes) is the PDF at
-      https://www2.census.gov/programs-surveys/popest/technical-documentation/file-layouts/2020-2025/SUB-EST2025.pdf
+      shows that file as last modified on 2026-05-14 08:45 (as of October 5 2026).
+    - The file layout (column definitions and codes) is the downloaded PDF, taken from here:
+        - https://www2.census.gov/programs-surveys/popest/technical-documentation/file-layouts/2020-2025/SUB-EST2025.pdf
 
     Encoding:
     - The Census serves the CSV encoded as latin-1 (it is not valid UTF-8;
       e.g. the "ñ" in "Cañon City" is byte 0xf1). The CSV is decoded as
       latin-1 and saved as UTF-8 so downstream tools (pandas defaults,
-      taxman's UTF-8 message files) read place names correctly. Nothing else
-      about the text is changed. The PDF is saved byte for byte.
+      taxman's UTF-8 message files) read place names correctly.
 
     No re-downloads:
-    - Each file's name gets the date and time of the download, for the
-      record. Before downloading, the script looks for an earlier download of
-      the same file (any timestamp). If one exists, it logs a warning and
+    - Each file's name gets the date and time of the download, for posterity.
+    - Before downloading, the script looks for an earlier download of
+      the same file (with any timestamp). If one exists, it logs a warning and
       skips that file; delete the existing file to download it again. When
       both files already exist the script ends without downloading anything.
 
@@ -37,17 +35,16 @@ Input:
 Output:
     - data/raw/census/sub-est2025_<YYYY-MM-DD_HHMMSS>.csv: the Census file,
       UTF-8. One row per geography (states, counties, incorporated places,
-      minor civil divisions, ...); see the PDF for the columns. Columns used
-      in this project:
+      minor civil divisions, etc.); see the PDF for detailed definitions of all values.
+    - Columns used in this project are:
         - SUMLEV (str): summary level; 162 = incorporated place.
         - STATE, COUNTY, PLACE (str): FIPS codes, zero padded.
         - NAME (str): official place name, with its legal descriptor
           (e.g. "Houston city").
         - STNAME (str): state name.
         - POPESTIMATE2025 (int): July 1, 2025 population estimate.
-    - data/raw/census/SUB-EST2025_<YYYY-MM-DD_HHMMSS>.pdf: the file layout.
-    - data/logs/download_census_city_populations/<YYYY-MM-DD>.log: run log
-      (appended).
+    - data/raw/census/SUB-EST2025_<YYYY-MM-DD_HHMMSS>.pdf: the file layout and data details.
+    - data/logs/download_census_city_populations/<YYYY-MM-DD>.log: run log (appended).
 
 Author: Matthew DeVerna
 """
