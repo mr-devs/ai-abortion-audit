@@ -1,0 +1,13 @@
+clean_guttmacher.py report
+
+Raw file: guttmacher_raw_states_2026-10-05.json
+States: 51
+
+States per category (most restrictive first):
+  Most Restrictive               17
+  Very Restrictive               2
+  Restrictive                    5
+  Some Restrictions/Protections  5
+  Protective                     8
+  Very Protective                7
+  Most Protective                7
