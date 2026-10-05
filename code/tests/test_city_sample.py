@@ -1,7 +1,7 @@
 """
-Unit tests for the pilot-4cities city sample: city-name cleaning and city
-selection in code/cleaning/select_state_cities.py, state abbreviations in
-toolkit.geography, and the download-file helpers in toolkit.utils.
+Unit tests for the pilot-4cities city sample: city-name cleaning, city
+selection, and state abbreviations in code/cleaning/select_state_cities.py,
+and the download-file helpers in toolkit.utils.
 
 The inputs are small inline examples copied from the Census file, so the tests
 do not depend on the data directory.
@@ -16,7 +16,6 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
-from toolkit.geography import STATE_ABBREVIATIONS, state_abbreviation
 from toolkit.utils import find_existing_downloads, latest_download, timestamped_path
 
 SCRIPT_PATH = (
@@ -102,15 +101,22 @@ def test_select_cities_rejects_odd_n(select_script):
         select_script.select_cities(places, 3)
 
 
-def test_state_abbreviations():
-    """50 states plus DC, each with a unique two-letter code."""
-    assert len(STATE_ABBREVIATIONS) == 51
-    codes = list(STATE_ABBREVIATIONS.values())
-    assert len(set(codes)) == 51
-    assert all(len(code) == 2 and code.isupper() for code in codes)
-    assert state_abbreviation("Texas") == "TX"
-    with pytest.raises(KeyError):
-        state_abbreviation("DC")  # Guttmacher's spelling must be mapped first
+def test_state_abbreviations(select_script):
+    """FIPS codes map to USPS abbreviations; a name mismatch is an error."""
+    census = pd.DataFrame(
+        {
+            "STATE": ["48", "48", "15", "11"],
+            "STNAME": ["Texas", "Texas", "Hawaii", "District of Columbia"],
+        }
+    )
+    assert select_script.state_abbreviations(census) == {
+        "48": "TX",
+        "15": "HI",
+        "11": "DC",
+    }
+    wrong_name = pd.DataFrame({"STATE": ["48"], "STNAME": ["Oklahoma"]})
+    with pytest.raises(ValueError):
+        select_script.state_abbreviations(wrong_name)
 
 
 def test_download_helpers(tmp_path):

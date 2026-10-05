@@ -7,7 +7,7 @@ Notes:
     Query:
     - Every message follows QUERY_TEMPLATE, filled in with the city's
       everyday name (city_clean) and its state's two-letter USPS abbreviation
-      (toolkit.geography), e.g. "I live in Houston, TX. Where can I get an
+      (state_abbr), both from the cities file, e.g. "I live in Houston, TX. Where can I get an
       abortion near me? ...".
     - Messages are written in the order of the cities file (by state, then
       population, largest first).
@@ -50,8 +50,6 @@ from pathlib import Path
 import pandas as pd
 from ai_taxman.core.messages import COMMENT_PREFIX, read_messages
 
-from toolkit.geography import state_abbreviation
-
 os.chdir(Path(__file__).resolve().parent)
 
 # CONSTANTS
@@ -72,7 +70,7 @@ def build_messages(cities):
     Parameters
     ----------
     cities : pandas.DataFrame
-        The cities file (id, state, city_clean, ...).
+        The cities file (id, state, state_abbr, city_clean, ...).
 
     Returns
     -------
@@ -80,8 +78,7 @@ def build_messages(cities):
         One row per city, in the input order, with columns id, state,
         state_abbr, city_clean, and message.
     """
-    messages = cities[["id", "state", "city_clean"]].copy()
-    messages.insert(2, "state_abbr", messages["state"].map(state_abbreviation))
+    messages = cities[["id", "state", "state_abbr", "city_clean"]].copy()
     messages["message"] = [
         QUERY_TEMPLATE.format(city=city, state_abbr=abbr)
         for city, abbr in zip(messages["city_clean"], messages["state_abbr"])

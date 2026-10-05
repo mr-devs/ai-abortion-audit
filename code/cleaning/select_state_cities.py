@@ -30,6 +30,13 @@ Notes:
       every run. Ties at the cut-off (the last place selected and the first
       left out have the same population) are listed in the report.
 
+    State abbreviations:
+    - state_abbr is the two-letter USPS abbreviation from the `us` package,
+      looked up by the state's two-digit FIPS code (the STATE column), which
+      is an exact match. Name lookups in `us` fall back to phonetic matching,
+      so they are not used. The script checks that the state name `us` returns
+      for each code matches the Census STNAME.
+
     IDs:
     - id is the STATE, COUNTY, and PLACE FIPS codes concatenated and converted
       to an integer. For incorporated places COUNTY is always "000", and the
@@ -65,6 +72,7 @@ Output:
       columns:
         - id (int): STATE + COUNTY + PLACE FIPS codes as an integer.
         - state (str): state name (Census STNAME).
+        - state_abbr (str): two-letter USPS state abbreviation (e.g. "TX").
         - city_official (str): official Census place name (NAME).
         - city_clean (str): everyday city name used in the audit queries.
         - pop_est_2025 (int): July 1, 2025 population estimate
@@ -80,6 +88,7 @@ import re
 from pathlib import Path
 
 import pandas as pd
+import us
 
 from toolkit.utils import latest_download
 
@@ -101,7 +110,14 @@ OUTPUT_PATH = Path(
 )
 REPORT_PATH = Path("../../results/reports/select_state_cities_report.txt")
 
-OUTPUT_COLUMNS = ["id", "state", "city_official", "city_clean", "pop_est_2025"]
+OUTPUT_COLUMNS = [
+    "id",
+    "state",
+    "state_abbr",
+    "city_official",
+    "city_clean",
+    "pop_est_2025",
+]
 
 # Official Census name -> everyday name, where the general rules below would
 # give the wrong answer. Keyed on the full official name.
@@ -160,6 +176,38 @@ def clean_city_name(official_name):
     return name.strip()
 
 
+def state_abbreviations(census):
+    """
+    Map each state FIPS code in the Census file to its USPS abbreviation.
+
+    Parameters
+    ----------
+    census : pandas.DataFrame
+        Census rows, with STATE (two-digit FIPS code) and STNAME columns.
+
+    Returns
+    -------
+    dict
+        {FIPS code: abbreviation}, e.g. {"48": "TX"}.
+
+    Raises
+    ------
+    ValueError
+        If `us` does not know a FIPS code, or its name for the state differs
+        from the Census STNAME.
+    """
+    abbreviations = {}
+    pairs = census[["STATE", "STNAME"]].drop_duplicates()
+    for fips, census_name in pairs.itertuples(index=False):
+        state = us.states.lookup(fips)
+        if state is None or state.name != census_name:
+            raise ValueError(
+                f"FIPS {fips} ({census_name}) matched {state} in the `us` package"
+            )
+        abbreviations[fips] = state.abbr
+    return abbreviations
+
+
 def load_places(census_path):
     """
     Load the eligible incorporated places from the Census file.
@@ -172,8 +220,8 @@ def load_places(census_path):
     Returns
     -------
     pandas.DataFrame
-        One row per eligible place, with columns id, state, city_official,
-        and pop_est_2025.
+        One row per eligible place, with columns id, state, state_abbr,
+        city_official, and pop_est_2025.
     """
     # Read everything as text so FIPS codes keep their leading zeros.
     census = pd.read_csv(census_path, dtype=str, encoding="utf-8")
@@ -184,6 +232,7 @@ def load_places(census_path):
         {
             "id": (places["STATE"] + places["COUNTY"] + places["PLACE"]).astype(int),
             "state": places["STNAME"],
+            "state_abbr": places["STATE"].map(state_abbreviations(places)),
             "city_official": places["NAME"],
             "pop_est_2025": places["POPESTIMATE2025"].astype(int),
         }

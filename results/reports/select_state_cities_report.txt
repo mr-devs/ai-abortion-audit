@@ -26,201 +26,201 @@ Massachusetts                                       Palmer Town city       Palme
     Tennessee   Nashville-Davidson metropolitan government (balance)    Nashville
 
 Selected cities:
-        id          state                                          city_official           city_clean  pop_est_2025
- 100037000        Alabama                                        Huntsville city           Huntsville        233627
- 100050000        Alabama                                            Mobile city               Mobile        200824
- 100019912        Alabama                                            Dayton town               Dayton            24
- 100055848        Alabama                                          Oak Hill town             Oak Hill            13
- 200003000         Alaska                                 Anchorage municipality            Anchorage        287155
- 200036400         Alaska                                Juneau city and borough               Juneau         31609
- 200006630         Alaska                                           Bettles city              Bettles            23
- 200042160         Alaska                                         Kupreanof city            Kupreanof            18
- 400055000        Arizona                                           Phoenix city              Phoenix       1665481
- 400077000        Arizona                                            Tucson city               Tucson        548371
- 400036290        Arizona                                            Jerome town               Jerome           452
- 400083790        Arizona                                         Winkelman town            Winkelman           290
- 500041000       Arkansas                                       Little Rock city          Little Rock        206427
- 500023290       Arkansas                                      Fayetteville city         Fayetteville        106623
- 500026800       Arkansas                                           Gilbert town              Gilbert            25
- 500071900       Arkansas                                          Victoria town             Victoria            17
- 600044000     California                                       Los Angeles city          Los Angeles       3869089
- 600066000     California                                         San Diego city            San Diego       1406106
- 600001514     California                                       Amador City city          Amador City           204
- 600036490     California                                          Industry city             Industry           199
- 800020000       Colorado                                            Denver city               Denver        740613
- 800016000       Colorado                                  Colorado Springs city     Colorado Springs        494743
- 800079270       Colorado                                        Two Buttes town           Two Buttes            30
- 800042495       Colorado                                          Lakeside town             Lakeside            16
- 900008000    Connecticut                                        Bridgeport city           Bridgeport        152273
- 900073000    Connecticut                                          Stamford city             Stamford        139535
- 900034460    Connecticut                              Groton Long Point borough    Groton Long Point           522
- 900027810    Connecticut                                        Fenwick borough              Fenwick            44
-1000077580       Delaware                                        Wilmington city           Wilmington         73512
-1000021200       Delaware                                             Dover city                Dover         40592
-1000025840       Delaware                                        Farmington town           Farmington           101
-1000033250       Delaware                                            Hartly town               Hartly            79
-1200035000        Florida                                      Jacksonville city         Jacksonville       1017689
-1200045000        Florida                                             Miami city                Miami        489812
-1200004150        Florida                                          Bay Lake city             Bay Lake            19
-1200043250        Florida                                        Marineland town           Marineland             9
-1300004000        Georgia                                           Atlanta city              Atlanta        529110
-1300019000        Georgia                                          Columbus city             Columbus        202171
-1300064792        Georgia                                        Rest Haven town           Rest Haven            44
-1300026224        Georgia                                         Edge Hill city            Edge Hill            27
-1500071550         Hawaii                                     Urban Honolulu CDP             Honolulu        341868
-1600008830          Idaho                                        Boise City city                Boise        238429
-1600052120          Idaho                                          Meridian city             Meridian        142988
-1600015490          Idaho                                           Clayton city              Clayton            11
-1600085420          Idaho                                        Warm River city           Warm River             1
-1700014000       Illinois                                           Chicago city              Chicago       2731585
-1700003012       Illinois                                            Aurora city               Aurora        181505
-1700026480       Illinois                                       Florence village             Florence            17
-1700077187       Illinois                                    Valley City village          Valley City            13
-1800036003        Indiana                            Indianapolis city (balance)         Indianapolis        901116
-1800025000        Indiana                                        Fort Wayne city           Fort Wayne        275203
-1800064728        Indiana                                      River Forest town         River Forest            23
-1800052398        Indiana                                     New Amsterdam town        New Amsterdam            13
-1900021000           Iowa                                        Des Moines city           Des Moines        212086
-1900012000           Iowa                                      Cedar Rapids city         Cedar Rapids        137935
-1900005095           Iowa                                      Beaconsfield city         Beaconsfield            14
-1900044580           Iowa                                            Le Roy city               Le Roy            10
-2000079000         Kansas                                           Wichita city              Wichita        400987
-2000053775         Kansas                                     Overland Park city        Overland Park        203677
-2000011325         Kansas                                             Cedar city                Cedar            12
-2000074625         Kansas                                           Waldron city              Waldron             8
-2100048006       Kentucky Louisville/Jefferson County metro government (balance)           Louisville        641962
-2100046027       Kentucky                         Lexington-Fayette urban county            Lexington        329751
-2100013060       Kentucky                                        Carrsville city           Carrsville            45
-2100016894       Kentucky                                           Concord city              Concord            17
-2200055000      Louisiana                                       New Orleans city          New Orleans        362154
-2200005000      Louisiana                                       Baton Rouge city          Baton Rouge        222795
-2200052740      Louisiana                                     Mount Lebanon town        Mount Lebanon            62
-2200052565      Louisiana                                          Mound village                Mound            12
-2300060545          Maine                                          Portland city             Portland         69911
-2300038740          Maine                                          Lewiston city             Lewiston         38866
-2300030550          Maine                                         Hallowell city            Hallowell          2624
-2300021730          Maine                                          Eastport city             Eastport          1285
-2400004000       Maryland                                         Baltimore city            Baltimore        569997
-2400030325       Maryland                                         Frederick city            Frederick         92059
-2400010575       Maryland                                         Brookview town            Brookview            46
-2400063225       Maryland                              Port Tobacco Village town Port Tobacco Village            23
-2500007000  Massachusetts                                            Boston city               Boston        672973
-2500082000  Massachusetts                                         Worcester city            Worcester        213862
-2500046225  Massachusetts                                       North Adams city          North Adams         12368
-2500052144  Massachusetts                                       Palmer Town city               Palmer         12367
-2600022000       Michigan                                           Detroit city              Detroit        649095
-2600034000       Michigan                                      Grand Rapids city         Grand Rapids        201183
-2600023560       Michigan                                          Eagle village                Eagle           107
-2600029660       Michigan                                    Forestville village          Forestville            84
-2700043000      Minnesota                                       Minneapolis city          Minneapolis        430324
-2700058000      Minnesota                                          St. Paul city             St. Paul        306684
-2700022976      Minnesota                                           Funkley city              Funkley            12
-2700033236      Minnesota                                           Kinbrae city              Kinbrae            12
-2800036000    Mississippi                                           Jackson city              Jackson        141196
-2800029700    Mississippi                                          Gulfport city             Gulfport         76506
-2800039880    Mississippi                                           Learned town              Learned            54
-2800065680    Mississippi                                       Satartia village             Satartia            38
-2900038000       Missouri                                       Kansas City city          Kansas City        521220
-2900065000       Missouri                                         St. Louis city            St. Louis        278144
-2900005464       Missouri                                        Bigelow village              Bigelow             4
-2900026000       Missouri                                   Friedenswald village         Friedenswald             3
-3000006550        Montana                                          Billings city             Billings        121239
-3000050200        Montana                                          Missoula city             Missoula         78903
-3000053200        Montana                                           Neihart town              Neihart            41
-3000038950        Montana                                             Ismay town                Ismay            21
-3100037000       Nebraska                                             Omaha city                Omaha        488797
-3100028000       Nebraska                                           Lincoln city              Lincoln        301522
-3100020295       Nebraska                                          Gross village                Gross             3
-3100032550       Nebraska                                         Monowi village               Monowi             1
-3200040000         Nevada                                         Las Vegas city            Las Vegas        679817
-3200031900         Nevada                                         Henderson city            Henderson        353289
-3200083000         Nevada                                             Wells city                Wells          1245
-3200008500         Nevada                                          Caliente city             Caliente           943
-3300045140  New Hampshire                                        Manchester city           Manchester        116818
-3300050260  New Hampshire                                            Nashua city               Nashua         92435
-3300005140  New Hampshire                                            Berlin city               Berlin          9502
-3300027380  New Hampshire                                          Franklin city             Franklin          8839
-3400051000     New Jersey                                            Newark city               Newark        323808
-3400036000     New Jersey                                       Jersey City city          Jersey City        302013
-3400072480     New Jersey                                      Teterboro borough            Teterboro            70
-3400072240     New Jersey                                      Tavistock borough            Tavistock             3
-3500002000     New Mexico                                       Albuquerque city          Albuquerque        556588
-3500039380     New Mexico                                        Las Cruces city           Las Cruces        116978
-3500026780     New Mexico                                         Folsom village               Folsom            46
-3500030770     New Mexico                                      Grenville village            Grenville            24
-3600051000       New York                                          New York city             New York       8584629
-3600011000       New York                                           Buffalo city              Buffalo        274613
-3600064881       New York                                       Saltaire village             Saltaire           111
-3600020379       New York                                  Dering Harbor village        Dering Harbor            36
-3700012000 North Carolina                                         Charlotte city            Charlotte        964784
-3700055000 North Carolina                                           Raleigh city              Raleigh        506306
-3700037640 North Carolina                                           Leggett town              Leggett            37
-3700023980 North Carolina                                       Fontana Dam town          Fontana Dam            10
-3800025700   North Dakota                                             Fargo city                Fargo        136275
-3800007200   North Dakota                                          Bismarck city             Bismarck         77963
-3800061780   North Dakota                                             Perth city                Perth             6
-3800069140   North Dakota                                              Ruso city                 Ruso             4
-3900018000           Ohio                                          Columbus city             Columbus        938396
-3900016000           Ohio                                         Cleveland city            Cleveland        363608
-3900024794           Ohio                                          Elgin village                Elgin            46
-3900050722           Ohio                                    Miltonsburg village          Miltonsburg            31
-4000055000       Oklahoma                                     Oklahoma City city        Oklahoma City        719849
-4000075000       Oklahoma                                             Tulsa city                Tulsa        416209
-4000040100       Oklahoma                                           Knowles town              Knowles             5
-4000017050       Oklahoma                                         Cooperton town            Cooperton             4
-4100059000         Oregon                                          Portland city             Portland        635109
-4100064900         Oregon                                             Salem city                Salem        181779
-4100030500         Oregon                                           Granite city              Granite            29
-4100043400         Oregon                                          Lonerock city             Lonerock            24
-4200060000   Pennsylvania                                      Philadelphia city         Philadelphia       1574281
-4200061000   Pennsylvania                                        Pittsburgh city           Pittsburgh        307632
-4200079644   Pennsylvania                                      Valley-Hi borough            Valley-Hi             5
-4200012312   Pennsylvania                                      Centralia borough            Centralia             4
-4400059000   Rhode Island                                        Providence city           Providence        195310
-4400019180   Rhode Island                                          Cranston city             Cranston         84647
-4400049960   Rhode Island                                           Newport city              Newport         24251
-4400014140   Rhode Island                                     Central Falls city        Central Falls         23124
-4500013330 South Carolina                                        Charleston city           Charleston        159423
-4500016000 South Carolina                                          Columbia city             Columbia        147035
-4500036655 South Carolina                                      Jenkinsville town         Jenkinsville            40
-4500016720 South Carolina                                              Cope town                 Cope            36
-4600059020   South Dakota                                       Sioux Falls city          Sioux Falls        213748
-4600052980   South Dakota                                        Rapid City city           Rapid City         80589
-4600008860   South Dakota                                            Butler town               Butler             4
-4600029340   South Dakota                                         Hillsview town            Hillsview             1
-4700052006      Tennessee   Nashville-Davidson metropolitan government (balance)            Nashville        721074
-4700048000      Tennessee                                           Memphis city              Memphis        609647
-4700033920      Tennessee                                    Hickory Valley town       Hickory Valley            80
-4700017340      Tennessee                                     Cottage Grove town        Cottage Grove            66
-4800035000          Texas                                           Houston city              Houston       2397315
-4800065000          Texas                                       San Antonio city          San Antonio       1548422
-4800044170          Texas                                        Los Ybanez city           Los Ybanez            20
-4800035816          Texas                                            Impact town               Impact            18
-4900067000           Utah                                    Salt Lake City city       Salt Lake City        218428
-4900083470           Utah                                  West Valley City city     West Valley City        137491
-4900037690           Utah                                      Independence town         Independence           102
-4900067990           Utah                                          Scofield town             Scofield            26
-5000010675        Vermont                                        Burlington city           Burlington         44019
-5000066175        Vermont                                  South Burlington city     South Burlington         21394
-5000053125        Vermont                                 Old Bennington village       Old Bennington           122
-5000048325        Vermont                                        Newfane village              Newfane            92
-5100082000       Virginia                                    Virginia Beach city       Virginia Beach        453737
-5100016000       Virginia                                        Chesapeake city           Chesapeake        255332
-5100023680       Virginia                                          Duffield town             Duffield            68
-5100017536       Virginia                                        Clinchport town           Clinchport            62
-5300063000     Washington                                           Seattle city              Seattle        784777
-5300067000     Washington                                           Spokane city              Spokane        230783
-5300038215     Washington                                            Lamont town               Lamont            78
-5300036395     Washington                                             Krupp town                Krupp            45
-5400014600  West Virginia                                        Charleston city           Charleston         46117
-5400039460  West Virginia                                        Huntington city           Huntington         44815
-5400010852  West Virginia                                    Bruceton Mills town       Bruceton Mills            60
-5400080284  West Virginia                                          Thurmond town             Thurmond             6
-5500053000      Wisconsin                                         Milwaukee city            Milwaukee        562407
-5500048000      Wisconsin                                           Madison city              Madison        286233
-5500007250      Wisconsin                                      Big Falls village            Big Falls            61
-5500089625      Wisconsin                                           Yuba village                 Yuba            51
-5600013900        Wyoming                                          Cheyenne city             Cheyenne         66507
-5600013150        Wyoming                                            Casper city               Casper         58771
-5600079705        Wyoming                                       Van Tassell town          Van Tassell            24
-5600047805        Wyoming                                      Lost Springs town         Lost Springs             3
+        id          state state_abbr                                          city_official           city_clean  pop_est_2025
+ 100037000        Alabama         AL                                        Huntsville city           Huntsville        233627
+ 100050000        Alabama         AL                                            Mobile city               Mobile        200824
+ 100019912        Alabama         AL                                            Dayton town               Dayton            24
+ 100055848        Alabama         AL                                          Oak Hill town             Oak Hill            13
+ 200003000         Alaska         AK                                 Anchorage municipality            Anchorage        287155
+ 200036400         Alaska         AK                                Juneau city and borough               Juneau         31609
+ 200006630         Alaska         AK                                           Bettles city              Bettles            23
+ 200042160         Alaska         AK                                         Kupreanof city            Kupreanof            18
+ 400055000        Arizona         AZ                                           Phoenix city              Phoenix       1665481
+ 400077000        Arizona         AZ                                            Tucson city               Tucson        548371
+ 400036290        Arizona         AZ                                            Jerome town               Jerome           452
+ 400083790        Arizona         AZ                                         Winkelman town            Winkelman           290
+ 500041000       Arkansas         AR                                       Little Rock city          Little Rock        206427
+ 500023290       Arkansas         AR                                      Fayetteville city         Fayetteville        106623
+ 500026800       Arkansas         AR                                           Gilbert town              Gilbert            25
+ 500071900       Arkansas         AR                                          Victoria town             Victoria            17
+ 600044000     California         CA                                       Los Angeles city          Los Angeles       3869089
+ 600066000     California         CA                                         San Diego city            San Diego       1406106
+ 600001514     California         CA                                       Amador City city          Amador City           204
+ 600036490     California         CA                                          Industry city             Industry           199
+ 800020000       Colorado         CO                                            Denver city               Denver        740613
+ 800016000       Colorado         CO                                  Colorado Springs city     Colorado Springs        494743
+ 800079270       Colorado         CO                                        Two Buttes town           Two Buttes            30
+ 800042495       Colorado         CO                                          Lakeside town             Lakeside            16
+ 900008000    Connecticut         CT                                        Bridgeport city           Bridgeport        152273
+ 900073000    Connecticut         CT                                          Stamford city             Stamford        139535
+ 900034460    Connecticut         CT                              Groton Long Point borough    Groton Long Point           522
+ 900027810    Connecticut         CT                                        Fenwick borough              Fenwick            44
+1000077580       Delaware         DE                                        Wilmington city           Wilmington         73512
+1000021200       Delaware         DE                                             Dover city                Dover         40592
+1000025840       Delaware         DE                                        Farmington town           Farmington           101
+1000033250       Delaware         DE                                            Hartly town               Hartly            79
+1200035000        Florida         FL                                      Jacksonville city         Jacksonville       1017689
+1200045000        Florida         FL                                             Miami city                Miami        489812
+1200004150        Florida         FL                                          Bay Lake city             Bay Lake            19
+1200043250        Florida         FL                                        Marineland town           Marineland             9
+1300004000        Georgia         GA                                           Atlanta city              Atlanta        529110
+1300019000        Georgia         GA                                          Columbus city             Columbus        202171
+1300064792        Georgia         GA                                        Rest Haven town           Rest Haven            44
+1300026224        Georgia         GA                                         Edge Hill city            Edge Hill            27
+1500071550         Hawaii         HI                                     Urban Honolulu CDP             Honolulu        341868
+1600008830          Idaho         ID                                        Boise City city                Boise        238429
+1600052120          Idaho         ID                                          Meridian city             Meridian        142988
+1600015490          Idaho         ID                                           Clayton city              Clayton            11
+1600085420          Idaho         ID                                        Warm River city           Warm River             1
+1700014000       Illinois         IL                                           Chicago city              Chicago       2731585
+1700003012       Illinois         IL                                            Aurora city               Aurora        181505
+1700026480       Illinois         IL                                       Florence village             Florence            17
+1700077187       Illinois         IL                                    Valley City village          Valley City            13
+1800036003        Indiana         IN                            Indianapolis city (balance)         Indianapolis        901116
+1800025000        Indiana         IN                                        Fort Wayne city           Fort Wayne        275203
+1800064728        Indiana         IN                                      River Forest town         River Forest            23
+1800052398        Indiana         IN                                     New Amsterdam town        New Amsterdam            13
+1900021000           Iowa         IA                                        Des Moines city           Des Moines        212086
+1900012000           Iowa         IA                                      Cedar Rapids city         Cedar Rapids        137935
+1900005095           Iowa         IA                                      Beaconsfield city         Beaconsfield            14
+1900044580           Iowa         IA                                            Le Roy city               Le Roy            10
+2000079000         Kansas         KS                                           Wichita city              Wichita        400987
+2000053775         Kansas         KS                                     Overland Park city        Overland Park        203677
+2000011325         Kansas         KS                                             Cedar city                Cedar            12
+2000074625         Kansas         KS                                           Waldron city              Waldron             8
+2100048006       Kentucky         KY Louisville/Jefferson County metro government (balance)           Louisville        641962
+2100046027       Kentucky         KY                         Lexington-Fayette urban county            Lexington        329751
+2100013060       Kentucky         KY                                        Carrsville city           Carrsville            45
+2100016894       Kentucky         KY                                           Concord city              Concord            17
+2200055000      Louisiana         LA                                       New Orleans city          New Orleans        362154
+2200005000      Louisiana         LA                                       Baton Rouge city          Baton Rouge        222795
+2200052740      Louisiana         LA                                     Mount Lebanon town        Mount Lebanon            62
+2200052565      Louisiana         LA                                          Mound village                Mound            12
+2300060545          Maine         ME                                          Portland city             Portland         69911
+2300038740          Maine         ME                                          Lewiston city             Lewiston         38866
+2300030550          Maine         ME                                         Hallowell city            Hallowell          2624
+2300021730          Maine         ME                                          Eastport city             Eastport          1285
+2400004000       Maryland         MD                                         Baltimore city            Baltimore        569997
+2400030325       Maryland         MD                                         Frederick city            Frederick         92059
+2400010575       Maryland         MD                                         Brookview town            Brookview            46
+2400063225       Maryland         MD                              Port Tobacco Village town Port Tobacco Village            23
+2500007000  Massachusetts         MA                                            Boston city               Boston        672973
+2500082000  Massachusetts         MA                                         Worcester city            Worcester        213862
+2500046225  Massachusetts         MA                                       North Adams city          North Adams         12368
+2500052144  Massachusetts         MA                                       Palmer Town city               Palmer         12367
+2600022000       Michigan         MI                                           Detroit city              Detroit        649095
+2600034000       Michigan         MI                                      Grand Rapids city         Grand Rapids        201183
+2600023560       Michigan         MI                                          Eagle village                Eagle           107
+2600029660       Michigan         MI                                    Forestville village          Forestville            84
+2700043000      Minnesota         MN                                       Minneapolis city          Minneapolis        430324
+2700058000      Minnesota         MN                                          St. Paul city             St. Paul        306684
+2700022976      Minnesota         MN                                           Funkley city              Funkley            12
+2700033236      Minnesota         MN                                           Kinbrae city              Kinbrae            12
+2800036000    Mississippi         MS                                           Jackson city              Jackson        141196
+2800029700    Mississippi         MS                                          Gulfport city             Gulfport         76506
+2800039880    Mississippi         MS                                           Learned town              Learned            54
+2800065680    Mississippi         MS                                       Satartia village             Satartia            38
+2900038000       Missouri         MO                                       Kansas City city          Kansas City        521220
+2900065000       Missouri         MO                                         St. Louis city            St. Louis        278144
+2900005464       Missouri         MO                                        Bigelow village              Bigelow             4
+2900026000       Missouri         MO                                   Friedenswald village         Friedenswald             3
+3000006550        Montana         MT                                          Billings city             Billings        121239
+3000050200        Montana         MT                                          Missoula city             Missoula         78903
+3000053200        Montana         MT                                           Neihart town              Neihart            41
+3000038950        Montana         MT                                             Ismay town                Ismay            21
+3100037000       Nebraska         NE                                             Omaha city                Omaha        488797
+3100028000       Nebraska         NE                                           Lincoln city              Lincoln        301522
+3100020295       Nebraska         NE                                          Gross village                Gross             3
+3100032550       Nebraska         NE                                         Monowi village               Monowi             1
+3200040000         Nevada         NV                                         Las Vegas city            Las Vegas        679817
+3200031900         Nevada         NV                                         Henderson city            Henderson        353289
+3200083000         Nevada         NV                                             Wells city                Wells          1245
+3200008500         Nevada         NV                                          Caliente city             Caliente           943
+3300045140  New Hampshire         NH                                        Manchester city           Manchester        116818
+3300050260  New Hampshire         NH                                            Nashua city               Nashua         92435
+3300005140  New Hampshire         NH                                            Berlin city               Berlin          9502
+3300027380  New Hampshire         NH                                          Franklin city             Franklin          8839
+3400051000     New Jersey         NJ                                            Newark city               Newark        323808
+3400036000     New Jersey         NJ                                       Jersey City city          Jersey City        302013
+3400072480     New Jersey         NJ                                      Teterboro borough            Teterboro            70
+3400072240     New Jersey         NJ                                      Tavistock borough            Tavistock             3
+3500002000     New Mexico         NM                                       Albuquerque city          Albuquerque        556588
+3500039380     New Mexico         NM                                        Las Cruces city           Las Cruces        116978
+3500026780     New Mexico         NM                                         Folsom village               Folsom            46
+3500030770     New Mexico         NM                                      Grenville village            Grenville            24
+3600051000       New York         NY                                          New York city             New York       8584629
+3600011000       New York         NY                                           Buffalo city              Buffalo        274613
+3600064881       New York         NY                                       Saltaire village             Saltaire           111
+3600020379       New York         NY                                  Dering Harbor village        Dering Harbor            36
+3700012000 North Carolina         NC                                         Charlotte city            Charlotte        964784
+3700055000 North Carolina         NC                                           Raleigh city              Raleigh        506306
+3700037640 North Carolina         NC                                           Leggett town              Leggett            37
+3700023980 North Carolina         NC                                       Fontana Dam town          Fontana Dam            10
+3800025700   North Dakota         ND                                             Fargo city                Fargo        136275
+3800007200   North Dakota         ND                                          Bismarck city             Bismarck         77963
+3800061780   North Dakota         ND                                             Perth city                Perth             6
+3800069140   North Dakota         ND                                              Ruso city                 Ruso             4
+3900018000           Ohio         OH                                          Columbus city             Columbus        938396
+3900016000           Ohio         OH                                         Cleveland city            Cleveland        363608
+3900024794           Ohio         OH                                          Elgin village                Elgin            46
+3900050722           Ohio         OH                                    Miltonsburg village          Miltonsburg            31
+4000055000       Oklahoma         OK                                     Oklahoma City city        Oklahoma City        719849
+4000075000       Oklahoma         OK                                             Tulsa city                Tulsa        416209
+4000040100       Oklahoma         OK                                           Knowles town              Knowles             5
+4000017050       Oklahoma         OK                                         Cooperton town            Cooperton             4
+4100059000         Oregon         OR                                          Portland city             Portland        635109
+4100064900         Oregon         OR                                             Salem city                Salem        181779
+4100030500         Oregon         OR                                           Granite city              Granite            29
+4100043400         Oregon         OR                                          Lonerock city             Lonerock            24
+4200060000   Pennsylvania         PA                                      Philadelphia city         Philadelphia       1574281
+4200061000   Pennsylvania         PA                                        Pittsburgh city           Pittsburgh        307632
+4200079644   Pennsylvania         PA                                      Valley-Hi borough            Valley-Hi             5
+4200012312   Pennsylvania         PA                                      Centralia borough            Centralia             4
+4400059000   Rhode Island         RI                                        Providence city           Providence        195310
+4400019180   Rhode Island         RI                                          Cranston city             Cranston         84647
+4400049960   Rhode Island         RI                                           Newport city              Newport         24251
+4400014140   Rhode Island         RI                                     Central Falls city        Central Falls         23124
+4500013330 South Carolina         SC                                        Charleston city           Charleston        159423
+4500016000 South Carolina         SC                                          Columbia city             Columbia        147035
+4500036655 South Carolina         SC                                      Jenkinsville town         Jenkinsville            40
+4500016720 South Carolina         SC                                              Cope town                 Cope            36
+4600059020   South Dakota         SD                                       Sioux Falls city          Sioux Falls        213748
+4600052980   South Dakota         SD                                        Rapid City city           Rapid City         80589
+4600008860   South Dakota         SD                                            Butler town               Butler             4
+4600029340   South Dakota         SD                                         Hillsview town            Hillsview             1
+4700052006      Tennessee         TN   Nashville-Davidson metropolitan government (balance)            Nashville        721074
+4700048000      Tennessee         TN                                           Memphis city              Memphis        609647
+4700033920      Tennessee         TN                                    Hickory Valley town       Hickory Valley            80
+4700017340      Tennessee         TN                                     Cottage Grove town        Cottage Grove            66
+4800035000          Texas         TX                                           Houston city              Houston       2397315
+4800065000          Texas         TX                                       San Antonio city          San Antonio       1548422
+4800044170          Texas         TX                                        Los Ybanez city           Los Ybanez            20
+4800035816          Texas         TX                                            Impact town               Impact            18
+4900067000           Utah         UT                                    Salt Lake City city       Salt Lake City        218428
+4900083470           Utah         UT                                  West Valley City city     West Valley City        137491
+4900037690           Utah         UT                                      Independence town         Independence           102
+4900067990           Utah         UT                                          Scofield town             Scofield            26
+5000010675        Vermont         VT                                        Burlington city           Burlington         44019
+5000066175        Vermont         VT                                  South Burlington city     South Burlington         21394
+5000053125        Vermont         VT                                 Old Bennington village       Old Bennington           122
+5000048325        Vermont         VT                                        Newfane village              Newfane            92
+5100082000       Virginia         VA                                    Virginia Beach city       Virginia Beach        453737
+5100016000       Virginia         VA                                        Chesapeake city           Chesapeake        255332
+5100023680       Virginia         VA                                          Duffield town             Duffield            68
+5100017536       Virginia         VA                                        Clinchport town           Clinchport            62
+5300063000     Washington         WA                                           Seattle city              Seattle        784777
+5300067000     Washington         WA                                           Spokane city              Spokane        230783
+5300038215     Washington         WA                                            Lamont town               Lamont            78
+5300036395     Washington         WA                                             Krupp town                Krupp            45
+5400014600  West Virginia         WV                                        Charleston city           Charleston         46117
+5400039460  West Virginia         WV                                        Huntington city           Huntington         44815
+5400010852  West Virginia         WV                                    Bruceton Mills town       Bruceton Mills            60
+5400080284  West Virginia         WV                                          Thurmond town             Thurmond             6
+5500053000      Wisconsin         WI                                         Milwaukee city            Milwaukee        562407
+5500048000      Wisconsin         WI                                           Madison city              Madison        286233
+5500007250      Wisconsin         WI                                      Big Falls village            Big Falls            61
+5500089625      Wisconsin         WI                                           Yuba village                 Yuba            51
+5600013900        Wyoming         WY                                          Cheyenne city             Cheyenne         66507
+5600013150        Wyoming         WY                                            Casper city               Casper         58771
+5600079705        Wyoming         WY                                       Van Tassell town          Van Tassell            24
+5600047805        Wyoming         WY                                      Lost Springs town         Lost Springs             3
