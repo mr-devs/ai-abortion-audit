@@ -5,9 +5,15 @@ Utility functions for LLM search auditing.
 import json
 import logging
 import os
+from datetime import datetime
+from pathlib import Path
 from typing import Dict, List, Any, Optional
 
 import tldextract
+
+#: Timestamp appended to downloaded filenames, e.g. "2026-10-05_134501".
+#: Its ISO order means sorting filenames also sorts downloads by time.
+TIMESTAMP_FORMAT = "%Y-%m-%d_%H%M%S"
 
 
 def setup_logging(
@@ -120,3 +126,81 @@ def load_jsonl(filepath: str) -> List[str]:
     """
     with open(filepath, "r", encoding="utf-8") as f:
         return [json.loads(line) for line in f if line]
+
+
+def timestamped_path(directory, stem, suffix):
+    """
+    Return the path for a new download, stamped with the current local time.
+
+    Parameters
+    ----------
+    directory : str or pathlib.Path
+        Folder the file will be written to.
+    stem : str
+        Filename before the timestamp (e.g. "sub-est2025").
+    suffix : str
+        File extension, including the dot (e.g. ".csv").
+
+    Returns
+    -------
+    pathlib.Path
+        `<directory>/<stem>_<YYYY-MM-DD_HHMMSS><suffix>`.
+    """
+    timestamp = datetime.now().strftime(TIMESTAMP_FORMAT)
+    return Path(directory) / f"{stem}_{timestamp}{suffix}"
+
+
+def find_existing_downloads(directory, stem, suffix):
+    """
+    Return every earlier download of a file, whatever its timestamp.
+
+    Download scripts use this to refuse to re-download a file that is already
+    saved: the timestamp is ignored, so any earlier copy counts.
+
+    Parameters
+    ----------
+    directory : str or pathlib.Path
+        Folder the downloads are saved in.
+    stem : str
+        Filename before the timestamp (e.g. "sub-est2025").
+    suffix : str
+        File extension, including the dot (e.g. ".csv").
+
+    Returns
+    -------
+    list of pathlib.Path
+        Matching files, oldest first; empty if there are none (or the folder
+        does not exist yet).
+    """
+    return sorted(Path(directory).glob(f"{stem}_*{suffix}"))
+
+
+def latest_download(directory, stem, suffix):
+    """
+    Return the most recent download of a file.
+
+    Parameters
+    ----------
+    directory : str or pathlib.Path
+        Folder the downloads are saved in.
+    stem : str
+        Filename before the timestamp (e.g. "sub-est2025").
+    suffix : str
+        File extension, including the dot (e.g. ".csv").
+
+    Returns
+    -------
+    pathlib.Path
+        The matching file whose name sorts last, i.e. the newest timestamp.
+
+    Raises
+    ------
+    FileNotFoundError
+        If no matching file exists, so the download script has not been run.
+    """
+    downloads = find_existing_downloads(directory, stem, suffix)
+    if not downloads:
+        raise FileNotFoundError(
+            f"No '{stem}_*{suffix}' file in {directory}. Run the download script first."
+        )
+    return downloads[-1]
