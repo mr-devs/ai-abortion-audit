@@ -8,8 +8,7 @@
 #     - The three providers (one audit each) run in parallel; `wait` holds the
 #       script until all three finish.
 #     - Each audit sends every message in
-#       taxman/messages/pilot-4cities-queries.txt once (repeats: 1). That file
-#       is written by write_4cities_messages.py.
+#       taxman/messages/pilot-4cities-queries.txt once (repeats: 1). 
 #     - After the audits, resolve_gemini_urls.py resolves the Google redirect
 #       URLs cited in the pilot-4cities Gemini run. It skips responses already
 #       resolved, so re-running is safe.
@@ -39,7 +38,7 @@ echo "--- Starting pilot-4cities audits ---"
 echo ""
 
 for provider in anthropic gemini openai; do
-    taxman collect "pilot-4cities-${provider}" &
+    uv run taxman collect "pilot-4cities-${provider}" &
     echo "Started pilot-4cities-${provider} ..."
 done
 wait

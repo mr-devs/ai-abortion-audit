@@ -41,7 +41,7 @@ echo ""
 
 for suffix in "" "-houston-tx" "-portland-or"; do
     for provider in anthropic gemini openai; do
-        taxman collect "pilot-${provider}${suffix}" &
+        uv run taxman collect "pilot-${provider}${suffix}" &
         echo "Started pilot-${provider}${suffix} ..."
     done
     wait

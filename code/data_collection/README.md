@@ -22,7 +22,7 @@ bash code/data_collection/run_pilot_audits.sh          # first pilot (nine audit
 bash code/data_collection/run_pilot_4cities_audits.sh  # pilot-4cities (three audits)
 ```
 
-They need `taxman` on your PATH, and the API key environment variables named in the audit files must be set.
+They run taxman through `uv run`, so they use the version pinned in [`uv.lock`](../../uv.lock) (run `uv sync` first), and the API key environment variables named in the audit files must be set.
 Keep the terminal open until they finish; closing it stops the runs.
 
 To resolve Gemini citation links on their own (e.g. after an interrupted run):
