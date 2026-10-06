@@ -77,6 +77,8 @@ def calculate_demographic_shift(df, baseline_year, target_year):
     """
 ```
 
+Wrap docstrings at 100 characters.
+
 ### 2.4  Directory‑Level README
 
 Every directory _must_ contain a `README.md` file that lists the purpose of the directory and contents.
