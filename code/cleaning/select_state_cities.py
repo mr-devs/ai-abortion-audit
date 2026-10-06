@@ -6,16 +6,13 @@ Purpose:
 Notes:
     Sample:
     - N_CITIES_PER_STATE (must be even) sets the number of cities per state:
-      half are the most populated places in the state and half the least
-      populated. With N_CITIES_PER_STATE = 4: the two largest and two smallest.
+      N_CITIES_PER_STATE / 2 = the number of most populated and least populated
+      cities selected.
     - Only incorporated places are eligible (SUMLEV 162 in the Census file).
-      All functional-status codes (FUNCSTAT) are kept: the "balance" rows
-      flagged F are the cities proper of consolidated city-counties such as
-      Indianapolis, Louisville, and Nashville.
     - The District of Columbia is excluded (EXCLUDED_STATES), so the sample
       covers the 50 states.
     - Places with an estimated population below MIN_POPULATION (1) are
-      excluded: four places have a 2025 estimate of 0 and would otherwise be
+      excluded: a few places have a 2025 estimate of 0 and would otherwise be
       picked as the least populated.
     - A state with fewer than N_CITIES_PER_STATE places contributes all of
       them, each once. Hawaii has no incorporated places; the Census lists
@@ -26,7 +23,7 @@ Notes:
       small towns.
 
     Ties:
-    - Population ties are broken by the lower id, so the sample is the same on
+    - Population ties are broken by the lower geoid, so the sample is the same on
       every run. Ties at the cut-off (the last place selected and the first
       left out have the same population) are listed in the report.
 
@@ -38,11 +35,23 @@ Notes:
       for each code matches the Census STNAME.
 
     IDs:
-    - id is the STATE, COUNTY, and PLACE FIPS codes concatenated and converted
-      to an integer. For incorporated places COUNTY is always "000", and the
-      conversion drops the leading zero of one-digit state codes (e.g.
-      "01" + "000" + "00124" -> 100000124). The script checks that ids are
-      unique.
+    - geoid is the Census Bureau's standard identifier for a place: the
+      two-digit state FIPS code followed by the five-digit place FIPS code
+      (STATE + PLACE), e.g. "48" + "35000" -> "4835000" for Houston, TX.
+      Place codes are assigned to be unique within a state, so geoid is
+      unique nationwide, and it is the key other Census products (e.g. the
+      American Community Survey) use for places. The county is not part of
+      it because places can cross county lines.
+    - geoid is text, always seven characters. Read it back with
+      dtype={"geoid": str}: read as a number, states 01-09 lose their
+      leading zero.
+    - STATE + PLACE is unique only among incorporated places (SUMLEV 162).
+      Elsewhere in the Census file the same codes repeat: each place also
+      has one row per county it spans (SUMLEV 157), and minor civil
+      divisions such as New England towns (SUMLEV 061) have PLACE "00000"
+      and are identified by STATE + COUNTY + COUSUB instead. A sample that
+      adds other geography types needs a geoid built for each type. The
+      script checks that geoids are unique.
 
     City names:
     - city_official is the Census NAME, verbatim (e.g. "Houston city").
@@ -70,7 +79,8 @@ Output:
     - data/processed/census/selected_cities_<N>_per_state.csv: one row per selected
       city, sorted by state and then by population (largest first), with
       columns:
-        - id (int): STATE + COUNTY + PLACE FIPS codes as an integer.
+        - geoid (str): Census place GEOID, STATE + PLACE FIPS codes
+          (7 characters, e.g. "4835000"); read it as text.
         - state (str): state name (Census STNAME).
         - state_abbr (str): two-letter USPS state abbreviation (e.g. "TX").
         - city_official (str): official Census place name (NAME).
@@ -111,7 +121,7 @@ OUTPUT_PATH = Path(
 REPORT_PATH = Path("../../results/reports/select_state_cities_report.txt")
 
 OUTPUT_COLUMNS = [
-    "id",
+    "geoid",
     "state",
     "state_abbr",
     "city_official",
@@ -220,7 +230,7 @@ def load_places(census_path):
     Returns
     -------
     pandas.DataFrame
-        One row per eligible place, with columns id, state, state_abbr,
+        One row per eligible place, with columns geoid, state, state_abbr,
         city_official, and pop_est_2025.
     """
     # Read everything as text so FIPS codes keep their leading zeros.
@@ -230,15 +240,15 @@ def load_places(census_path):
 
     places = pd.DataFrame(
         {
-            "id": (places["STATE"] + places["COUNTY"] + places["PLACE"]).astype(int),
+            "geoid": places["STATE"] + places["PLACE"],
             "state": places["STNAME"],
             "state_abbr": places["STATE"].map(state_abbreviations(places)),
             "city_official": places["NAME"],
             "pop_est_2025": places["POPESTIMATE2025"].astype(int),
         }
     )
-    if places["id"].duplicated().any():
-        raise ValueError("STATE + COUNTY + PLACE ids are not unique")
+    if places["geoid"].duplicated().any():
+        raise ValueError("STATE + PLACE geoids are not unique")
 
     excluded_state = places["state"].isin(EXCLUDED_STATES)
     too_small = places["pop_est_2025"] < MIN_POPULATION
@@ -276,8 +286,8 @@ def select_cities(places, n_per_state):
     selected, cutoff_ties = [], []
     for state, group in places.groupby("state"):
         # Lower id breaks population ties in both rankings.
-        largest = group.sort_values(["pop_est_2025", "id"], ascending=[False, True])
-        smallest = group.sort_values(["pop_est_2025", "id"], ascending=[True, True])
+        largest = group.sort_values(["pop_est_2025", "geoid"], ascending=[False, True])
+        smallest = group.sort_values(["pop_est_2025", "geoid"], ascending=[True, True])
         for end, ranked in [("most populated", largest), ("least populated", smallest)]:
             pops = ranked["pop_est_2025"].tolist()
             if len(pops) > n_each_end and pops[n_each_end - 1] == pops[n_each_end]:
@@ -286,10 +296,10 @@ def select_cities(places, n_per_state):
                 )
         # A state with fewer than n_per_state places would select some twice.
         picks = pd.concat([largest.head(n_each_end), smallest.head(n_each_end)])
-        selected.append(picks.drop_duplicates(subset="id"))
+        selected.append(picks.drop_duplicates(subset="geoid"))
 
     selected = pd.concat(selected).sort_values(
-        ["state", "pop_est_2025", "id"], ascending=[True, False, True]
+        ["state", "pop_est_2025", "geoid"], ascending=[True, False, True]
     )
     return selected.reset_index(drop=True), cutoff_ties
 
@@ -362,7 +372,7 @@ def write_report(selected, cutoff_ties, census_path):
         f"States with fewer than {N_CITIES_PER_STATE} cities:",
         short.to_string() if not short.empty else "  none",
         "",
-        "Population ties at the cut-off (broken by lower id):",
+        "Population ties at the cut-off (broken by lower geoid):",
         "\n".join(f"  {t}" for t in cutoff_ties) if cutoff_ties else "  none",
         "",
         "Cleaned names that differ from the official name minus its descriptor:",

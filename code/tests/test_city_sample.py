@@ -74,10 +74,10 @@ def test_leftover_census_wording_is_caught(select_script, official):
 
 
 def test_select_cities_ends_and_ties(select_script):
-    """Two largest and two smallest per state; ties go to the lower id."""
+    """Two largest and two smallest per state; ties go to the lower geoid."""
     places = pd.DataFrame(
         {
-            "id": [1, 2, 3, 4, 5, 6, 7],
+            "geoid": ["0100001", "0100002", "0100003", "0100004", "0100005", "0100006", "0200007"],
             "state": ["A"] * 6 + ["B"],
             "city_official": [f"P{i} city" for i in range(1, 8)],
             "pop_est_2025": [1000, 500, 50, 10, 10, 10, 300],
@@ -85,17 +85,17 @@ def test_select_cities_ends_and_ties(select_script):
     )
     selected, ties = select_script.select_cities(places, 4)
     state_a = selected[selected["state"] == "A"]
-    # 1 and 2 are largest; 4, 5, 6 tie for smallest and the lower ids win.
-    assert state_a["id"].tolist() == [1, 2, 4, 5]
+    # 1 and 2 are largest; 4, 5, 6 tie for smallest and the lower geoids win.
+    assert state_a["geoid"].tolist() == ["0100001", "0100002", "0100004", "0100005"]
     assert ties == ["A (least populated): tie at population 10"]
     # A state with a single place contributes it once.
-    assert selected[selected["state"] == "B"]["id"].tolist() == [7]
+    assert selected[selected["state"] == "B"]["geoid"].tolist() == ["0200007"]
 
 
 def test_select_cities_rejects_odd_n(select_script):
     """An odd number of cities per state cannot be split evenly."""
     places = pd.DataFrame(
-        {"id": [1], "state": ["A"], "city_official": ["X city"], "pop_est_2025": [5]}
+        {"geoid": ["0100001"], "state": ["A"], "city_official": ["X city"], "pop_est_2025": [5]}
     )
     with pytest.raises(ValueError):
         select_script.select_cities(places, 3)

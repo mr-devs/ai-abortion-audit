@@ -35,7 +35,8 @@ Output:
       columns:
         - message_id (str): taxman message id (e.g. "m0000"); join key to the
           collected and cleaned audit data.
-        - id (int): city id from the cities file.
+        - geoid (str): Census place GEOID from the cities file (7 characters,
+          e.g. "4835000"); read it as text.
         - state (str): state name.
         - state_abbr (str): two-letter USPS state abbreviation.
         - city_clean (str): city name used in the message.
@@ -70,15 +71,15 @@ def build_messages(cities):
     Parameters
     ----------
     cities : pandas.DataFrame
-        The cities file (id, state, state_abbr, city_clean, ...).
+        The cities file (geoid, state, state_abbr, city_clean, ...).
 
     Returns
     -------
     pandas.DataFrame
-        One row per city, in the input order, with columns id, state,
+        One row per city, in the input order, with columns geoid, state,
         state_abbr, city_clean, and message.
     """
-    messages = cities[["id", "state", "state_abbr", "city_clean"]].copy()
+    messages = cities[["geoid", "state", "state_abbr", "city_clean"]].copy()
     messages["message"] = [
         QUERY_TEMPLATE.format(city=city, state_abbr=abbr)
         for city, abbr in zip(messages["city_clean"], messages["state_abbr"])
@@ -94,7 +95,8 @@ def main():
     """
     Write the message file and the message-to-city crosswalk.
     """
-    cities = pd.read_csv(CITIES_PATH, encoding="utf-8")
+    # geoid is text: read as a number it would lose its leading zero.
+    cities = pd.read_csv(CITIES_PATH, dtype={"geoid": str}, encoding="utf-8")
     messages = build_messages(cities)
 
     MESSAGES_PATH.parent.mkdir(parents=True, exist_ok=True)
