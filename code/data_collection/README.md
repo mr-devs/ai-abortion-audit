@@ -9,7 +9,7 @@ Data collection scripts handle API calls, web scraping, file downloads, and othe
 - [`run_pilot_4cities_audits.sh`](run_pilot_4cities_audits.sh): Runs the three `pilot-4cities-<provider>` audits in parallel, then resolves the Gemini citation links.
 - [`download_census_city_populations.py`](download_census_city_populations.py): Downloads the Census Bureau's 2020-2025 city and town population estimates (`sub-est2025.csv`, saved as UTF-8) and its column documentation (`SUB-EST2025.pdf`) to timestamped files; skips any file already downloaded.
 - [`download_guttmacher.py`](download_guttmacher.py): Downloads the state data behind Guttmacher's abortion policy map to a timestamped raw JSON file; exits if a download already exists.
-- [`write_4cities_messages.py`](write_4cities_messages.py): Writes the `pilot-4cities` taxman message file (one "I live in [city, ST]..." query per selected city) and a crosswalk from taxman message ids to cities.
+- [`write_4cities_messages.py`](write_4cities_messages.py): Writes the `pilot-4cities` taxman message file (one "I live in [city, ST]..." query per selected city), in the order of the cities file.
 - [`resolve_gemini_urls.py`](resolve_gemini_urls.py): Resolves the Google redirect URLs that Gemini cites to the URLs Google cited (one HEAD request per link, reading the 302 `Location` header), writing `resolved_urls.jsonl` into each Gemini run directory; skips responses already resolved.
 
 ## Other instructions
