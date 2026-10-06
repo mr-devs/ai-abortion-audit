@@ -7,51 +7,36 @@ Notes:
     Sample:
     - N_CITIES_PER_STATE (must be even) sets the number of cities per state:
       N_CITIES_PER_STATE / 2 = the number of most populated and least populated
-      cities selected.
+      cities selected. If N_CITIES_PER_STATE is not even, the script raises an error.
     - Only incorporated places are eligible (SUMLEV 162 in the Census file).
     - The District of Columbia is excluded (EXCLUDED_STATES), so the sample
       covers the 50 states.
     - Places with an estimated population below MIN_POPULATION (1) are
       excluded: a few places have a 2025 estimate of 0 and would otherwise be
       picked as the least populated.
-    - A state with fewer than N_CITIES_PER_STATE places contributes all of
-      them, each once. Hawaii has no incorporated places; the Census lists
+    - A state with fewer than N_CITIES_PER_STATE places contributes all places.
+      For example, Hawaii has no incorporated places; the Census lists
       "Urban Honolulu CDP" as its only SUMLEV 162 row, so Hawaii contributes
       one city. Such states are listed in the report.
-    - In New England, towns are minor civil divisions rather than incorporated
-      places, so the least populated places there are small cities, not
-      small towns.
 
     Ties:
-    - Population ties are broken by the lower geoid, so the sample is the same on
+    - Population ties are broken by order, so the sample is the same on
       every run. Ties at the cut-off (the last place selected and the first
       left out have the same population) are listed in the report.
 
     State abbreviations:
     - state_abbr is the two-letter USPS abbreviation from the `us` package,
       looked up by the state's two-digit FIPS code (the STATE column), which
-      is an exact match. Name lookups in `us` fall back to phonetic matching,
-      so they are not used. The script checks that the state name `us` returns
-      for each code matches the Census STNAME.
+      is an exact match.
 
     IDs:
     - geoid is the Census Bureau's standard identifier for a place: the
       two-digit state FIPS code followed by the five-digit place FIPS code
       (STATE + PLACE), e.g. "48" + "35000" -> "4835000" for Houston, TX.
-      Place codes are assigned to be unique within a state, so geoid is
-      unique nationwide, and it is the key other Census products (e.g. the
-      American Community Survey) use for places. The county is not part of
-      it because places can cross county lines.
-    - geoid is text, always seven characters. Read it back with
-      dtype={"geoid": str}: read as a number, states 01-09 lose their
-      leading zero.
+      Place codes are assigned to be unique within a state.
+    - geoid should always be a string, as states with 01-09 codes lose their
+      leading zero as numbers.
     - STATE + PLACE is unique only among incorporated places (SUMLEV 162).
-      Elsewhere in the Census file the same codes repeat: each place also
-      has one row per county it spans (SUMLEV 157), and minor civil
-      divisions such as New England towns (SUMLEV 061) have PLACE "00000"
-      and are identified by STATE + COUNTY + COUSUB instead. A sample that
-      adds other geography types needs a geoid built for each type. The
-      script checks that geoids are unique.
 
     City names:
     - city_official is the Census NAME, verbatim (e.g. "Houston city").
@@ -65,8 +50,8 @@ Notes:
            "San Buenaventura (Ventura)", keep the common name in parentheses.
       The Census capitalization is kept; str.title() would break names such
       as "McAllen". The script stops if a selected city_clean still contains
-      a descriptor word, "County", or punctuation such as parentheses, so new
-      cases get an override rather than a bad query.
+      a descriptor word, "County", or punctuation such as parentheses, so we can
+      catch and fix these cases.
 
 Input:
     - data/raw/census/sub-est2025_<timestamp>.csv (newest), written by
@@ -144,18 +129,12 @@ CITY_NAME_OVERRIDES = {
     "Urban Honolulu CDP": "Honolulu",
 }
 
-# Trailing "(balance)": the part of a consolidated city outside its other
-# incorporated places.
+# Other patterns to remove from city names
 BALANCE_PATTERN = re.compile(r"\s+\(balance\)$")
-# Trailing legal descriptor; longer alternatives first so "city and borough"
-# is removed whole.
 DESCRIPTOR_PATTERN = re.compile(
     r"\s+(?:city and borough|city|town|village|borough|municipality|corporation|CDP)$"
 )
-# "Official (Common)" -> "Common".
 COMMON_NAME_PATTERN = re.compile(r"^.+\s+\((?P<common>[^()]+)\)$")
-# A cleaned name matching this still carries Census wording. Descriptors are
-# lowercase in Census names, so capitalized words like "Kansas City" pass.
 LEFTOVER_PATTERN = re.compile(
     r"\b(?:city|town|village|borough|municipality|corporation|CDP|government"
     r"|county|County|balance)\b|[(),/]"
@@ -233,7 +212,7 @@ def load_places(census_path):
         One row per eligible place, with columns geoid, state, state_abbr,
         city_official, and pop_est_2025.
     """
-    # Read everything as text so FIPS codes keep their leading zeros.
+    # Read everything as text so FIPS codes keep their leading zeros
     census = pd.read_csv(census_path, dtype=str, encoding="utf-8")
     places = census[census["SUMLEV"] == SUMLEV_INCORPORATED_PLACE]
     print(f"Incorporated places (SUMLEV {SUMLEV_INCORPORATED_PLACE}): {len(places):,}")
@@ -250,6 +229,7 @@ def load_places(census_path):
     if places["geoid"].duplicated().any():
         raise ValueError("STATE + PLACE geoids are not unique")
 
+    # Remove DC and places with a population below the minimum
     excluded_state = places["state"].isin(EXCLUDED_STATES)
     too_small = places["pop_est_2025"] < MIN_POPULATION
     print(f"Dropped {excluded_state.sum()} places in {sorted(EXCLUDED_STATES)}")
@@ -290,9 +270,12 @@ def select_cities(places, n_per_state):
         smallest = group.sort_values(["pop_est_2025", "geoid"], ascending=[True, True])
         for end, ranked in [("most populated", largest), ("least populated", smallest)]:
             pops = ranked["pop_est_2025"].tolist()
-            if len(pops) > n_each_end and pops[n_each_end - 1] == pops[n_each_end]:
+            if len(pops) <= n_each_end:
+                continue  # every place is selected, so there is no cut-off
+            last_selected, first_left_out = pops[n_each_end - 1], pops[n_each_end]
+            if last_selected == first_left_out:
                 cutoff_ties.append(
-                    f"{state} ({end}): tie at population {pops[n_each_end]:,}"
+                    f"{state} ({end}): tie at population {first_left_out:,}"
                 )
         # A state with fewer than n_per_state places would select some twice.
         picks = pd.concat([largest.head(n_each_end), smallest.head(n_each_end)])
