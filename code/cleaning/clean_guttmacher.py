@@ -1,13 +1,8 @@
 """
 Purpose:
-    Turn a raw Guttmacher policy-map download into one JSONL record per state
-    and a simple CSV of each state's policy category.
+    Clean the raw Guttmacher policy-map data.
 
 Notes:
-    Input file:
-    - By default, the newest data/raw/guttmacher/guttmacher_raw_states_*.json
-      (the timestamped names sort by download time); --raw-file overrides it.
-
     Policy category (environment_type):
     - The map sorts states into seven categories, from "Most Restrictive" to
       "Most Protective". The raw API spells some inconsistently (e.g.
@@ -39,9 +34,9 @@ Notes:
       out. Every other state name matches the Census STNAME column.
 
 Input:
-    - data/raw/guttmacher/guttmacher_raw_states_<timestamp>.json, written by
-      code/data_collection/download_guttmacher.py.
-    - --raw-file (optional): a different raw file to clean.
+    - data/raw/guttmacher/guttmacher_raw_states_<timestamp>.json (latest by date in filename),
+      written by code/data_collection/download_guttmacher.py.
+    - --raw-file (optional): specifiy a different raw file to clean.
 
     Usage (from anywhere):
         uv run python code/cleaning/clean_guttmacher.py
