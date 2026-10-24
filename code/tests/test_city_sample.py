@@ -1,7 +1,8 @@
 """
 Unit tests for the pilot-4cities city sample: city-name cleaning, city
 selection, and state abbreviations in code/cleaning/select_state_cities.py,
-and the download-file helpers in toolkit.utils.
+the parsing of a message's city, and the download-file helpers in
+toolkit.utils.
 
 The inputs are small inline examples copied from the Census file, so the tests
 do not depend on the data directory.
@@ -16,7 +17,12 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
-from toolkit.utils import find_existing_downloads, latest_download, timestamped_path
+from toolkit.utils import (
+    find_existing_downloads,
+    latest_download,
+    parse_message_location,
+    timestamped_path,
+)
 
 SCRIPT_PATH = (
     Path(__file__).resolve().parents[1] / "cleaning" / "select_state_cities.py"
@@ -117,6 +123,31 @@ def test_state_abbreviations(select_script):
     wrong_name = pd.DataFrame({"STATE": ["48"], "STNAME": ["Oklahoma"]})
     with pytest.raises(ValueError):
         select_script.state_abbreviations(wrong_name)
+
+
+QUESTION = "Where can I get an abortion near me?"
+
+
+@pytest.mark.parametrize(
+    "city, state_abbr, location",
+    [
+        ("Huntsville", "AL", "huntsville-al"),
+        ("St. Paul", "MN", "st-paul-mn"),
+        ("Valley-Hi", "PA", "valley-hi-pa"),
+        ("Oak Hill", "AL", "oak-hill-al"),
+    ],
+)
+def test_parse_message_location(city, state_abbr, location):
+    parsed = parse_message_location(f"I live in {city}, {state_abbr}. {QUESTION}")
+    assert parsed == {"city": city, "state_abbr": state_abbr, "location": location}
+
+
+@pytest.mark.parametrize(
+    "message",
+    [QUESTION, f"I live in Huntsville. {QUESTION}", f"I live in Huntsville, Al. {QUESTION}"],
+)
+def test_parse_message_location_no_match(message):
+    assert parse_message_location(message) is None
 
 
 def test_download_helpers(tmp_path):

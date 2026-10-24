@@ -9,10 +9,14 @@ Notes:
       this script only assembles rows.
     - study and location are parsed from the audit name
       ("<study>-<provider>[-<location>]"; see toolkit.loading.
-      parse_audit_name). The pilot-4cities audits put the city in the message
-      text rather than the audit name, so their location is "none"; join
-      message_id to taxman/messages/pilot-4cities-queries-lookup.csv for the
-      city.
+      parse_audit_name).
+    - The pilot-4cities audits ask about many cities, naming the city in each
+      message ("I live in <city>, <ST>. ...") rather than in the audit name.
+      For these studies (CITY_IN_MESSAGE_STUDIES), city, state_abbr, and
+      location are parsed from the message (toolkit.utils.
+      parse_message_location), and the script stops if any message does not
+      match. city and state_abbr join to data/processed/census/
+      selected_cities_4_per_state.csv on (city_clean, state_abbr).
     - message_id is taxman's UUID5 of the message text, so the same text has
       the same id in every audit and run.
     - Failed requests (status "error") are kept in metadata, with their
@@ -38,7 +42,13 @@ Output:
             - audit (str): taxman audit name.
             - study (str): Study part of the audit name (e.g. "pilot").
             - location (str): Location part of the audit name (e.g.
-              "houston-tx"); "none" when the audit has no location.
+              "houston-tx"), or for pilot-4cities the city and state in the
+              message, in the same form (e.g. "st-paul-mn"); "none" when
+              neither names one.
+            - city (str or None): pilot-4cities only - the city the message
+              names (e.g. "St. Paul"); None for other studies.
+            - state_abbr (str or None): pilot-4cities only - the state's
+              postal abbreviation (e.g. "MN"); None for other studies.
             - run_id (str): taxman run id.
             - message_id (str): taxman message id, a UUID5 of the message
               text.
@@ -65,7 +75,9 @@ Output:
     - data/processed/audits/audit_runs.parquet - one row per taxman run
         Columns:
             - audit (str), study (str), location (str), run_id (str),
-              provider (str), model (str): As in metadata.
+              provider (str), model (str): As in metadata, except that
+              location comes from the audit name only, so it is "none" for
+              pilot-4cities runs, which cover many cities.
             - status (str): Manifest status (always "complete" here).
             - n_messages (int): Messages in the message file.
             - repeats (int): Repeats per message.
@@ -83,8 +95,8 @@ Output:
             - taxman_versions (str): Comma-separated taxman versions that
               collected the run, in the order each first did.
     - results/reports/clean_metadata_text_report.txt - row counts per table,
-      rows replaced by a later collect, responses per (provider, location),
-      and responses without text
+      rows replaced by a later collect, responses per (provider, study), and
+      responses without text
 
 Author: Matthew DeVerna
 """
@@ -96,12 +108,16 @@ from pathlib import Path
 import pandas as pd
 
 from toolkit.loading import discover_runs, load_run_responses, parse_audit_name
+from toolkit.utils import parse_message_location
 
 os.chdir(Path(__file__).resolve().parent)
 
 AUDITS_DIR = Path("../../data/raw/audits")
 OUTPUT_DIR = Path("../../data/processed/audits")
 REPORT_PATH = Path("../../results/reports/clean_metadata_text_report.txt")
+
+#: Studies whose audits name the city in each message, not in the audit name.
+CITY_IN_MESSAGE_STUDIES = {"pilot-4cities"}
 
 RUN_COLUMNS = [
     "audit",
@@ -144,6 +160,41 @@ def parse_args():
     return parser.parse_args()
 
 
+def message_location(message, names):
+    """
+    Return the location columns for one response.
+
+    Parameters
+    ----------
+    message : str
+        The message text sent.
+    names : dict
+        {"study", "location"} from ``parse_audit_name``.
+
+    Returns
+    -------
+    dict
+        {"location", "city", "state_abbr"}: parsed from the message for
+        CITY_IN_MESSAGE_STUDIES; otherwise the audit name's location, with
+        city and state_abbr None.
+
+    Raises
+    ------
+    ValueError
+        If a message of a CITY_IN_MESSAGE_STUDIES study names no city, so a
+        change in the message wording is caught rather than left null.
+    """
+    if names["study"] not in CITY_IN_MESSAGE_STUDIES:
+        return {"location": names["location"], "city": None, "state_abbr": None}
+    parsed = parse_message_location(message)
+    if parsed is None:
+        raise ValueError(
+            f"{names['study']} message names no city "
+            f"('I live in <city>, <ST>. ...'): {message!r}"
+        )
+    return parsed
+
+
 def build_tables(audit_prefix):
     """
     Build the metadata, response-text, and audit-runs tables.
@@ -165,10 +216,12 @@ def build_tables(audit_prefix):
         names = parse_audit_name(run["audit"], run["provider"])
         responses = load_run_responses(run)
         for response in responses:
+            meta = response.get_metadata()
             metadata_rows.append(
                 {
-                    **response.get_metadata(),
+                    **meta,
                     **names,
+                    **message_location(meta["message"], names),
                     **response.get_stop_info(),
                 }
             )
@@ -186,11 +239,11 @@ def build_tables(audit_prefix):
         )
 
     metadata = pd.DataFrame(metadata_rows)
-    first = ["response_id", "audit", "study", "location"]
+    first = ["response_id", "audit", "study", "location", "city", "state_abbr"]
     metadata = metadata[first + [c for c in metadata.columns if c not in first]]
     for col in ["requested_at", "received_at"]:
         metadata[col] = pd.to_datetime(metadata[col], utc=True)
-    nullable_str = ["error", "stop_reason", "stop_detail"]
+    nullable_str = ["city", "state_abbr", "error", "stop_reason", "stop_detail"]
     metadata[nullable_str] = metadata[nullable_str].astype("str")
 
     response_text = pd.DataFrame(text_rows)
@@ -272,8 +325,9 @@ def write_report(metadata, response_text, audit_runs):
         "Rows replaced by a later collect (failed pairs re-sent): "
         f"{(audit_runs['n_rows'] - audit_runs['n_responses']).sum()}",
         "",
-        "Responses per provider and location (status counts):",
-        metadata.groupby(["provider", "location"])["status"]
+        # By study rather than location: pilot-4cities has ~200 locations.
+        "Responses per provider and study (status counts):",
+        metadata.groupby(["provider", "study"])["status"]
         .value_counts()
         .unstack(fill_value=0)
         .to_string(),

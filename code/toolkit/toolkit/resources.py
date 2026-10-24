@@ -67,7 +67,10 @@ def find_resources(text: str) -> Dict[str, bool]:
     dict
         {resource_id: bool} for every resource in RESOURCES, in order.
     """
-    text = text or ""
+    # Missing text reads back from parquet as NaN, a truthy float, so test
+    # the type rather than `text or ""`.
+    if not isinstance(text, str):
+        text = ""
     return {rid: bool(rx.search(text)) for rid, rx in _COMPILED}
 
 

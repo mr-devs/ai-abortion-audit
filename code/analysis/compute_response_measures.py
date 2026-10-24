@@ -39,8 +39,11 @@ Output:
         Columns:
             - response_id (str): Joins to metadata.
             - provider (str): anthropic | gemini | openai.
-            - location (str): none | houston-tx | portland-or.
-            - message_id (str): Query id, shared across locations.
+            - study (str): Study part of the audit name (e.g.
+              "pilot-4cities").
+            - location (str): As in metadata (e.g. "st-paul-mn").
+            - message_id (str): taxman message id, a UUID5 of the message
+              text, so each city's message has its own id.
             - repeat (int): Zero-based repeat number.
             - n_words (int): Words in the response, URLs removed.
             - n_chars (int): Characters in the response text, verbatim.
@@ -57,7 +60,7 @@ Output:
             - res_<id> (bool): One column per resource in
               toolkit.resources.RESOURCES; True if the response names it.
     - results/reports/compute_response_measures_report.txt - mean measures
-      and resource-mention shares by provider and location
+      and resource-mention shares by provider and study
 
 Author: Matthew DeVerna
 """
@@ -94,15 +97,19 @@ def count_words(text):
 
     Parameters
     ----------
-    text : str
-        Response text (markdown).
+    text : str or None
+        Response text (markdown); None or NaN when the response has none.
 
     Returns
     -------
     int
         Word count after removing markdown link targets and bare URLs.
     """
-    text = MARKDOWN_LINK_TARGET.sub("]", text or "")
+    # Missing text reads back from parquet as NaN, a truthy float, so test
+    # the type rather than `text or ""`.
+    if not isinstance(text, str):
+        text = ""
+    text = MARKDOWN_LINK_TARGET.sub("]", text)
     text = BARE_URL.sub(" ", text)
     return len(WORD.findall(text))
 
@@ -170,7 +177,8 @@ def build_measures(meta, text, tool_calls, text_cites, tool_cites):
     pandas.DataFrame
         One row per response with the columns listed in the script header.
     """
-    df = meta[["response_id", "provider", "location", "message_id", "repeat"]].merge(
+    id_cols = ["response_id", "provider", "study", "location", "message_id", "repeat"]
+    df = meta[id_cols].merge(
         text[["response_id", "text"]], on="response_id", how="left", validate="1:1"
     )
     df["n_words"] = df["text"].apply(count_words)
@@ -217,7 +225,8 @@ def write_report(df):
     df : pandas.DataFrame
         The response_measures table.
     """
-    group = ["provider", "location"]
+    # By study rather than location: pilot-4cities has ~200 locations.
+    group = ["provider", "study"]
     means = df.groupby(group)[
         [
             "n_words",
@@ -237,7 +246,7 @@ def write_report(df):
         "",
         f"response_measures rows: {len(df)}",
         "",
-        "Mean per response by provider and location",
+        "Mean per response by provider and study",
         "(searched = share of responses with any search):",
         means.round(2).to_string(),
         "",

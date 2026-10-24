@@ -46,3 +46,9 @@ def test_resource_non_matches(text, resource_id):
 def test_every_resource_reported():
     """find_resources returns a key for every resource, even for empty text."""
     assert list(find_resources(None)) == [rid for rid, _, _ in RESOURCES]
+
+
+@pytest.mark.parametrize("missing", [None, float("nan")])
+def test_missing_text_finds_nothing(missing):
+    """Missing text, which reads back from parquet as NaN, names no resource."""
+    assert not any(find_resources(missing).values())

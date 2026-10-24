@@ -5,7 +5,7 @@ Each audit script discovers runs through taxman's `manifest.json` files (complet
 
 ## Contents
 
-- [`clean_metadata_text.py`](clean_metadata_text.py): Builds `metadata` (one row per response, including study and location), `response_text`, and `audit_runs` (one row per taxman run).
+- [`clean_metadata_text.py`](clean_metadata_text.py): Builds `metadata` (one row per response, including study and location; for pilot-4cities, location, city, and state_abbr are parsed from the message), `response_text`, and `audit_runs` (one row per taxman run).
 - [`clean_citations.py`](clean_citations.py): Builds `text_citations` (URLs cited in the response text, with Gemini's resolved URLs joined in) and `tool_citations` (URLs search tools returned), each with a `domain` column.
 - [`clean_tool_calls.py`](clean_tool_calls.py): Builds `tool_calls` (one row per search, page open, or code execution), including Anthropic code-execution outcomes.
 - [`clean_token_usage.py`](clean_token_usage.py): Builds the long-format `token_usage` table, with a `unit` for every token type.

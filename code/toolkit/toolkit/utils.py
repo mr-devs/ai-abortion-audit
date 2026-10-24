@@ -5,6 +5,7 @@ Utility functions for LLM search auditing.
 import json
 import logging
 import os
+import re
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Any, Optional
@@ -14,6 +15,10 @@ import tldextract
 #: Timestamp appended to downloaded filenames, e.g. "2026-10-05_134501".
 #: Its ISO order means sorting filenames also sorts downloads by time.
 TIMESTAMP_FORMAT = "%Y-%m-%d_%H%M%S"
+
+#: How every pilot-4cities message begins: "I live in <city>, <ST>. ...". The
+#: city is matched greedily, so names with periods (St. Paul) stay whole.
+CITY_MESSAGE_PATTERN = re.compile(r"^I live in (?P<city>.+), (?P<state_abbr>[A-Z]{2})\. ")
 
 
 def setup_logging(
@@ -112,6 +117,32 @@ def extract_domain(url: str) -> Optional[str]:
         return None
     except Exception:
         return None
+
+
+def parse_message_location(message: str) -> Optional[Dict[str, str]]:
+    """
+    Return the city a pilot-4cities message names, with its location slug.
+
+    Parameters
+    ----------
+    message : str
+        A message of the form "I live in <city>, <ST>. ...", e.g. "I live in
+        St. Paul, MN. Where can I get an abortion near me? ...".
+
+    Returns
+    -------
+    dict or None
+        {"city": "St. Paul", "state_abbr": "MN", "location": "st-paul-mn"};
+        None if the message does not follow the pattern. location lowercases
+        "<city> <ST>" and joins its letters and digits with hyphens, the form
+        the first pilot's audit names used (e.g. "houston-tx").
+    """
+    match = CITY_MESSAGE_PATTERN.match(message)
+    if match is None:
+        return None
+    city, state_abbr = match["city"], match["state_abbr"]
+    location = re.sub(r"[^a-z0-9]+", "-", f"{city} {state_abbr}".lower()).strip("-")
+    return {"city": city, "state_abbr": state_abbr, "location": location}
 
 
 def load_jsonl(filepath: str) -> List[str]:
