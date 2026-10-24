@@ -14,6 +14,7 @@ audit: pilot-4cities-gemini
 provider: gemini
 
 # The name of the environment variable that holds the API key to use for this audit.
+# A name in capitals, never the key itself.
 #   Type:     string
 #   Required: yes
 #   Example:  GEMINI_API_KEY
@@ -64,7 +65,7 @@ execution:
 
   # Max number of simultaneous requests.
   #   Type:     integer, 1 or more
-  #   Default:  8
+  #   Default:  4
   max_concurrency: 4
 
   # Send the messages through the provider's batch API instead of one request at a time.
@@ -89,11 +90,6 @@ execution:
   #   Default:  continue
   on_error: continue
 
-  # Send requests in random order instead of file order.
-  #   Type:     boolean
-  #   Default:  false
-  shuffle: false
-
 # Settings below are specific to the 'gemini' provider.
 model:
   # The model to send every message to.
@@ -101,18 +97,6 @@ model:
   #   Required: yes
   #   Docs:     https://ai.google.dev/gemini-api/docs/models
   name: gemini-3.8-flash
-
-  # Sampling randomness, from focused to varied.
-  #   Type:     float, 0 to 2
-  #   Default:  blank (model default)
-  #   Docs:     https://ai.google.dev/gemini-api/docs/text-generation
-  temperature:
-
-  # Nucleus sampling threshold.
-  #   Type:     float, 0 to 1
-  #   Default:  blank (model default)
-  #   Docs:     https://ai.google.dev/gemini-api/docs/text-generation
-  top_p:
 
   # Max tokens per response, thinking included.
   #   Type:     integer, 1 or more

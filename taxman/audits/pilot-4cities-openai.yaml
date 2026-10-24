@@ -14,6 +14,7 @@ audit: pilot-4cities-openai
 provider: openai
 
 # The name of the environment variable that holds the API key to use for this audit.
+# A name in capitals, never the key itself.
 #   Type:     string
 #   Required: yes
 #   Example:  OPENAI_API_KEY
@@ -64,7 +65,7 @@ execution:
 
   # Max number of simultaneous requests.
   #   Type:     integer, 1 or more
-  #   Default:  8
+  #   Default:  4
   max_concurrency: 4
 
   # Send the messages through the provider's batch API instead of one request at a time.
@@ -88,11 +89,6 @@ execution:
   #             stop      stop sending; the run ends as stopped_early
   #   Default:  continue
   on_error: continue
-
-  # Send requests in random order instead of file order.
-  #   Type:     boolean
-  #   Default:  false
-  shuffle: false
 
 # Settings below are specific to the 'openai' provider.
 model:

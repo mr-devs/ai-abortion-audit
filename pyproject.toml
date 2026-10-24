@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "Audit of AI model responses on abortion"
 requires-python = ">=3.14"
 dependencies = [
-    "ai-taxman[all]==0.1.1",
+    "ai-taxman[all]==0.2.0",
     "pandas>=3.0.6",
     "pyarrow>=25.0.1",
     "requests>=2.34.2",

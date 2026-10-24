@@ -5,11 +5,6 @@ Reports are written by the scripts that produce them, as noted below.
 
 ## Contents
 
-- [`clean_metadata_text_report.txt`](clean_metadata_text_report.txt): Row counts per table, responses per provider and location by status, and successful responses without text (from `code/cleaning/clean_metadata_text.py`).
-- [`clean_citations_report.txt`](clean_citations_report.txt): Text and tool citation counts per response by provider and location, the Gemini resolution rate, and rows dropped for a null URL (from `code/cleaning/clean_citations.py`).
-- [`clean_tool_calls_report.txt`](clean_tool_calls_report.txt): Tool calls by provider and tool type, and searches per response by provider and location (from `code/cleaning/clean_tool_calls.py`).
-- [`clean_token_usage_report.txt`](clean_token_usage_report.txt): Mean and sum of every token type by provider (from `code/cleaning/clean_token_usage.py`).
-- [`compute_response_measures_report.txt`](compute_response_measures_report.txt): Mean words, search rate, searches, cited and retrieved URLs, and resources named per response, plus the share of responses naming each resource, by provider and location (from `code/analysis/compute_response_measures.py`).
-- [`build_pilot_explorer_data_report.txt`](build_pilot_explorer_data_report.txt): Size of the explorer data bundle and its record counts (from `code/generate_figures/build_pilot_explorer_data.py`).
 - [`select_state_cities_report.txt`](select_state_cities_report.txt): The pilot-4cities sample: cities and states selected, states with fewer than four cities, population ties at the cut-off, renamed cities, and the full list (from `code/cleaning/select_state_cities.py`).
 - [`clean_guttmacher_report.txt`](clean_guttmacher_report.txt): The raw Guttmacher file used and the number of states in each policy category (from `code/cleaning/clean_guttmacher.py`).
+- [`archive-taxman-0.1.1/`](archive-taxman-0.1.1/): The cleaning, analysis, and explorer reports of the first pilot (2026-10-04), collected with taxman 0.1.1.

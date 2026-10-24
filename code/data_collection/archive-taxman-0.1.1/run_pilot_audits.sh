@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 #
+# ARCHIVED: this script collected the 2026-10-04 pilot with taxman 0.1.1 and is
+# kept, unchanged below this note, as a record of how that data was collected.
+# It no longer runs: its audits moved to taxman/archive-taxman-0.1.1/audits/,
+# and taxman 0.2.0 refuses them (see that folder's README).
+#
 # Purpose:
 #     Run every pilot audit with taxman, one location group at a time, then
 #     resolve the Gemini citation links, so all data collection for this pilot

@@ -5,21 +5,8 @@ Each page reads a data bundle that a Python script writes to `data/processed/exp
 
 ## Contents
 
-- [`pilot_explorer.html`](pilot_explorer.html): D3 explorer of the 2026-10-04 pilot (270 responses). It has a query rail with full-text search, plus four tabs:
-  - **Responses**: every repeat side by side, by provider for one location or by location for one provider.
-  - **Overview**: dot plots of response measures for the selected location, or one panel per location when comparing. Each query × provider line shows every run (one marker shape per run) and their mean.
-  - **Resources named**: a dot matrix of the share of responses naming each abortion-access resource.
-  - **Search & sources**: search rates, top cited and retrieved domains, and the search strings sent.
+- [`archive-taxman-0.1.1/`](archive-taxman-0.1.1/): The D3 explorer of the first pilot (2026-10-04, 270 responses), collected with taxman 0.1.1, which reads its bundle from `data/processed/archive-taxman-0.1.1/explorer/`.
 
 ## Other instructions
 
-Build the data bundle from the project root, then open the HTML file in a browser (a double-click works; no server is needed):
-
-```bash
-uv run python code/analysis/compute_response_measures.py
-uv run python code/generate_figures/build_pilot_explorer_data.py
-```
-
-The page loads `../../../data/processed/explorer/pilot_explorer_data.js`, so the `data/` symlink must exist (see the `setup-data-symlink` skill).
-D3, marked, and DOMPurify load from cdnjs, so the page needs an internet connection.
-The view (tab, query, location, and so on) is kept in the URL hash, so a link reopens the same view.
+[`code/generate_figures/build_pilot_explorer_data.py`](../../../code/generate_figures/build_pilot_explorer_data.py) builds the first pilot's bundle shape (queries asked with no location, about Houston, and about Portland) into `data/processed/explorer/`; it has not been adapted to pilot-4cities.

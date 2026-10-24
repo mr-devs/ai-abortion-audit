@@ -35,7 +35,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "ai-taxman", extras = ["all"], specifier = "==0.1.1" },
+    { name = "ai-taxman", extras = ["all"], specifier = "==0.2.0" },
     { name = "pandas", specifier = ">=3.0.6" },
     { name = "pyarrow", specifier = ">=25.0.1" },
     { name = "requests", specifier = ">=2.34.2" },
@@ -50,17 +50,18 @@ dev = [{ name = "pytest", specifier = ">=9.1.1" }]
 
 [[package]]
 name = "ai-taxman"
-version = "0.1.1"
+version = "0.2.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "pydantic" },
     { name = "pyyaml" },
     { name = "questionary" },
+    { name = "tqdm" },
     { name = "typer" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/5c/42/9a8649adfe31f409701d4ffaa272ec292c88e792c45584510a3e79a67ac7/ai_taxman-0.1.1.tar.gz", hash = "sha256:c0843d1e6592319ae1933daa7b67bf7878ce556c3f0f1454b82ad92d4f7eaca0", size = 64726, upload-time = "2026-10-04T01:30:43.596Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/93/c5/c37401565f7af2dbd407e25bcd33321f1851b65d20fee26b80bd0cbb14cc/ai_taxman-0.2.0.tar.gz", hash = "sha256:623fd29546256e24a14119d5cbd06f25d818163c7739b32277d8d89549028592", size = 82886, upload-time = "2026-10-24T00:57:01.795Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/98/f1/087eb6e0f6cf9f1d703e552113aef4a8b48063c28a14fc566b61e0ff2121/ai_taxman-0.1.1-py3-none-any.whl", hash = "sha256:ce7f086a71f3750688ac6b095ee00cc81fea178ef63b671f4a82d1ed53426c37", size = 90938, upload-time = "2026-10-04T01:30:44.517Z" },
+    { url = "https://files.pythonhosted.org/packages/25/66/2f4a7c117c195d5fb968d98b855cc8197bb69bdf81393edaa109fc88e897/ai_taxman-0.2.0-py3-none-any.whl", hash = "sha256:24e39395112b949deab02031ab80cfb7c372ce442341c54b8cee6587cd1111ed", size = 109391, upload-time = "2026-10-24T00:57:00.764Z" },
 ]
 
 [package.optional-dependencies]
@@ -1035,6 +1036,18 @@ wheels = [
 name = "toolkit"
 version = "0.1.0"
 source = { editable = "code/toolkit" }
+
+[[package]]
+name = "tqdm"
+version = "4.70.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "colorama", marker = "sys_platform == 'win32'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/0d/ea/b2a5bd54b28a324dae8211928b2d730b6547500342c7e6c6dea08bd0a485/tqdm-4.70.1.tar.gz", hash = "sha256:cefd0eca11b2a37a3aee776544d4f4ae913f02688135b5556b8788dfa474afc4", size = 171846, upload-time = "2026-09-11T07:25:16.601Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/a7/03/921a3d3c75785aca9ebfbfcabfbc3a1be12e2ab5265deb026d55a5a3f83e/tqdm-4.70.1-py3-none-any.whl", hash = "sha256:c293e525e6fef9c20e8728fd4612df02a0aa31bb5fe91ecd93e123b1b7bffa73", size = 80199, upload-time = "2026-09-11T07:25:14.599Z" },
+]
 
 [[package]]
 name = "truststore"
