@@ -1,16 +1,20 @@
 """
-Unit tests for toolkit.response_models and toolkit.loading.parse_audit_name.
+Unit tests for toolkit.response_models and toolkit.loading (audit-name parsing
+and one-row-per-pair loading).
 
-The records below are trimmed copies of the structure taxman saved in the
-2026-10-04 pilot (data/raw/audits/), kept inline so the tests do not depend
-on the data directory.
+The raw payloads below are trimmed copies of the structure taxman saved in the
+2026-10-04 pilot (data/raw/archive-taxman-0.1.1/); taxman 0.2.0 saves them
+unchanged. The record envelope follows taxman 0.2.0. Everything is inline so
+the tests do not depend on the data directory.
 
 Run with: uv run pytest code/tests
 """
 
+import json
+
 import pytest
 
-from toolkit.loading import NO_LOCATION, parse_audit_name
+from toolkit.loading import NO_LOCATION, load_run_responses, parse_audit_name
 from toolkit.response_models import (
     AnthropicResponse,
     GeminiResponse,
@@ -19,26 +23,27 @@ from toolkit.response_models import (
 )
 
 
-def make_record(provider, raw, audit=None, status="ok"):
-    """Return a taxman response record wrapping `raw`."""
+MESSAGE_ID = "2ebdff37-21ca-5927-8f87-d593b1ec0f4f"
+
+
+def make_record(provider, raw, audit=None, status="ok", message_id=MESSAGE_ID):
+    """Return a taxman 0.2.0 response record wrapping `raw`."""
     return {
         "schema_version": 1,
         "audit": audit or f"pilot-{provider}",
-        "run_id": "20261004T201940Z-abc123",
-        "message_id": "m0003",
-        "message_hash": "sha256:x",
+        "run_id": "20261023T101502-abc123",
+        "message_id": message_id,
         "message": "Is abortion legal?",
         "repeat": 2,
-        "system_prompt_hash": None,
         "provider": provider,
         "model": "some-model",
-        "requested_at": "2026-10-04T20:19:49.209765Z",
-        "received_at": "2026-10-04T20:19:59.126121Z",
+        "requested_at": "2026-10-23T10:15:02.123456-07:00",
+        "received_at": "2026-10-23T10:15:12.039812-07:00",
         "latency_ms": 9916,
         "status": status,
-        "error": None if status == "ok" else {"type": "Timeout"},
+        "error": None if status == "ok" else "APITimeoutError: Request timed out.",
         "attempts": 1,
-        "raw": raw,
+        "raw": raw if raw is not None else {},
     }
 
 
@@ -244,7 +249,9 @@ def test_provider_mismatch_raises():
 def test_metadata_and_response_id():
     response = parse_record(make_record("openai", OPENAI_RAW))
     meta = response.get_metadata()
-    assert meta["response_id"] == "pilot-openai__20261004T201940Z-abc123__m0003__r2"
+    assert meta["response_id"] == (
+        f"pilot-openai__20261023T101502-abc123__{MESSAGE_ID}__r2"
+    )
     assert meta["repeat"] == 2
     assert meta["error"] is None
 
@@ -256,7 +263,30 @@ def test_failed_record_returns_empty_results():
     assert response.get_tool_calls() == []
     assert response.get_tool_citations() == []
     assert response.get_token_usage() == []
-    assert response.get_metadata()["error"] == '{"type": "Timeout"}'
+    assert response.get_metadata()["error"] == "APITimeoutError: Request timed out."
+
+
+def test_load_run_responses_keeps_final_row_per_pair(tmp_path):
+    # A resumed run appends a new row for each failed pair: "a" failed and
+    # then succeeded, "b" succeeded at once, "c" failed in both collects.
+    rows = [
+        make_record("openai", None, status="error", message_id="a"),
+        make_record("openai", OPENAI_RAW, message_id="b"),
+        make_record("openai", None, status="error", message_id="c"),
+        make_record("openai", OPENAI_RAW, message_id="a"),
+        make_record("openai", None, status="error", message_id="c"),
+    ]
+    rows[-1]["error"] = "RateLimitError: second failure"
+    (tmp_path / "responses.jsonl").write_text(
+        "".join(json.dumps(row) + "\n" for row in rows), encoding="utf-8"
+    )
+    responses = load_run_responses({"run_dir": tmp_path})
+    assert [(r.record["message_id"], r.record["status"]) for r in responses] == [
+        ("a", "ok"),
+        ("b", "ok"),
+        ("c", "error"),
+    ]
+    assert responses[2].record["error"] == "RateLimitError: second failure"
 
 
 def test_anthropic_extraction():

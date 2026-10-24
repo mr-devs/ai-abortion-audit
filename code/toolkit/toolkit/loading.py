@@ -4,6 +4,10 @@ Locate and load taxman audit runs and their responses.
 Runs are discovered through taxman's `manifest.json` files (one per run
 directory), never by globbing for response files, so every loaded response
 belongs to a run whose status taxman recorded.
+
+Collecting an audit again finishes its latest run by appending a new row for
+every (message, repeat) pair that failed, so a responses file can hold more
+than one row per pair. `load_run_responses` returns one row per pair.
 """
 
 import json
@@ -104,7 +108,12 @@ def load_run_responses(
     run: Dict[str, Any], filename: str = "responses.jsonl"
 ) -> List[BaseProviderResponse]:
     """
-    Return the response models for every line of one run's responses file.
+    Return the final response model for each (message_id, repeat) of one run.
+
+    A pair has more than one row when it failed and a later collect sent it
+    again (taxman appends the new row). The final row is the successful one
+    if there is one (taxman never re-sends a pair once it succeeds), else the
+    last failure. Earlier failures are dropped; they stay in the raw file.
 
     Parameters
     ----------
@@ -116,14 +125,19 @@ def load_run_responses(
     Returns
     -------
     list of BaseProviderResponse
-        One provider-specific response model per line, in file order.
+        One provider-specific response model per pair, in the file order of
+        each pair's first row.
     """
-    responses = []
+    final = {}
     with open(Path(run["run_dir"]) / filename, "r", encoding="utf-8") as fh:
         for line in fh:
-            if line.strip():
-                responses.append(parse_record(json.loads(line)))
-    return responses
+            if not line.strip():
+                continue
+            record = json.loads(line)
+            key = (record["message_id"], record["repeat"])
+            if key not in final or final[key]["status"] != "ok":
+                final[key] = record
+    return [parse_record(record) for record in final.values()]
 
 
 def load_all_responses(

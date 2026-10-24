@@ -9,7 +9,7 @@ Data collection scripts handle API calls, web scraping, file downloads, and othe
 - [`download_census_city_populations.py`](download_census_city_populations.py): Downloads the Census Bureau's 2020-2025 city and town population estimates (`sub-est2025.csv`, saved as UTF-8) and its column documentation (`SUB-EST2025.pdf`) to timestamped files; skips any file already downloaded.
 - [`download_guttmacher.py`](download_guttmacher.py): Downloads the state data behind Guttmacher's abortion policy map to a timestamped raw JSON file; exits if a download already exists.
 - [`write_4cities_messages.py`](write_4cities_messages.py): Writes the `pilot-4cities` taxman message file (one "I live in [city, ST]..." query per selected city), in the order of the cities file.
-- [`resolve_gemini_urls.py`](resolve_gemini_urls.py): Resolves the Google redirect URLs that Gemini cites to the URLs Google cited (one HEAD request per link, reading the 302 `Location` header), writing `resolved_urls.jsonl` into each Gemini run directory; skips responses already resolved.
+- [`resolve_gemini_urls.py`](resolve_gemini_urls.py): Resolves the Google redirect URLs that Gemini cites to the URLs Google cited (one HEAD request per link, reading the 302 `Location` header), writing `resolved_urls.jsonl` into each Gemini run directory; resolves only successful responses and skips those already resolved, so a failure that a later collect fills in is resolved on the next run.
 - [`archive-taxman-0.1.1/`](archive-taxman-0.1.1/): The runner that collected the first pilot with taxman 0.1.1 (`run_pilot_audits.sh`); kept as a record, it no longer runs.
 
 ## Other instructions

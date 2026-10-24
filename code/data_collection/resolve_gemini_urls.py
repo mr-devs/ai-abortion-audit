@@ -24,6 +24,11 @@ Notes:
       order is therefore completion order; consumers join on response_id.
     - Idempotent: response_ids already in a run's resolved-URLs file are
       skipped, so re-running resolves only what is missing.
+    - Only successful responses are resolved; failed ones cite nothing and
+      get no line. A pair that failed and succeeded on a later collect (taxman
+      appends the new row under the same response_id) is therefore resolved
+      once it succeeds. toolkit.loading.load_run_responses returns each pair's
+      final row.
     - Runs are discovered through taxman's manifest.json files; only
       complete Gemini runs are processed (toolkit.loading.discover_runs).
     - No API key is needed: resolution is plain HTTP to Google's redirect
@@ -37,7 +42,7 @@ Input:
 
 Output:
     - data/raw/audits/<audit>/<run_id>/resolved_urls.jsonl, one JSON line per
-      response:
+      successful response:
         - response_id (str): "<audit>__<run_id>__<message_id>__r<repeat>";
           join key to the cleaned tables.
         - message_id (str): taxman message id.
@@ -203,7 +208,7 @@ def load_done_response_ids(resolved_path):
 
 def resolve_run(run, logger):
     """
-    Resolve every not-yet-resolved response of one Gemini run.
+    Resolve every not-yet-resolved successful response of one Gemini run.
 
     Parameters
     ----------
@@ -219,7 +224,8 @@ def resolve_run(run, logger):
     pending = []
     for response in load_run_responses(run):
         response_id = response.get_response_id()
-        if response_id in done:
+        # A failed response is left out until a later collect succeeds.
+        if response_id in done or response.record["status"] != "ok":
             continue
         done.add(response_id)  # guards against duplicate lines in the input
         pending.append((response, response.get_cited_redirect_urls()))
@@ -249,8 +255,8 @@ def resolve_run(run, logger):
             n_failed += len(unresolved_urls)
             for url in unresolved_urls:
                 logger.warning(f"{response.get_response_id()}: could not resolve {url}")
-            # One line per response, even when nothing was cited, so the
-            # file mirrors the responses file and re-runs skip it.
+            # One line per successful response, even when nothing was cited,
+            # so re-runs skip it.
             out_fh.write(
                 json.dumps(
                     {

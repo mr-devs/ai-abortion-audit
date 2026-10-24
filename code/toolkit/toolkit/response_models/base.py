@@ -23,9 +23,10 @@ class BaseProviderResponse:
 
     Notes
     -----
-    A record whose request failed (status "error") has `raw` set to None.
-    Every extraction method then returns an empty result (None or []), so
-    callers can process failed and successful records the same way.
+    A record whose request failed (status "error") has an empty `raw` (taxman
+    0.2.0 writes {}). Every extraction method then returns an empty result
+    (None or []), so callers can process failed and successful records the
+    same way.
     """
 
     #: Overridden by each subclass; validated against the record's provider.
@@ -84,7 +85,8 @@ class BaseProviderResponse:
         dict
             Keys: response_id, audit, run_id, message_id, repeat, message,
             provider, model, requested_at, received_at, latency_ms, status,
-            error, attempts, message_hash, system_prompt_hash.
+            error, attempts. The times are taxman's local-time ISO strings
+            with a UTC offset.
         """
         r = self.record
         return {
@@ -100,12 +102,9 @@ class BaseProviderResponse:
             "received_at": r.get("received_at"),
             "latency_ms": r.get("latency_ms"),
             "status": r.get("status"),
-            # taxman stores error details as a dict; keep it as a JSON string
-            # so the column has one type.
-            "error": json.dumps(r["error"]) if r.get("error") is not None else None,
+            # taxman writes the error as one string, e.g. "RateLimitError: ...".
+            "error": r.get("error"),
             "attempts": r.get("attempts"),
-            "message_hash": r.get("message_hash"),
-            "system_prompt_hash": r.get("system_prompt_hash"),
         }
 
     # ------------------------------------------------------------------

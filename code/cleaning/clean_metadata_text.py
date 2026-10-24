@@ -9,11 +9,20 @@ Notes:
       this script only assembles rows.
     - study and location are parsed from the audit name
       ("<study>-<provider>[-<location>]"; see toolkit.loading.
-      parse_audit_name). message_id identifies the same question across
-      locations, because every location's message file lists the same
-      questions in the same order.
+      parse_audit_name). The pilot-4cities audits put the city in the message
+      text rather than the audit name, so their location is "none"; join
+      message_id to taxman/messages/pilot-4cities-queries-lookup.csv for the
+      city.
+    - message_id is taxman's UUID5 of the message text, so the same text has
+      the same id in every audit and run.
     - Failed requests (status "error") are kept in metadata, with their
       error, so they stay visible; they have no text.
+    - Collecting an audit again re-sends its failed (message, repeat) pairs
+      and appends the new rows. Each pair keeps only its final row (the
+      successful one, else the last failure; toolkit.loading.
+      load_run_responses), and the report counts the rows replaced.
+    - taxman records times in local time with a UTC offset; every time column
+      here is converted to UTC.
 
 Input:
     - data/raw/audits/<audit>/<run_id>/manifest.json - taxman run manifests
@@ -31,8 +40,8 @@ Output:
             - location (str): Location part of the audit name (e.g.
               "houston-tx"); "none" when the audit has no location.
             - run_id (str): taxman run id.
-            - message_id (str): taxman message id (e.g. "m0000"), the same
-              question across locations.
+            - message_id (str): taxman message id, a UUID5 of the message
+              text.
             - repeat (int): Repeat number (0-based).
             - message (str): The query text sent.
             - provider (str): anthropic | openai | gemini.
@@ -41,10 +50,10 @@ Output:
             - received_at (datetime, UTC): When the response arrived.
             - latency_ms (int): Request latency in milliseconds.
             - status (str): "ok" or "error".
-            - error (str or None): Error details as a JSON string.
-            - attempts (int): Number of attempts taxman made.
-            - message_hash (str): Hash of the message text.
-            - system_prompt_hash (str or None): Hash of the system prompt.
+            - error (str or None): taxman's error string (e.g.
+              "RateLimitError: ..."); None when status is "ok".
+            - attempts (int): Number of attempts taxman made in the collect
+              that wrote this row.
             - stop_reason (str or None): Why generation ended (anthropic:
               stop_reason; openai/gemini: response status).
             - stop_detail (str or None): Further stop details (JSON string).
@@ -60,17 +69,22 @@ Output:
             - status (str): Manifest status (always "complete" here).
             - n_messages (int): Messages in the message file.
             - repeats (int): Repeats per message.
-            - n_ok (int), n_error (int): taxman's response counts.
-            - n_responses (int): Lines in responses.jsonl.
-            - started_at (datetime, UTC), finished_at (datetime, UTC):
-              Run start and end.
-            - duration_seconds (float): finished_at minus started_at.
+            - n_ok (int), n_error (int): taxman's counts of (message,
+              repeat) pairs that succeeded and that only failed.
+            - n_responses (int): Responses kept, one per (message, repeat).
+            - n_rows (int): Lines in responses.jsonl; more than n_responses
+              when a later collect re-sent failed pairs.
+            - started_at (datetime, UTC), finished_at (datetime, UTC): Start
+              of the run's first collect and end of its last.
+            - duration_seconds (float): finished_at minus started_at, so it
+              includes any time between collects of a resumed run.
             - messages_path (str): Message file used.
-            - messages_hash (str): Hash of the message file.
             - system_prompt_path (str or None): System prompt file used.
-            - taxman_version (str): taxman version that collected the run.
+            - taxman_versions (str): Comma-separated taxman versions that
+              collected the run, in the order each first did.
     - results/reports/clean_metadata_text_report.txt - row counts per table,
-      responses per (provider, location), and responses without text
+      rows replaced by a later collect, responses per (provider, location),
+      and responses without text
 
 Author: Matthew DeVerna
 """
@@ -102,13 +116,13 @@ RUN_COLUMNS = [
     "n_ok",
     "n_error",
     "n_responses",
+    "n_rows",
     "started_at",
     "finished_at",
     "duration_seconds",
     "messages_path",
-    "messages_hash",
     "system_prompt_path",
-    "taxman_version",
+    "taxman_versions",
 ]
 
 
@@ -165,14 +179,18 @@ def build_tables(audit_prefix):
                     "text": response.get_text(),
                 }
             )
-        run_rows.append({**run, **names, "n_responses": len(responses)})
+        with open(run["run_dir"] / "responses.jsonl", "r", encoding="utf-8") as fh:
+            n_rows = sum(1 for line in fh if line.strip())
+        run_rows.append(
+            {**run, **names, "n_responses": len(responses), "n_rows": n_rows}
+        )
 
     metadata = pd.DataFrame(metadata_rows)
     first = ["response_id", "audit", "study", "location"]
     metadata = metadata[first + [c for c in metadata.columns if c not in first]]
     for col in ["requested_at", "received_at"]:
         metadata[col] = pd.to_datetime(metadata[col], utc=True)
-    nullable_str = ["error", "system_prompt_hash", "stop_reason", "stop_detail"]
+    nullable_str = ["error", "stop_reason", "stop_detail"]
     metadata[nullable_str] = metadata[nullable_str].astype("str")
 
     response_text = pd.DataFrame(text_rows)
@@ -184,6 +202,7 @@ def build_tables(audit_prefix):
     audit_runs["duration_seconds"] = (
         audit_runs["finished_at"] - audit_runs["started_at"]
     ).dt.total_seconds()
+    audit_runs["taxman_versions"] = audit_runs["taxman_versions"].str.join(",")
     audit_runs = audit_runs[RUN_COLUMNS]
     audit_runs["system_prompt_path"] = audit_runs["system_prompt_path"].astype("str")
 
@@ -249,6 +268,9 @@ def write_report(metadata, response_text, audit_runs):
         f"metadata rows:      {len(metadata)}",
         f"response_text rows: {len(response_text)}",
         f"audit_runs rows:    {len(audit_runs)}",
+        "",
+        "Rows replaced by a later collect (failed pairs re-sent): "
+        f"{(audit_runs['n_rows'] - audit_runs['n_responses']).sum()}",
         "",
         "Responses per provider and location (status counts):",
         metadata.groupby(["provider", "location"])["status"]
