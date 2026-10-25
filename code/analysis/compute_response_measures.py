@@ -14,7 +14,9 @@ Notes:
       OpenAI `web_search.search`. OpenAI `web_search.open_page` (opening a
       page) and Anthropic `code_execution` are not searches. Anthropic runs
       some searches from inside code execution; those still appear as
-      `web_search` rows and are counted.
+      `web_search` rows and are counted. Only searches that ran count
+      (tool_calls.ran): a search the API rejected, such as Anthropic's
+      malformed `invalid_tool_input` calls, was never run.
     - Cited sources come from text_citations (URLs attached to the answer
       text). Anthropic attached none in the pilot, so its cited counts are 0
       by construction, not because it used no sources. Gemini's cited URLs
@@ -47,9 +49,10 @@ Output:
             - repeat (int): Zero-based repeat number.
             - n_words (int): Words in the response, URLs removed.
             - n_chars (int): Characters in the response text, verbatim.
-            - n_searches (int): Web-search tool calls.
+            - n_searches (int): Web-search tool calls that ran.
             - searched (bool): n_searches > 0.
-            - n_search_queries (int): Search strings sent across all calls.
+            - n_search_queries (int): Search strings sent across the calls
+              that ran.
             - n_cited_urls (int): Distinct URLs cited in the answer text.
             - n_cited_domains (int): Distinct domains cited in the text.
             - n_retrieved_urls (int): Distinct URLs returned by searches.
@@ -116,7 +119,7 @@ def count_words(text):
 
 def search_measures(tool_calls):
     """
-    Return per-response search counts.
+    Return per-response counts of the searches that ran.
 
     Parameters
     ----------
@@ -128,7 +131,9 @@ def search_measures(tool_calls):
     pandas.DataFrame
         Indexed by response_id with n_searches and n_search_queries.
     """
-    searches = tool_calls[tool_calls["tool_type"].isin(SEARCH_TOOL_TYPES)].copy()
+    searches = tool_calls[
+        tool_calls["tool_type"].isin(SEARCH_TOOL_TYPES) & tool_calls["ran"]
+    ].copy()
     searches["n_queries"] = searches["search_queries"].apply(
         lambda q: 0 if q is None else len(q)
     )

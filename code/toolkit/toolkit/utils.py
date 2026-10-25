@@ -8,7 +8,8 @@ import os
 import re
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Any, Optional
+from typing import Dict, List, Optional
+from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
 import tldextract
 
@@ -18,7 +19,21 @@ TIMESTAMP_FORMAT = "%Y-%m-%d_%H%M%S"
 
 #: How every pilot-4cities message begins: "I live in <city>, <ST>. ...". The
 #: city is matched greedily, so names with periods (St. Paul) stay whole.
-CITY_MESSAGE_PATTERN = re.compile(r"^I live in (?P<city>.+), (?P<state_abbr>[A-Z]{2})\. ")
+CITY_MESSAGE_PATTERN = re.compile(
+    r"^I live in (?P<city>.+), (?P<state_abbr>[A-Z]{2})\. "
+)
+
+#: A URL that starts with a scheme, e.g. "https://". Only a scheme at the very
+#: start counts, so "a.org/x?u=https://b.org" is a URL without one.
+SCHEME_PATTERN = re.compile(r"^[a-z][a-z0-9+.-]*://", re.IGNORECASE)
+
+#: The domain extractor every function here uses. Splitting a host into
+#: subdomain, name, and public suffix ("portal" + "ct" + "gov", or "" + "bbc" +
+#: "co.uk") needs the Public Suffix List. By default tldextract downloads the
+#: current list and caches it per machine, so results could differ across
+#: machines and over time. With suffix_list_urls=() it never downloads and
+#: uses the copy bundled with the installed tldextract, which uv.lock pins.
+TLD_EXTRACTOR = tldextract.TLDExtract(suffix_list_urls=())
 
 
 def setup_logging(
@@ -108,7 +123,7 @@ def extract_domain(url: str) -> Optional[str]:
         The extracted domain (e.g., 'example.com') or None if extraction fails
     """
     try:
-        extracted = tldextract.extract(url)
+        extracted = TLD_EXTRACTOR(url)
         # Combine domain and suffix (e.g., 'example' + 'co.uk' = 'example.co.uk')
         if extracted.domain and extracted.suffix:
             return f"{extracted.domain}.{extracted.suffix}".lower()
@@ -117,6 +132,58 @@ def extract_domain(url: str) -> Optional[str]:
         return None
     except Exception:
         return None
+
+
+def normalize_url(url: str) -> Optional[str]:
+    """
+    Return a normalized form of a URL, for matching the same page across sources.
+
+    The same page is often written several ways: OpenAI appends
+    ``?utm_source=openai``, one source writes ``www.`` and another does not,
+    and a website named in text has no scheme at all. Normalizing removes
+    those differences so the forms match. The verbatim URL should always be
+    kept beside this one.
+
+    Parameters
+    ----------
+    url : str or None
+        A URL, or a web address without a scheme (e.g. "ineedana.com/us"),
+        which is read as https. None or NaN returns None.
+
+    Returns
+    -------
+    str or None
+        The URL with an https scheme, a lowercase host without "www.", no
+        ``utm_*`` query parameters, no fragment, and no trailing slash on the
+        path. Path and remaining query keep their case and order. None if the
+        URL is empty or has no host.
+    """
+    # Missing values from a pandas column arrive as NaN, a float.
+    if not isinstance(url, str) or not url.strip():
+        return None
+    url = url.strip()
+    if not SCHEME_PATTERN.match(url):
+        url = "https://" + url
+    try:
+        parts = urlsplit(url)
+        host = (parts.hostname or "").lower()
+    except ValueError:
+        return None
+    # Drop "www." only when it is a subdomain ("www.a.org"), not the name
+    # itself ("www.com").
+    if host.startswith("www.") and "." in host[len("www.") :].strip("."):
+        host = host[len("www.") :]
+    # A web host has at least one dot inside it ("a.org"; not "www." or "").
+    if "." not in host.strip("."):
+        return None
+    query = urlencode(
+        [
+            (key, value)
+            for key, value in parse_qsl(parts.query, keep_blank_values=True)
+            if not key.lower().startswith("utm_")
+        ]
+    )
+    return urlunsplit(("https", host, parts.path.rstrip("/"), query, ""))
 
 
 def parse_message_location(message: str) -> Optional[Dict[str, str]]:

@@ -383,3 +383,126 @@ def test_parse_audit_name(audit, provider, expected):
 def test_parse_audit_name_rejects_unexpected_names(audit, provider):
     with pytest.raises(ValueError):
         parse_audit_name(audit, provider)
+
+
+def test_anthropic_citation_offsets_are_the_cited_block():
+    response = parse_record(make_record("anthropic", ANTHROPIC_RAW))
+    text = response.get_text()
+    (citation,) = response.get_text_citations()
+    # Claude cites whole text blocks, so the span is the cited block.
+    assert text[citation["start_index"] : citation["end_index"]] == "banned in Texas."
+
+
+def test_anthropic_malformed_direct_search_is_an_error():
+    # Copied from pilot-4cities: a direct call that nests the query under
+    # "params", which the API rejects.
+    raw = {
+        "content": [
+            {
+                "type": "server_tool_use",
+                "id": "ws_bad",
+                "name": "web_search",
+                "input": {"params": {"query": "Granite OR to Walla Walla WA distance"}},
+                "caller": None,
+            },
+            {
+                "type": "web_search_tool_result",
+                "tool_use_id": "ws_bad",
+                "content": {
+                    "type": "web_search_tool_result_error",
+                    "error_code": "invalid_tool_input",
+                },
+                "caller": {"type": "direct"},
+            },
+            {"type": "text", "text": "Here is what I found.", "citations": None},
+        ]
+    }
+    response = parse_record(make_record("anthropic", raw))
+    (call,) = response.get_tool_calls()
+    assert call["search_queries"] == ["Granite OR to Walla Walla WA distance"]
+    assert call["status"] == "error"
+    assert call["error_code"] == "invalid_tool_input"
+    assert response.get_tool_citations() == []
+
+    # A successful search has no status or error code.
+    for call in parse_record(make_record("anthropic", ANTHROPIC_RAW)).get_tool_calls():
+        assert call["status"] is None and call["error_code"] is None
+
+
+def test_gemini_byte_offsets_become_character_offsets():
+    # Gemini counts UTF-8 bytes: "’" is one character but three bytes, so
+    # every offset after it is two bytes ahead of the character position.
+    text = "Planned Parenthood’s clinic is open. Call today."
+    cited = "Call today."
+    byte_start = len(text.encode("utf-8")) - len(cited.encode("utf-8"))
+    raw = {
+        "steps": [
+            {
+                "type": "model_output",
+                "content": [
+                    {
+                        "type": "text",
+                        "text": text,
+                        "annotations": [
+                            {
+                                "type": "url_citation",
+                                "url": "https://redir/1",
+                                "title": "a.org",
+                                "start_index": byte_start,
+                                "end_index": len(text.encode("utf-8")),
+                            }
+                        ],
+                    }
+                ],
+            }
+        ]
+    }
+    (citation,) = parse_record(make_record("gemini", raw)).get_text_citations()
+    assert citation["start_index"] == byte_start - 2
+    assert text[citation["start_index"] : citation["end_index"]] == cited
+
+
+def test_anthropic_error_without_a_code_is_still_an_error():
+    raw = {
+        "content": [
+            {"type": "server_tool_use", "id": "ws_1", "name": "web_search", "input": {"query": "q"}},
+            {
+                "type": "web_search_tool_result",
+                "tool_use_id": "ws_1",
+                "content": {"type": "web_search_tool_result_error"},
+            },
+        ]
+    }
+    (call,) = parse_record(make_record("anthropic", raw)).get_tool_calls()
+    assert call["status"] == "error"
+    assert call["error_code"] is None
+
+
+def test_gemini_bad_offsets_raise_but_do_not_block_url_resolution():
+    raw = {
+        "steps": [
+            {
+                "type": "model_output",
+                "content": [
+                    {
+                        "type": "text",
+                        "text": "abc’def",  # 7 characters, 9 bytes
+                        "annotations": [
+                            {
+                                "type": "url_citation",
+                                "url": "https://redir/1",
+                                "title": "a.org",
+                                "start_index": 0,
+                                "end_index": 100,  # past the end of the text
+                            }
+                        ],
+                    }
+                ],
+            }
+        ]
+    }
+    response = parse_record(make_record("gemini", raw))
+    with pytest.raises(ValueError, match="outside"):
+        response.get_text_citations()
+    # The resolver reads the URLs without the offsets.
+    assert response.get_cited_redirect_urls() == ["https://redir/1"]

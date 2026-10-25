@@ -21,6 +21,10 @@ from .response_models import BaseProviderResponse, parse_record
 #: run directory, next to taxman's responses.jsonl.
 RESOLVED_URLS_FILENAME = "resolved_urls.jsonl"
 
+#: The DataFrame.attrs key that lists the runs a cleaned table was built from
+#: (see tag_runs).
+RUNS_ATTR = "audit_runs"
+
 #: Value of the `location` column for audits whose name has no location part.
 NO_LOCATION = "none"
 
@@ -189,3 +193,30 @@ def load_resolved_urls(run_dir: Path) -> Dict[str, Dict[str, Any]]:
                 row = json.loads(line)
                 resolved[row["response_id"]] = row
     return resolved
+
+
+def tag_runs(df, runs):
+    """
+    Record which runs a cleaned table was built from, in the table itself.
+
+    The cleaning scripts write fixed filenames whatever --audit-prefix they
+    were given, so tables written by different runs of the scripts can cover
+    different audits. The tag is saved with the parquet file (pandas keeps
+    ``DataFrame.attrs`` in its metadata), so a script that combines tables
+    can check that they cover the same runs.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        The table about to be written.
+    runs : list of dict
+        Manifest dicts from ``discover_runs``.
+
+    Returns
+    -------
+    pandas.DataFrame
+        ``df``, with ``df.attrs[RUNS_ATTR]`` set to the sorted
+        "<audit>/<run_id>" of every run.
+    """
+    df.attrs[RUNS_ATTR] = sorted(f"{run['audit']}/{run['run_id']}" for run in runs)
+    return df

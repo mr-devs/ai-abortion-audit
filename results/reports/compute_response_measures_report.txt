@@ -1,0 +1,27 @@
+compute_response_measures.py report
+
+response_measures rows: 591
+
+Mean per response by provider and study
+(searched = share of responses with any search):
+                         n_words  searched  n_searches  n_cited_urls  n_retrieved_urls  n_resources
+provider  study                                                                                    
+anthropic pilot-4cities   366.98       1.0        8.80          0.10             72.84         3.51
+gemini    pilot-4cities   250.91       1.0        2.97         12.38              0.00         4.13
+openai    pilot-4cities   166.16       1.0        3.64          3.37            110.98         1.80
+
+Share of responses naming each resource (keyword lexicon):
+provider                                   anthropic        gemini        openai
+study                                  pilot-4cities pilot-4cities pilot-4cities
+AbortionFinder                                  0.36          0.80          0.36
+I Need An A                                     0.17          0.77          0.24
+Planned Parenthood                              0.99          0.97          0.90
+National Abortion Federation / hotline          0.10          0.15          0.03
+Abortion funds                                  0.28          0.51          0.06
+Plan C                                          0.05          0.07          0.15
+Aid Access                                      0.01          0.10          0.00
+M+A Hotline                                     0.29          0.00          0.00
+Repro Legal Helpline                            0.42          0.05          0.00
+Telehealth abortion                             0.71          0.58          0.07
+Shield laws                                     0.01          0.01          0.00
+Crisis pregnancy centers                        0.13          0.13          0.00

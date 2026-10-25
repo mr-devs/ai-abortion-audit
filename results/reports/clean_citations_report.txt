@@ -1,0 +1,24 @@
+clean_citations.py report
+
+text_citations rows: 5212
+tool_citations rows: 41140
+
+Text citations by provider and location:
+                     total  mean_per_response  share_with_any
+provider  location                                           
+anthropic none        52.0               0.26            0.02
+gemini    none      4401.0              22.34            1.00
+openai    none       759.0               3.85            0.99
+
+Tool citations by provider and location:
+                      total  mean_per_response  share_with_any
+provider  location                                            
+anthropic none      16849.0              85.53             1.0
+gemini    none          0.0               0.00             0.0
+openai    none      24291.0             123.30             1.0
+
+Gemini text citations resolved: 4401 of 4401
+
+Rows dropped for a null url:
+  text_citations: 0
+  tool_citations: 0

@@ -12,7 +12,12 @@ Notes:
       when the result was returned encrypted.
     - search_queries is a list column: one OpenAI search action or Gemini
       search call can issue several queries, while an Anthropic web_search
-      issues exactly one.
+      issues exactly one. A few direct Anthropic searches nest the query as
+      input.params.query, which the API rejects (invalid_tool_input); the
+      query is still recorded, and the call has status "error".
+    - ran is False for a call that did not run: status "error" (Anthropic,
+      Gemini) or any OpenAI status other than "completed" (e.g. "failed").
+      Count searches with ran = True: a rejected search was never run.
     - tool_id joins to tool_citations.parquet on (response_id, tool_id).
 
 Input:
@@ -29,17 +34,22 @@ Output:
             - provider (str): anthropic | openai | gemini.
             - index (int): Zero-based invocation order within the response.
             - tool_type (str): anthropic: "web_search" | "code_execution";
-              openai: "web_search.search" | "web_search.open_page";
+              openai: "web_search.search" | "web_search.open_page" |
+              "web_search.find_in_page";
               gemini: "google_search".
             - tool_id (str): Provider's invocation id.
             - status (str or None): Invocation status (openai: provider
-              status; gemini: "error" when the search errored, else None;
-              anthropic: None).
+              status; gemini and anthropic: "error" when the call's result is
+              an error, else None).
+            - error_code (str or None): Anthropic only - the error code of an
+              errored call, e.g. "invalid_tool_input".
+            - ran (bool): Whether the call ran (see Notes).
             - search_queries (list of str or None): Search queries issued.
             - code (str or None): Anthropic code_execution only - the code.
             - caller_tool_id (str or None): Anthropic web_search only - the
               code_execution call that launched it.
-            - url (str or None): OpenAI open_page only - the opened page.
+            - url (str or None): OpenAI open_page and find_in_page only - the
+              page opened or searched.
             - return_code (int or None): Anthropic code_execution only.
             - stdout (str or None): Anthropic code_execution only, when not
               encrypted.
@@ -48,7 +58,8 @@ Output:
               when the result was encrypted.
             - abort_reason (str or None): Anthropic code_execution only.
     - results/reports/clean_tool_calls_report.txt - row counts by provider
-      and tool_type, and searches per response by provider and location
+      and tool_type, calls that did not run, and searches that ran per
+      response by provider and location
 
 Author: Matthew DeVerna
 """
@@ -59,7 +70,12 @@ from pathlib import Path
 
 import pandas as pd
 
-from toolkit.loading import discover_runs, load_run_responses, parse_audit_name
+from toolkit.loading import (
+    discover_runs,
+    load_run_responses,
+    parse_audit_name,
+    tag_runs,
+)
 
 os.chdir(Path(__file__).resolve().parent)
 
@@ -74,6 +90,8 @@ COLUMNS = [
     "tool_type",
     "tool_id",
     "status",
+    "error_code",
+    "ran",
     "search_queries",
     "code",
     "caller_tool_id",
@@ -88,6 +106,7 @@ STRING_COLUMNS = [
     "tool_type",
     "tool_id",
     "status",
+    "error_code",
     "code",
     "caller_tool_id",
     "url",
@@ -147,6 +166,11 @@ def build_table(audit_prefix):
     tool_calls[STRING_COLUMNS] = tool_calls[STRING_COLUMNS].astype("str")
     tool_calls["return_code"] = tool_calls["return_code"].astype("Int64")
     tool_calls["encrypted"] = tool_calls["encrypted"].astype("boolean")
+    # Anthropic and Gemini report no status for a call that ran; OpenAI
+    # reports "completed".
+    tool_calls["ran"] = tool_calls["status"].isna() | (
+        tool_calls["status"] == "completed"
+    )
     return tool_calls, pd.DataFrame(response_rows)
 
 
@@ -195,7 +219,7 @@ def write_report(tool_calls, responses):
     responses : pandas.DataFrame
         One row per response (response_id, provider, location).
     """
-    searches = tool_calls[tool_calls["search_queries"].notna()]
+    searches = tool_calls[tool_calls["search_queries"].notna() & tool_calls["ran"]]
     counts = searches.groupby("response_id").size().rename("n_searches")
     per_response = responses.merge(
         counts, left_on="response_id", right_index=True, how="left"
@@ -209,7 +233,13 @@ def write_report(tool_calls, responses):
         "Tool calls by provider and tool_type:",
         tool_calls.groupby(["provider", "tool_type"]).size().to_string(),
         "",
-        "Search calls per response by provider and location:",
+        "Tool calls that did not run, by provider, tool_type, status, and error_code:",
+        tool_calls[~tool_calls["ran"]]
+        .groupby(["provider", "tool_type", "status", "error_code"], dropna=False)
+        .size()
+        .to_string(),
+        "",
+        "Search calls that ran, per response, by provider and location:",
         per_response.groupby(["provider", "location"])["n_searches"]
         .agg(
             total="sum",
@@ -230,6 +260,8 @@ def main():
     args = parse_args()
     tool_calls, responses = build_table(args.audit_prefix)
     validate(tool_calls)
+    # Record which runs the table covers, for scripts that combine tables.
+    tag_runs(tool_calls, discover_runs(AUDITS_DIR, args.audit_prefix))
 
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     tool_calls.to_parquet(OUTPUT_DIR / "tool_calls.parquet", index=False)

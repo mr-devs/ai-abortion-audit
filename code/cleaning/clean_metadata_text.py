@@ -107,7 +107,12 @@ from pathlib import Path
 
 import pandas as pd
 
-from toolkit.loading import discover_runs, load_run_responses, parse_audit_name
+from toolkit.loading import (
+    discover_runs,
+    load_run_responses,
+    parse_audit_name,
+    tag_runs,
+)
 from toolkit.utils import parse_message_location
 
 os.chdir(Path(__file__).resolve().parent)
@@ -347,6 +352,11 @@ def main():
     args = parse_args()
     metadata, response_text, audit_runs = build_tables(args.audit_prefix)
     validate(metadata, response_text, audit_runs)
+
+    # Record which runs the tables cover, for scripts that combine tables.
+    runs = discover_runs(AUDITS_DIR, args.audit_prefix)
+    for df in [metadata, response_text, audit_runs]:
+        tag_runs(df, runs)
 
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     metadata.to_parquet(OUTPUT_DIR / "metadata.parquet", index=False)

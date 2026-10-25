@@ -8,11 +8,21 @@ Notes:
       text a user sees; tool citations are URLs a search tool returned in
       the payload, which the response may or may not have used.
     - The script stops if the URLs of a Gemini collection have not been resolved yet.
-    - domain is the registrable domain (toolkit.utils.extract_domain): for
-      gemini it comes from resolved_url (null when unresolved), for everyone
-      else from url.
-    - Every tool citation's tool_id is checked against the tool calls of its
-      own response, so tool_citations joins with tool_calls.
+    - domain is the registrable domain (toolkit.utils.extract_domain) and
+      url_norm the normalized URL (toolkit.utils.normalize_url: https, no
+      "www.", no utm_* parameters, no fragment or trailing slash), used to
+      match the same page across tables. For gemini both come from
+      resolved_url (null when unresolved), for everyone else from url. url
+      itself is always kept verbatim.
+    - start_index/end_index are character offsets into the response text
+      (response_text.parquet) for every provider. Gemini reports byte
+      offsets, which the response model converts. Anthropic cites whole text
+      blocks, so its offsets are the cited block's span.
+    - Checks before writing: every tool citation's tool_id matches a tool
+      call of its own response (so tool_citations joins with tool_calls);
+      every text-citation span lies inside its response text; and every URL
+      Anthropic cites is among that response's own search results (compared
+      on url_norm).
 
 Input:
     - data/raw/audits/<audit>/<run_id>/manifest.json - taxman run manifests
@@ -34,14 +44,17 @@ Output:
             - resolved_url (str or None): Gemini only - the cited URL from
               the redirect's Location header; None if unresolved or not
               gemini.
+            - url_norm (str or None): Normalized URL (gemini: from
+              resolved_url; others: from url).
             - domain (str or None): Registrable domain (gemini: from
               resolved_url; others: from url).
             - title (str or None): Title as reported by the provider (gemini
               reports the cited site's domain).
-            - cited_text (str or None): Anthropic only - the cited passage.
-            - start_index (int or None): openai/gemini - start offset of the
-              cited span in the response text.
-            - end_index (int or None): openai/gemini - end offset.
+            - cited_text (str or None): Anthropic only - the source passage
+              the citation quotes.
+            - start_index (int or None): Character offset where the cited
+              span starts in the response text (anthropic: the cited block).
+            - end_index (int or None): Character offset where it ends.
     - data/processed/audits/tool_citations.parquet - one row per URL a search tool
       returned
         Columns:
@@ -50,6 +63,7 @@ Output:
             - provider (str): anthropic | openai.
             - index (int): Zero-based order within the response payload.
             - url (str): URL, verbatim.
+            - url_norm (str or None): Normalized URL.
             - domain (str or None): Registrable domain from url.
             - title (str or None): Anthropic only - search result title.
             - page_age (str or None): Anthropic only - reported page age.
@@ -73,8 +87,9 @@ from toolkit.loading import (
     load_resolved_urls,
     load_run_responses,
     parse_audit_name,
+    tag_runs,
 )
-from toolkit.utils import extract_domain
+from toolkit.utils import extract_domain, normalize_url
 
 os.chdir(Path(__file__).resolve().parent)
 
@@ -88,6 +103,7 @@ TEXT_COLUMNS = [
     "index",
     "url",
     "resolved_url",
+    "url_norm",
     "domain",
     "title",
     "cited_text",
@@ -99,6 +115,7 @@ TOOL_COLUMNS = [
     "provider",
     "index",
     "url",
+    "url_norm",
     "domain",
     "title",
     "page_age",
@@ -137,8 +154,9 @@ def build_tables(audit_prefix):
     -------
     tuple of pandas.DataFrame
         (text_citations, tool_citations, responses), where responses has one
-        row per response (response_id, provider, location) so the report
-        can count responses that have no citations.
+        row per response (response_id, provider, location, text_length) so
+        the report can count responses that have no citations and the
+        offsets can be checked against the text.
 
     Raises
     ------
@@ -164,7 +182,10 @@ def build_tables(audit_prefix):
             response_id = response.get_response_id()
             provider = response.record["provider"]
             base = {"response_id": response_id, "provider": provider}
-            response_rows.append({**base, "location": location})
+            text_length = len(response.get_text() or "")
+            response_rows.append(
+                {**base, "location": location, "text_length": text_length}
+            )
 
             for row in response.get_text_citations():
                 if provider == "gemini":
@@ -176,12 +197,18 @@ def build_tables(audit_prefix):
                     resolved_url = resolved[response_id]["resolved_urls"].get(
                         row["url"]
                     )
-                    domain = extract_domain(resolved_url) if resolved_url else None
+                    source_url = resolved_url
                 else:
                     resolved_url = None
-                    domain = extract_domain(row["url"]) if row["url"] else None
+                    source_url = row["url"]
                 text_rows.append(
-                    {**base, **row, "resolved_url": resolved_url, "domain": domain}
+                    {
+                        **base,
+                        **row,
+                        "resolved_url": resolved_url,
+                        "url_norm": normalize_url(source_url),
+                        "domain": extract_domain(source_url) if source_url else None,
+                    }
                 )
 
             tool_ids = {call["tool_id"] for call in response.get_tool_calls()}
@@ -191,8 +218,14 @@ def build_tables(audit_prefix):
                         f"{response_id}: tool citation {row['index']} has tool_id "
                         f"{row['tool_id']!r}, which matches no tool call"
                     )
-                domain = extract_domain(row["url"]) if row["url"] else None
-                tool_rows.append({**base, **row, "domain": domain})
+                tool_rows.append(
+                    {
+                        **base,
+                        **row,
+                        "url_norm": normalize_url(row["url"]),
+                        "domain": extract_domain(row["url"]) if row["url"] else None,
+                    }
+                )
 
     text_citations = pd.DataFrame(text_rows).reindex(columns=TEXT_COLUMNS)
     tool_citations = pd.DataFrame(tool_rows).reindex(columns=TOOL_COLUMNS)
@@ -203,8 +236,11 @@ def build_tables(audit_prefix):
     for col in ["start_index", "end_index"]:
         text_citations[col] = text_citations[col].astype("Int64")
     for df, cols in [
-        (text_citations, ["url", "resolved_url", "domain", "title", "cited_text"]),
-        (tool_citations, ["url", "domain", "title", "page_age", "tool_id"]),
+        (
+            text_citations,
+            ["url", "resolved_url", "url_norm", "domain", "title", "cited_text"],
+        ),
+        (tool_citations, ["url", "url_norm", "domain", "title", "page_age", "tool_id"]),
     ]:
         df[cols] = df[cols].astype("str")
     return text_citations, tool_citations, pd.DataFrame(response_rows)
@@ -228,7 +264,7 @@ def drop_null_urls(df):
     return df[~missing].reset_index(drop=True), df[missing]
 
 
-def validate(text_citations, tool_citations):
+def validate(text_citations, tool_citations, responses):
     """
     Assert the tables are internally consistent before writing.
 
@@ -236,6 +272,8 @@ def validate(text_citations, tool_citations):
     ----------
     text_citations, tool_citations : pandas.DataFrame
         The citation tables after null-URL rows are dropped.
+    responses : pandas.DataFrame
+        One row per response, with text_length.
 
     Raises
     ------
@@ -249,6 +287,34 @@ def validate(text_citations, tool_citations):
         assert df["url"].notna().all(), f"Null url in {name}_citations"
     non_gemini = text_citations[text_citations["provider"] != "gemini"]
     assert non_gemini["resolved_url"].isna().all(), "resolved_url set for non-gemini"
+
+    # Every cited span must lie inside its response text.
+    spans = text_citations.merge(
+        responses[["response_id", "text_length"]], on="response_id", how="left"
+    )
+    outside = spans[
+        spans["start_index"].isna()
+        | spans["end_index"].isna()
+        | (spans["start_index"] < 0)
+        | (spans["start_index"] > spans["end_index"])
+        | (spans["end_index"] > spans["text_length"])
+    ]
+    assert outside.empty, (
+        f"{len(outside)} text citations have no span inside the response text, "
+        f"e.g. {outside[['response_id', 'index']].head(3).values.tolist()}"
+    )
+
+    # Anthropic can only cite what its own searches returned.
+    anthropic_cited = text_citations[text_citations["provider"] == "anthropic"]
+    retrieved = set(zip(tool_citations["response_id"], tool_citations["url_norm"]))
+    not_retrieved = [
+        pair
+        for pair in zip(anthropic_cited["response_id"], anthropic_cited["url_norm"])
+        if pair not in retrieved
+    ]
+    assert not not_retrieved, (
+        f"Anthropic cites URLs its searches did not return: {not_retrieved[:3]}"
+    )
 
 
 def write_report(text_citations, tool_citations, dropped, responses):
@@ -318,7 +384,12 @@ def main():
     text_citations, tool_citations, responses = build_tables(args.audit_prefix)
     text_citations, dropped_text = drop_null_urls(text_citations)
     tool_citations, dropped_tool = drop_null_urls(tool_citations)
-    validate(text_citations, tool_citations)
+    validate(text_citations, tool_citations, responses)
+
+    # Record which runs the tables cover, for scripts that combine tables.
+    runs = discover_runs(AUDITS_DIR, args.audit_prefix)
+    tag_runs(text_citations, runs)
+    tag_runs(tool_citations, runs)
 
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     text_citations.to_parquet(OUTPUT_DIR / "text_citations.parquet", index=False)

@@ -1,0 +1,16 @@
+clean_metadata_text.py report
+
+metadata rows:      591
+response_text rows: 591
+audit_runs rows:    3
+
+Rows replaced by a later collect (failed pairs re-sent): 0
+
+Responses per provider and study (status counts):
+status                    ok
+provider  study             
+anthropic pilot-4cities  197
+gemini    pilot-4cities  197
+openai    pilot-4cities  197
+
+Successful responses without text: 0

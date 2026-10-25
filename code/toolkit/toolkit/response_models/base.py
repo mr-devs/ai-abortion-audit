@@ -9,7 +9,11 @@ only the extraction of its own `raw` payload.
 """
 
 import json
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
+
+#: What separates text parts that are separate turns or output items in the
+#: response text (a blank line).
+TEXT_PART_SEPARATOR = "\n\n"
 
 
 class BaseProviderResponse:
@@ -122,8 +126,9 @@ class BaseProviderResponse:
         Returns
         -------
         list of dict
-            Zero-indexed rows with at least: index, url (verbatim), title.
-            Providers add start_index/end_index or cited_text where reported.
+            Zero-indexed rows with at least: index, url (verbatim), title,
+            start_index, end_index (character offsets of the cited span in
+            get_text()). Anthropic adds cited_text.
         """
         raise NotImplementedError
 
@@ -135,7 +140,7 @@ class BaseProviderResponse:
         -------
         list of dict
             Zero-indexed rows with: index, tool_type, tool_id, status,
-            search_queries (list of str or None), plus provider-specific
+            error_code, search_queries (list of str or None), plus provider-specific
             keys (e.g. code, caller_tool_id, url).
         """
         raise NotImplementedError
@@ -221,3 +226,36 @@ class BaseProviderResponse:
     def _json_or_none(value: Any) -> Optional[str]:
         """Return `value` as a JSON string, or None when it is None."""
         return json.dumps(value) if value is not None else None
+
+    @staticmethod
+    def _join_text_parts(parts: List[str]) -> Tuple[str, List[Optional[int]]]:
+        """
+        Join text parts with a blank line, skipping empty parts.
+
+        Used by get_text and by the citation getters, so citation offsets
+        reported against one part can be shifted onto the joined text.
+
+        Parameters
+        ----------
+        parts : list of str
+            The text parts, in response order.
+
+        Returns
+        -------
+        tuple of (str, list)
+            The joined text, and where each part starts in it (None for an
+            empty part, which is skipped).
+        """
+        pieces: List[str] = []
+        starts: List[Optional[int]] = []
+        position = 0
+        for part in parts:
+            if not part:
+                starts.append(None)
+                continue
+            if pieces:
+                position += len(TEXT_PART_SEPARATOR)
+            starts.append(position)
+            pieces.append(part)
+            position += len(part)
+        return TEXT_PART_SEPARATOR.join(pieces), starts

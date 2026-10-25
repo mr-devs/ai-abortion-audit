@@ -35,9 +35,7 @@ class OpenAIResponse(BaseProviderResponse):
         Return the answer text: every output_text part, joined with a blank
         line (the pilot has exactly one message with one part per response).
         """
-        text = "\n\n".join(
-            p.get("text", "") for p in self._output_texts() if p.get("text")
-        )
+        text, _ = self._join_text_parts([p.get("text", "") for p in self._output_texts()])
         return text or None
 
     def get_text_citations(self) -> List[Dict[str, Any]]:
@@ -48,20 +46,27 @@ class OpenAIResponse(BaseProviderResponse):
         -------
         list of dict
             Zero-indexed rows: index, url (verbatim), title, start_index,
-            end_index (character offsets into the output_text part).
+            end_index (character offsets of the cited span in get_text()).
+            In pilot-4cities every span is one markdown link with the
+            parentheses around it, "([site](url))".
         """
+        parts = self._output_texts()
+        _, part_starts = self._join_text_parts([p.get("text", "") for p in parts])
         rows: List[Dict[str, Any]] = []
-        for part in self._output_texts():
+        for part, part_start in zip(parts, part_starts):
+            shift = part_start or 0  # an empty part has no text to cite
             for annotation in part.get("annotations") or []:
                 if annotation.get("type") != "url_citation":
                     continue
+                start = annotation.get("start_index")
+                end = annotation.get("end_index")
                 rows.append(
                     {
                         "index": len(rows),
                         "url": annotation.get("url"),
                         "title": annotation.get("title"),
-                        "start_index": annotation.get("start_index"),
-                        "end_index": annotation.get("end_index"),
+                        "start_index": None if start is None else shift + start,
+                        "end_index": None if end is None else shift + end,
                     }
                 )
         return rows
@@ -75,8 +80,9 @@ class OpenAIResponse(BaseProviderResponse):
         list of dict
             Zero-indexed rows: index, tool_type ("web_search.<action type>",
             e.g. "web_search.search" or "web_search.open_page"), tool_id,
-            status, search_queries (the action's queries, for searches), and
-            url (the opened page, for open_page).
+            status, error_code (always None; OpenAI reports a status only),
+            search_queries (the action's queries, for searches), and url (the
+            page opened or searched, for open_page and find_in_page).
         """
         rows: List[Dict[str, Any]] = []
         for item in self._output_items("web_search_call"):
@@ -90,6 +96,7 @@ class OpenAIResponse(BaseProviderResponse):
                     "tool_type": f"web_search.{action.get('type')}",
                     "tool_id": item.get("id"),
                     "status": item.get("status"),
+                    "error_code": None,
                     "search_queries": queries,
                     "code": None,
                     "caller_tool_id": None,

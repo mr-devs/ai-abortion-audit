@@ -1,0 +1,40 @@
+build_link_events.py report
+
+link_events rows: 47824
+
+Rows by provider and channel:
+provider   channel      
+anthropic  citation            52
+           named_site         152
+           search_result    16849
+gemini     citation          4401
+           md_link            422
+           named_site          44
+openai     citation           759
+           find_in_page         2
+           md_link            759
+           open_page           93
+           search_result    24291
+
+Text links that duplicate a citation, by provider:
+provider
+openai    759
+
+Anthropic search results by search_caller:
+search_caller
+code_execution    16783
+direct               66
+
+Distinct domains shown to the reader per response, by provider:
+           mean  median  n_with_none  n_responses
+provider                                         
+anthropic  0.78     0.0          103          197
+gemini     8.11     8.0            0          197
+openai     2.68     3.0            1          197
+
+Distinct domains shown to the reader across all responses:
+provider
+anthropic     36
+gemini       362
+openai       134
+all providers: 413

@@ -1,0 +1,83 @@
+clean_text_links.py report
+
+text_links rows: 1377
+
+Rows by provider and channel:
+provider   channel   
+anthropic  named_site    152
+gemini     md_link       422
+           named_site     44
+openai     md_link       759
+
+Links per response by provider (mean, and share of responses with any):
+           md_link  named_site
+provider                      
+anthropic     0.00        0.77
+gemini        2.14        0.22
+openai        3.85        0.00
+           md_link  named_site
+provider                      
+anthropic     0.00        0.46
+gemini        0.82        0.12
+openai        0.99        0.00
+
+Distinct domains by provider and channel:
+provider   channel   
+anthropic  named_site     27
+gemini     md_link        46
+           named_site     22
+openai     md_link       134
+
+Every distinct named site (50), for review:
+provider                                                      anthropic  gemini  total
+name                                                                                  
+abortionfinder.org                                                   62       6     68
+ineedana.com                                                         31       6     37
+abortionfunds.org                                                     7       6     13
+abortionfundofohio.org                                                7       1      8
+plancpills.org                                                        7       1      8
+plannedparenthood.org                                                 5       0      5
+midwestaccesscoalition.org                                            0       3      3
+chicagoabortionfund.org                                               0       3      3
+abortioncaretn.org                                                    3       0      3
+all-options.org                                                       0       2      2
+reprocare.com                                                         2       0      2
+abortionintucson.org                                                  2       0      2
+mtabortion.org                                                        1       1      2
+mahotline.org                                                         2       0      2
+wiabortionfund.org                                                    0       2      2
+cobaltaf.org                                                          2       0      2
+nwaafund.org                                                          0       1      1
+nationalabortionfederation.org/find-a-provider                        1       0      1
+nearfund.org                                                          0       1      1
+abortion-clinic.plancpills.org/wisconsin                              1       0      1
+ourjustice.net                                                        0       1      1
+plancpills.org/abortion-pill/alaska                                   1       0      1
+junipermidwifery.com                                                  0       1      1
+portal.ct.gov/reproductiverights/abortion-providers-and-care          1       0      1
+prochoiceminnesota.org/find-a-clinic                                  1       0      1
+reprocare.org                                                         1       0      1
+tapestryhealth.org                                                    1       0      1
+wellspringaccess.org                                                  1       0      1
+khjn.org                                                              0       1      1
+hollerhealthjustice.org                                               0       1      1
+iowaabortionaccessfund.org/find-a-clinic                              1       0      1
+iowaabortionaccessfund.org                                            1       0      1
+abortionfundmd.org                                                    1       0      1
+abortionfundofohio.org/clinics                                        1       0      1
+abortionfunds.org/fund/wisconsin-abortion-fund                        1       0      1
+aidaccess.org                                                         0       1      1
+arc-southeast.org                                                     0       1      1
+bidmc.org                                                             1       0      1
+bmc.org                                                               1       0      1
+brighamandwomens.org                                                  1       0      1
+carolinaabortionfund.org                                              0       1      1
+chelseasfund.org                                                      1       0      1
+cobaltadvocates.org                                                   0       1      1
+cobaltadvocates.org/abortion-fund                                     0       1      1
+cobaltaf.org/find-a-clinic                                            1       0      1
+floridareprofreedom.org/providers                                     1       0      1
+floridawomenscenter.com                                               1       0      1
+heyjane.com                                                           1       0      1
+iaafund.org                                                           0       1      1
+wildwestaccessfund.org                                                0       1      1

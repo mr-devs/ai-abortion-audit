@@ -1,0 +1,23 @@
+clean_tool_calls.py report
+
+tool_calls rows: 3990
+
+Tool calls by provider and tool_type:
+provider   tool_type              
+anthropic  code_execution              855
+           web_search                 1736
+gemini     google_search               586
+openai     web_search.find_in_page       2
+           web_search.open_page         93
+           web_search.search           718
+
+Tool calls that did not run, by provider, tool_type, status, and error_code:
+provider   tool_type   status  error_code        
+anthropic  web_search  error   invalid_tool_input    3
+
+Search calls that ran, per response, by provider and location:
+                    total  mean_per_response  share_with_any
+provider  location                                          
+anthropic none       1733               8.80             1.0
+gemini    none        586               2.97             1.0
+openai    none        718               3.64             1.0
