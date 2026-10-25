@@ -1,0 +1,7 @@
+provider,state_group,n_places,share_in_city,share_other_state,share_neighbor_of_other_state,median_mi,q25_mi,q75_mi
+Claude,Other states,428,0.2757,0.1542,0.8939,21.989,5.0137,77.378
+Claude,Total-ban state,149,0.0,1.0,0.6913,180.21,115.8401,313.8159
+Gemini,Other states,421,0.2827,0.1734,0.9452,19.9954,5.0937,74.5746
+Gemini,Total-ban state,152,0.0,1.0,0.6776,176.064,109.3895,282.1783
+ChatGPT,Other states,422,0.2867,0.1967,0.9157,22.4173,4.4444,74.8796
+ChatGPT,Total-ban state,149,0.0,1.0,0.6577,177.4918,114.9691,282.783

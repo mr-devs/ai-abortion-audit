@@ -1,0 +1,7 @@
+provider,city_size,n_places,share_in_city,median_mi
+Claude,Two largest,292,0.4007,11.2364
+Claude,Two smallest,285,0.0035,78.146
+Gemini,Two largest,290,0.4069,9.6385
+Gemini,Two smallest,283,0.0035,74.8309
+ChatGPT,Two largest,284,0.4225,9.4308
+ChatGPT,Two smallest,287,0.0035,74.8958

@@ -1,0 +1,7 @@
+step,label,n
+1,Responses (3 chatbots x 197 cities),591
+2,Places and resources extracted,3337
+3,In-person places (primary or alternative),2169
+4,Located precisely from their written address,2018
+5,Main recommendations located precisely,1721
+6,Distinct websites shown to readers,413

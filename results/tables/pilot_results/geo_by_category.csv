@@ -1,0 +1,22 @@
+category_rank,environment_type,provider,n_places,share_other_state,median_mi
+1,most restrictive,Claude,197,0.8071,143.7373
+1,most restrictive,Gemini,196,0.8265,143.527
+1,most restrictive,ChatGPT,196,0.8163,143.527
+2,very restrictive,Claude,24,0.1667,46.1218
+2,very restrictive,Gemini,24,0.1667,46.1218
+2,very restrictive,ChatGPT,24,0.1667,46.1218
+3,restrictive,Claude,59,0.2881,68.3341
+3,restrictive,Gemini,57,0.3158,66.3812
+3,restrictive,ChatGPT,59,0.322,68.3341
+4,some restrictions/protections,Claude,59,0.1356,21.3967
+4,some restrictions/protections,Gemini,60,0.1667,25.8105
+4,some restrictions/protections,ChatGPT,60,0.1833,25.8105
+5,protective,Claude,74,0.1486,21.1702
+5,protective,Gemini,72,0.1667,18.9822
+5,protective,ChatGPT,73,0.1918,19.439
+6,very protective,Claude,81,0.0617,15.2467
+6,very protective,Gemini,82,0.0854,14.6078
+6,very protective,ChatGPT,80,0.1375,14.6105
+7,most protective,Claude,83,0.1325,8.0273
+7,most protective,Gemini,82,0.1463,8.9702
+7,most protective,ChatGPT,79,0.1646,10.223

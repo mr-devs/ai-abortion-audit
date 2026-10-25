@@ -1,0 +1,4 @@
+provider,n_responses,share_places_provided,mean_primary,mean_alternative,mean_resource,mean_entities,mean_domains_shown,n_cpc_named,n_cpc_presented_as_provider
+Claude,197,1.0,3.0,1.3046,2.269,6.5736,1.0355,8.0,0.0
+Gemini,197,1.0,3.0051,0.6599,3.4264,7.0914,24.7056,8.0,0.0
+ChatGPT,197,0.9949,2.9848,0.0558,0.2335,3.2741,3.8528,0.0,0.0

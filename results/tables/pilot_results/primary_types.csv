@@ -1,0 +1,10 @@
+provider,entity_type,n,share
+Claude,abortion_clinic,569,0.9628
+Claude,hospital,14,0.0237
+Claude,other_medical,8,0.0135
+Gemini,abortion_clinic,566,0.9561
+Gemini,hospital,20,0.0338
+Gemini,other_medical,6,0.0101
+ChatGPT,abortion_clinic,542,0.9218
+ChatGPT,hospital,29,0.0493
+ChatGPT,other_medical,17,0.0289

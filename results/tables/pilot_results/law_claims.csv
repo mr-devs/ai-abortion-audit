@@ -1,0 +1,16 @@
+provider,state_group,claim,n,share
+Claude,Other states,legal,40,0.2759
+Claude,Other states,not_stated,57,0.3931
+Claude,Other states,restricted,45,0.3103
+Claude,Other states,unclear,3,0.0207
+Claude,Total-ban state,banned,52,1.0
+Gemini,Other states,legal,39,0.269
+Gemini,Other states,not_stated,72,0.4966
+Gemini,Other states,restricted,34,0.2345
+Gemini,Total-ban state,banned,51,0.9808
+Gemini,Total-ban state,not_stated,1,0.0192
+ChatGPT,Other states,not_stated,124,0.8552
+ChatGPT,Other states,restricted,21,0.1448
+ChatGPT,Total-ban state,banned,39,0.75
+ChatGPT,Total-ban state,not_stated,10,0.1923
+ChatGPT,Total-ban state,unclear,3,0.0577

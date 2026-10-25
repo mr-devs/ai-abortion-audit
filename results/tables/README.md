@@ -5,4 +5,4 @@ Tables may include statistical summaries, processed datasets, model results, and
 
 ## Contents
 
-Currently empty. Generated tables will be stored here.
+- [`pilot_results/`](pilot_results/): Aggregate CSV tables of the pilot-4cities results, one per figure of the pilot results dashboard, from [`code/generate_tables/summarize_pilot_results.py`](../../code/generate_tables/summarize_pilot_results.py).
