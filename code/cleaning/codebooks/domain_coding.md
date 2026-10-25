@@ -1,7 +1,7 @@
 # Domain coding codebook
 
 Instructions for coding the websites (registrable domains, e.g. `ineedana.com`) that AI chatbot responses showed to readers when asked where to get an abortion.
-The coding agents in [`.claude/workflows/code-domains.js`](../../../.claude/workflows/code-domains.js) and human coders follow these same rules.
+The coding agents in [`code/cleaning/workflows/code-domains.js`](../workflows/code-domains.js) and human coders follow these same rules.
 The output must validate against [`domain_coding.schema.json`](domain_coding.schema.json).
 
 ## Principles

@@ -1,7 +1,8 @@
 merge_llm_coding.py report (domains, pilot-4cities)
 
 Batches: 42 in the manifest, 0 missing
-Codebook SHA-256: a24ff9cfa57469f6ea42eabd1a313f191f7c8aea33f47ab876f1f998ee91a1b9
+Codebook SHA-256 (coded with): a24ff9cfa57469f6ea42eabd1a313f191f7c8aea33f47ab876f1f998ee91a1b9
+Codebook revised on 2026-10-25 to 3c968277d9fa9854f0f6dd460a7b13e4065b22a0781341e0f29917180a4001f3: Moved the workflow script from .claude/workflows/ to code/cleaning/workflows/ and updated the one sentence linking to it; no coding instruction changed. All batches were coded with sha256_before.
 
 domain_codes: 413 rows
 Extractor models:

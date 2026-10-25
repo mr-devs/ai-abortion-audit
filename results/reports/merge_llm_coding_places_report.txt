@@ -1,7 +1,8 @@
 merge_llm_coding.py report (places, pilot-4cities)
 
 Batches: 30 in the manifest, 0 missing
-Codebook SHA-256: 926d68ea53b90a1fe48840a044b6b639fef45bf193032878fa08f1b505e953b7
+Codebook SHA-256 (coded with): 926d68ea53b90a1fe48840a044b6b639fef45bf193032878fa08f1b505e953b7
+Codebook revised on 2026-10-25 to 31069ea48010537583f42f2ea4d96bf80c2360e21975b23d2627fb73239135bd: Moved the workflow script from .claude/workflows/ to code/cleaning/workflows/ and updated the one sentence linking to it; no coding instruction changed. All batches were coded with sha256_before.
 
 place_responses: 591 rows
 Extractor models:

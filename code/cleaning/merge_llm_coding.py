@@ -15,6 +15,10 @@ Notes:
       left are listed in check_problems on the row they belong to and in the
       report, for the human coders to look at first.
     - The codebook and schema must still match the hashes in the manifest.
+      A codebook change that alters no coding instruction (e.g. a moved link)
+      is recorded in the manifest's codebook_revisions, and the tables keep
+      the hash from before the first revision, which is the codebook the
+      agents saw. This assumes every batch was coded before that revision.
 
     Mapping back:
     - item_ids are mapped to response_ids (places) or domains through the
@@ -38,8 +42,9 @@ Input:
 
 Output:
     Every table has these provenance columns: item_id, batch_id,
-    extractor_model, extracted_on, codebook_sha256, and check_problems (list
-    of str; empty when the row passed every check).
+    extractor_model, extracted_on, codebook_sha256 (the hash of the codebook
+    the batches were coded with; see codebook_revisions below), and
+    check_problems (list of str; empty when the row passed every check).
 
     For --task places, in data/processed/coding/:
     - place_responses.parquet: one row per response, with:
@@ -70,7 +75,8 @@ Output:
       provides_abortions, site_loaded, evidence_urls, rationale, confidence
       (defined in code/cleaning/codebooks/domain_coding.md).
 
-    - results/reports/merge_llm_coding_<task>_report.txt: batch status,
+    - results/reports/merge_llm_coding_<task>_report.txt: batch status, the
+      codebook hash the batches were coded with and any codebook revisions,
       value counts of the main codes, and every flagged problem.
 
 Author: Matthew DeVerna
@@ -136,6 +142,26 @@ def parse_args():
     return parser.parse_args()
 
 
+def coded_codebook_sha256(manifest):
+    """
+    Return the hash of the codebook the batches were coded with.
+
+    Parameters
+    ----------
+    manifest : dict
+        The task manifest.
+
+    Returns
+    -------
+    str
+        The manifest's codebook_sha256, or, if the codebook was revised after coding (a change
+        that does not alter any coding instruction, recorded in the manifest's
+        codebook_revisions), the hash before the first revision.
+    """
+    revisions = manifest.get("codebook_revisions", [])
+    return revisions[0]["sha256_before"] if revisions else manifest["codebook_sha256"]
+
+
 def load_batches(manifest, allow_missing):
     """
     Check every batch and load the ones that pass.
@@ -179,7 +205,7 @@ def load_batches(manifest, allow_missing):
                 batch_id=coded["batch_id"],
                 extractor_model=coded["extractor_model"],
                 extracted_on=coded["extracted_on"],
-                codebook_sha256=manifest["codebook_sha256"],
+                codebook_sha256=coded_codebook_sha256(manifest),
             )
             items.append(item)
 
@@ -387,8 +413,12 @@ def write_report(task, manifest, tables, flagged, missing):
         "",
         f"Batches: {len(manifest['batches'])} in the manifest, {len(missing)} missing"
         + (f" ({', '.join(missing)})" if missing else ""),
-        f"Codebook SHA-256: {manifest['codebook_sha256']}",
+        f"Codebook SHA-256 (coded with): {coded_codebook_sha256(manifest)}",
     ]
+    for rev in manifest.get("codebook_revisions", []):
+        lines.append(
+            f"Codebook revised on {rev['revised_on']} to {rev['sha256_after']}: {rev['change']}"
+        )
     for name, table in tables.items():
         lines += ["", f"{name}: {len(table)} rows"]
         lines += [

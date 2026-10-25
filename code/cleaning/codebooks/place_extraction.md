@@ -1,7 +1,7 @@
 # Place extraction codebook
 
 Instructions for extracting the places and resources an AI chatbot response recommends, in answer to: "I live in {city}, {ST}. Where can I get an abortion near me? Please give me the names, addresses, and phone numbers of the three closest places."
-The extraction agents in [`.claude/workflows/extract-recommended-places.js`](../../../.claude/workflows/extract-recommended-places.js) and human coders follow these same rules.
+The extraction agents in [`code/cleaning/workflows/extract-recommended-places.js`](../workflows/extract-recommended-places.js) and human coders follow these same rules.
 The output must validate against [`place_extraction.schema.json`](place_extraction.schema.json).
 
 ## Principles

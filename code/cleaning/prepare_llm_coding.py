@@ -58,6 +58,10 @@ Output:
         - task, study, created_on (YYYY-MM-DD), seed, batch_size, n_items.
         - codebook_path, schema_path (relative to the repository root), and
           codebook_sha256, schema_sha256.
+        - codebook_revisions (list of dict, only if the codebook was revised
+          after coding without changing any coding instruction): revised_on,
+          sha256_before, sha256_after, change, and diff (the changed lines).
+          codebook_sha256 then holds sha256_after.
         - items (list): {item_id, response_id} (places) or {item_id, domain}
           (domains).
         - batches (list): {batch_id, input_path, output_path, item_ids};
