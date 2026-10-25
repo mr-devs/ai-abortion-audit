@@ -8,10 +8,42 @@ export const meta = {
   ],
 }
 
-// Args (all optional):
-//   manifest:  path to the manifest, relative to the repository root
-//   batch_ids: only code these batches (e.g. ["batch_003"]) - for reruns
-//   overwrite: recode batches whose output already passes the check
+/*
+Purpose:
+    Code each domain shown to readers (organization type, stance on abortion access, crisis
+    pregnancy center affiliation), one Sonnet agent per batch.
+
+Notes:
+    The `meta` block above must be the script's first statement, so this header follows it.
+    An inventory agent reads the manifest; then each batch goes to one agent, which follows
+    code/cleaning/codebooks/domain_coding.md and its JSON Schema, opens every domain's site
+    (WebFetch, or WebSearch if it does not load), never codes from memory, lists the pages it
+    relied on, writes the coded batch, and checks it with code/cleaning/check_coding_batch.py
+    (at most 5 rounds of fixes). Agents see blinded item ids, never providers. Batches whose
+    output already passes the check are skipped, so rerunning is safe.
+
+    Run from the repository root with the Workflow tool's scriptPath:
+        code/cleaning/workflows/code-domains.js
+
+Input:
+    - data/interim/llm_coding/domains/<study>/manifest.json and input/batch_*.jsonl, from
+      code/cleaning/prepare_llm_coding.py --task domains.
+    - args (all optional):
+        - manifest: path to the manifest, relative to the repository root (default: the
+          pilot-4cities manifest).
+        - batch_ids: only code these batches (e.g. ["batch_003"]), for reruns.
+        - overwrite: recode batches whose output already passes the check.
+
+Output:
+    - data/interim/llm_coding/domains/<study>/output/batch_*.json, written by the agents: one
+      JSON object per batch with batch_id, extractor_model, extracted_on (YYYY-MM-DD), and
+      items (one per domain, fields defined by the codebook and schema).
+    - Return value: {manifest, results, failed_batch_ids}. results has one record per batch
+      (batch_id, status coded/skipped_existing/failed, n_items, extractor_model, check_output);
+      rerun failed_batch_ids by passing them as args.batch_ids.
+
+Author: Matthew DeVerna
+*/
 const MANIFEST = (args && args.manifest) || 'data/interim/llm_coding/domains/pilot-4cities/manifest.json'
 const ONLY = (args && args.batch_ids) || null
 const OVERWRITE = Boolean(args && args.overwrite)

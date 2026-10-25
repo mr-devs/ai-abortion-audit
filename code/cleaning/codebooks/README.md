@@ -1,6 +1,6 @@
 # Codebooks
 
-This directory contains the instructions and output schemas for the coding tasks that the workflow agents in [`.claude/workflows/`](../../../.claude/workflows/) and the human coders both follow.
+This directory contains the instructions and output schemas for the coding tasks that the workflow agents in [`code/cleaning/workflows/`](../workflows/) and the human coders both follow.
 Each task has a codebook (the rules and every field's definition) and a JSON Schema that [`toolkit.llm_coding`](../../toolkit/toolkit/llm_coding.py) validates coded batches against.
 
 ## Contents

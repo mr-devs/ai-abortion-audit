@@ -15,11 +15,12 @@ Each audit script discovers runs through taxman's `manifest.json` files (complet
 - [`clean_guttmacher.py`](clean_guttmacher.py): Turns the newest raw Guttmacher download into one JSONL record per state and a CSV of each state's policy category and rank.
 - [`build_city_boundaries.py`](build_city_boundaries.py): Joins the city sample to the Census 2025 TIGER/Line places file on the place GEOID, adding each city's legal limits and Census internal point.
 - [`build_state_neighbors.py`](build_state_neighbors.py): Builds the lookup of states that physically touch (land borders, plus the two Four Corners point contacts, flagged) from the Census 1:500k state outlines.
-- [`prepare_llm_coding.py`](prepare_llm_coding.py): Writes the blinded input batches and manifest for a coding task (`--task places` or `--task domains`) that the workflows in [`.claude/workflows/`](../../.claude/workflows/) code.
+- [`prepare_llm_coding.py`](prepare_llm_coding.py): Writes the blinded input batches and manifest for a coding task (`--task places` or `--task domains`) that the workflows in [`workflows/`](workflows/) code.
 - [`check_coding_batch.py`](check_coding_batch.py): Checks one coded batch against its input and the task's schema (and, for places, that every copied span is in the response); the workflow agents run it on their own output.
 - [`merge_llm_coding.py`](merge_llm_coding.py): Checks and combines a task's coded batches into tables in [`data/processed/coding/`](../../data/processed/coding/), mapping every item back to its response and audit.
 - [`sample_for_human_coding.py`](sample_for_human_coding.py): Draws, from the task manifest, the 100 items human coders code blind (responses balanced across providers, or domains at random) and their coding order.
 - [`codebooks/`](codebooks/): The codebooks and JSON Schemas for the coding tasks.
+- [`workflows/`](workflows/): The Claude Code workflow scripts that code each task in parallel, one Sonnet agent per batch.
 
 ## Other instructions
 
@@ -51,7 +52,7 @@ uv run python code/cleaning/build_city_boundaries.py
 uv run python code/cleaning/build_state_neighbors.py
 ```
 
-The coding tasks run after the audit tables are built; see [`.claude/workflows/README.md`](../../.claude/workflows/README.md) for the workflow step:
+The coding tasks run after the audit tables are built; see [`workflows/README.md`](workflows/README.md) for the workflow step:
 
 ```bash
 uv run python code/cleaning/prepare_llm_coding.py --task places   # then run the workflow

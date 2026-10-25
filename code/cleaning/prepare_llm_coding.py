@@ -1,7 +1,7 @@
 """
 Purpose:
     Write the input batches for a codebook coding task, which the Claude Code
-    workflows in .claude/workflows/ then code in parallel:
+    workflows in code/cleaning/workflows/ then code in parallel:
         - places: extract the places and resources each response recommends
           (codebook: code/cleaning/codebooks/place_extraction.md).
         - domains: code each domain shown to readers

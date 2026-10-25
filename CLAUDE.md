@@ -88,6 +88,12 @@ When writing paths to files or directories in a README, make them clickable on G
 
 See @.claude/reference/reference-readme.md and use it as the canonical example for structure and tone.
 
+### 2.5  Claude Code Workflow Scripts
+
+Save Claude Code workflow scripts (`.js`) in the `code/` directory that fits their step (e.g. `code/cleaning/workflows/`), never in `.claude/workflows/`; keep a single copy, with no symbolic links or duplicates.
+They follow the same standards as the rest of the project: a header comment block with the fields in 2.1a (placed directly after the `meta` block, which must be the script's first statement), comments that document assumptions and decisions, and a listing in the directory's `README.md`.
+Run them by path with the Workflow tool's `scriptPath` (e.g. `code/cleaning/workflows/code-domains.js`), not by name.
+
 ## 3  Project Structure (Template)
 
 ```

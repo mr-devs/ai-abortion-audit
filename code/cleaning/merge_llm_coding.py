@@ -25,7 +25,7 @@ Notes:
 Input:
     - data/interim/llm_coding/<task>/<study>/manifest.json, input/, and
       output/, from code/cleaning/prepare_llm_coding.py and the workflows in
-      .claude/workflows/.
+      code/cleaning/workflows/.
     - data/processed/audits/metadata.parquet.
     - data/processed/census/selected_cities_4_per_state.csv.
     - --task (required): "places" or "domains".
