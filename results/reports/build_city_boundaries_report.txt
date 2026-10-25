@@ -12,5 +12,16 @@ min         0.04
 50%        52.70
 75%       223.00
 max      7000.54
-Smallest: River Forest, IN (0.041 km^2)
-Largest: Juneau, AK (7,001 km^2)
+
+Land area (mi^2):
+count     197.00
+mean       93.99
+std       253.49
+min         0.02
+25%         0.37
+50%        20.35
+75%        86.10
+max      2702.92
+
+Smallest: River Forest, IN (0.041 km^2, 0.016 mi^2)
+Largest: Juneau, AK (7,001 km^2, 2,703 mi^2)

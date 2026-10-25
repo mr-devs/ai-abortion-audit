@@ -36,6 +36,7 @@ Output:
         - neighbor_abbr (str): abbreviation of a state it touches.
         - border_type (str): "land" or "point" (see Notes).
         - shared_border_km (float): length of the shared border, km.
+        - shared_border_mi (float): the same length in miles.
     - results/reports/build_state_neighbors_report.txt: pair counts, the
       number of neighbors per state, and states with none.
 
@@ -49,7 +50,7 @@ import geopandas as gpd
 import pandas as pd
 import us
 
-from toolkit.utils import latest_download
+from toolkit.utils import km_to_miles, latest_download
 
 os.chdir(Path(__file__).resolve().parent)
 
@@ -101,6 +102,7 @@ def build_table(states):
                 "neighbor_abbr": neighbor,
                 "border_type": "land" if border_km > 0 else "point",
                 "shared_border_km": round(border_km, 1),
+                "shared_border_mi": round(km_to_miles(border_km), 1),
             }
         )
     return (

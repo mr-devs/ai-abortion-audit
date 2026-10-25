@@ -17,6 +17,10 @@ import tldextract
 #: Its ISO order means sorting filenames also sorts downloads by time.
 TIMESTAMP_FORMAT = "%Y-%m-%d_%H%M%S"
 
+#: Kilometers in one international mile (exact by definition). Distances are
+#: computed in kilometers and reported in both units.
+KM_PER_MILE = 1.609344
+
 #: How every pilot-4cities message begins: "I live in <city>, <ST>. ...". The
 #: city is matched greedily, so names with periods (St. Paul) stay whole.
 CITY_MESSAGE_PATTERN = re.compile(
@@ -302,3 +306,20 @@ def latest_download(directory, stem, suffix):
             f"No '{stem}_*{suffix}' file in {directory}. Run the download script first."
         )
     return downloads[-1]
+
+
+def km_to_miles(km):
+    """
+    Convert kilometers to international miles.
+
+    Parameters
+    ----------
+    km : float, numpy.ndarray, or pandas.Series
+        Distance in kilometers; missing values stay missing.
+
+    Returns
+    -------
+    float, numpy.ndarray, or pandas.Series
+        The same distance in miles (km / KM_PER_MILE), unrounded.
+    """
+    return km / KM_PER_MILE

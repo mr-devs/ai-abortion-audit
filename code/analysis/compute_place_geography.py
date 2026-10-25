@@ -29,6 +29,7 @@ Notes:
     - distance_km: geodesic distance on the WGS84 ellipsoid from the queried
       city's Census internal point to the place. The Census coordinates are
       NAD83, which differs from WGS84 by about a meter in the US.
+      distance_mi is the same distance in miles (toolkit.utils.km_to_miles).
     - crosses_state: place_state_abbr differs from the user's state.
     - is_neighbor_state: the place is in a state that touches the user's
       state (data/processed/census/state_neighbors.csv; Four Corners point
@@ -78,7 +79,8 @@ Output:
         - geocode_precise (bool).
         - lat, lon (float or null): the location used.
         - place_state_abbr (str or null), in_query_city (bool or null),
-          distance_km (float or null), crosses_state (bool or null),
+          distance_km, distance_mi (float or null: the same distance in
+          kilometers and miles), crosses_state (bool or null),
           is_neighbor_state (bool or null), neighbor_border_type (str or
           null: "land", "point", or null when not a neighbor),
           stated_state_matches (bool or null).
@@ -98,7 +100,7 @@ import numpy as np
 import pandas as pd
 from pyproj import Geod
 
-from toolkit.utils import latest_download
+from toolkit.utils import km_to_miles, latest_download
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "data_collection"))
 from geocode_place_addresses import address_key  # noqa: E402
@@ -262,6 +264,7 @@ def add_measures(places):
         places.loc[has_point, "lat"],
     )
     places.loc[has_point, "distance_km"] = np.asarray(meters) / 1000
+    places["distance_mi"] = km_to_miles(places["distance_km"])
 
     located = places["place_state_abbr"].notna()
     places["crosses_state"] = (
@@ -341,6 +344,7 @@ def write_report(table):
                 "n_places": grouped.size(),
                 **{f"share_{c}": grouped[c].mean().round(3) for c in summary_columns},
                 "median_km": grouped["distance_km"].median().round(1),
+                "median_mi": grouped["distance_mi"].median().round(1),
             }
         )
 
@@ -404,6 +408,7 @@ def main():
         "place_state_abbr",
         "in_query_city",
         "distance_km",
+        "distance_mi",
         "crosses_state",
         "is_neighbor_state",
         "neighbor_border_type",

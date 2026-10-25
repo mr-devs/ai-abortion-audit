@@ -54,7 +54,7 @@ from pathlib import Path
 import geopandas as gpd
 import pandas as pd
 
-from toolkit.utils import latest_download
+from toolkit.utils import KM_PER_MILE, latest_download
 
 os.chdir(Path(__file__).resolve().parent)
 
@@ -145,6 +145,7 @@ def write_report(table, places_path):
         The boundary file used.
     """
     area_km2 = table["aland_m2"] / 1e6
+    area_mi2 = area_km2 / KM_PER_MILE**2
     smallest = table.loc[area_km2.idxmin()]
     largest = table.loc[area_km2.idxmax()]
     lines = [
@@ -155,10 +156,14 @@ def write_report(table, places_path):
         "",
         "Land area (km^2):",
         area_km2.describe().round(2).to_string(),
+        "",
+        "Land area (mi^2):",
+        area_mi2.describe().round(2).to_string(),
+        "",
         f"Smallest: {smallest['city_clean']}, {smallest['state_abbr']} "
-        f"({smallest['aland_m2'] / 1e6:.3f} km^2)",
+        f"({area_km2[area_km2.idxmin()]:.3f} km^2, {area_mi2[area_km2.idxmin()]:.3f} mi^2)",
         f"Largest: {largest['city_clean']}, {largest['state_abbr']} "
-        f"({largest['aland_m2'] / 1e6:,.0f} km^2)",
+        f"({area_km2[area_km2.idxmax()]:,.0f} km^2, {area_mi2[area_km2.idxmax()]:,.0f} mi^2)",
     ]
     REPORT_PATH.parent.mkdir(parents=True, exist_ok=True)
     REPORT_PATH.write_text("\n".join(lines) + "\n", encoding="utf-8")
