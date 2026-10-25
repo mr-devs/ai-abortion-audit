@@ -1,0 +1,69 @@
+build_state_neighbors.py report
+
+Boundary file: cb_2025_us_state_500k_2026-10-24_195929.parquet
+Pairs (each listed in both directions): 109
+Pairs by border type:
+border_type
+land     107
+point      2
+
+Point contacts:
+state_abbr neighbor_abbr
+        AZ            CO
+        CO            AZ
+        NM            UT
+        UT            NM
+
+States with no neighbor: AK, HI
+
+Neighbors per state:
+state_abbr
+TN    8
+MO    8
+CO    7
+KY    7
+ID    6
+AR    6
+OK    6
+PA    6
+SD    6
+NE    6
+WY    6
+IA    6
+UT    6
+VA    6
+IL    5
+GA    5
+MA    5
+MD    5
+OH    5
+WV    5
+NY    5
+AZ    5
+NV    5
+NM    5
+TX    4
+OR    4
+WI    4
+AL    4
+MT    4
+KS    4
+NC    4
+MS    4
+MN    4
+IN    4
+CA    3
+CT    3
+VT    3
+DE    3
+NH    3
+NJ    3
+LA    3
+MI    3
+ND    3
+RI    2
+FL    2
+DC    2
+WA    2
+SC    2
+ME    1

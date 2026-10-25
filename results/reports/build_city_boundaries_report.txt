@@ -1,0 +1,16 @@
+build_city_boundaries.py report
+
+Boundary file: tl_2025_place_2026-10-24_195926.parquet
+Cities: 197 in 50 states
+
+Land area (km^2):
+count     197.00
+mean      243.43
+std       656.53
+min         0.04
+25%         0.95
+50%        52.70
+75%       223.00
+max      7000.54
+Smallest: River Forest, IN (0.041 km^2)
+Largest: Juneau, AK (7,001 km^2)

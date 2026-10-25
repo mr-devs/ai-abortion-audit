@@ -1,0 +1,49 @@
+merge_llm_coding.py report (domains, pilot-4cities)
+
+Batches: 42 in the manifest, 0 missing
+Codebook SHA-256: a24ff9cfa57469f6ea42eabd1a313f191f7c8aea33f47ab876f1f998ee91a1b9
+
+domain_codes: 413 rows
+Extractor models:
+extractor_model
+claude-sonnet-5-5    413
+
+category:
+category
+abortion_provider               103
+other                            46
+abortion_fund_or_support         42
+government                       38
+crisis_pregnancy_center          37
+news_media                       30
+hospital_or_health_system        30
+advocacy_or_research             25
+business_listing                 18
+other_medical_practice           14
+abortion_directory               10
+unclear                           8
+telehealth_abortion_provider      6
+social_media_or_forum             3
+reference                         3
+
+stance_on_abortion_access:
+stance_on_abortion_access
+supports_access    209
+neutral            134
+opposes_access      42
+unclear             28
+
+cpc_affiliated:
+cpc_affiliated
+no         347
+yes         38
+unclear     28
+
+confidence:
+confidence
+high      259
+medium    126
+low        28
+
+Flagged problems (0):
+  (none)

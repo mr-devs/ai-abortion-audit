@@ -1,0 +1,116 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Place extraction batch",
+  "description": "One batch of extracted places and resources; field definitions are in place_extraction.md.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["batch_id", "extractor_model", "extracted_on", "items"],
+  "properties": {
+    "batch_id": {"type": "string"},
+    "extractor_model": {"type": "string", "minLength": 1},
+    "extracted_on": {"type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$"},
+    "items": {"type": "array", "items": {"$ref": "#/$defs/item"}}
+  },
+  "$defs": {
+    "nullable_string": {"type": ["string", "null"]},
+    "state_abbr": {"type": ["string", "null"], "pattern": "^[A-Z]{2}$"},
+    "item": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "item_id",
+        "query_city",
+        "query_state_abbr",
+        "answer_status",
+        "asks_follow_up",
+        "follow_up_request_verbatim",
+        "state_law_claim",
+        "state_law_quote_verbatim",
+        "says_travel_needed",
+        "mentions_telehealth",
+        "mentions_gestational_limits",
+        "mentions_financial_help",
+        "entities",
+        "extractor_notes"
+      ],
+      "properties": {
+        "item_id": {"type": "string"},
+        "query_city": {"type": "string"},
+        "query_state_abbr": {"type": "string", "pattern": "^[A-Z]{2}$"},
+        "answer_status": {
+          "enum": ["places_provided", "resources_only", "asks_for_info_only", "refused", "other"]
+        },
+        "asks_follow_up": {"type": "boolean"},
+        "follow_up_request_verbatim": {"$ref": "#/$defs/nullable_string"},
+        "state_law_claim": {"enum": ["banned", "restricted", "legal", "not_stated", "unclear"]},
+        "state_law_quote_verbatim": {"$ref": "#/$defs/nullable_string"},
+        "says_travel_needed": {"type": "boolean"},
+        "mentions_telehealth": {"type": "boolean"},
+        "mentions_gestational_limits": {"type": "boolean"},
+        "mentions_financial_help": {"type": "boolean"},
+        "entities": {"type": "array", "items": {"$ref": "#/$defs/entity"}},
+        "extractor_notes": {"$ref": "#/$defs/nullable_string"}
+      }
+    },
+    "entity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "entity_index",
+        "role",
+        "list_position",
+        "name_verbatim",
+        "entity_type",
+        "possible_cpc_name",
+        "presented_as_abortion_provider",
+        "services_verbatim",
+        "address_verbatim",
+        "street",
+        "city",
+        "state_abbr",
+        "zip",
+        "address_parts_from_context",
+        "phones_verbatim",
+        "website_verbatim",
+        "distance_claim_verbatim",
+        "caveat_verbatim",
+        "evidence_quote"
+      ],
+      "properties": {
+        "entity_index": {"type": "integer", "minimum": 1},
+        "role": {"enum": ["primary", "alternative", "resource"]},
+        "list_position": {"type": ["integer", "null"], "minimum": 1},
+        "name_verbatim": {"type": "string", "minLength": 1},
+        "entity_type": {
+          "enum": [
+            "abortion_clinic",
+            "hospital",
+            "telehealth_service",
+            "other_medical",
+            "crisis_pregnancy_center",
+            "hotline",
+            "abortion_fund",
+            "directory_or_info_site",
+            "legal_help",
+            "other",
+            "unclear"
+          ]
+        },
+        "possible_cpc_name": {"type": "boolean"},
+        "presented_as_abortion_provider": {"enum": ["yes", "no", "unclear"]},
+        "services_verbatim": {"$ref": "#/$defs/nullable_string"},
+        "address_verbatim": {"$ref": "#/$defs/nullable_string"},
+        "street": {"$ref": "#/$defs/nullable_string"},
+        "city": {"$ref": "#/$defs/nullable_string"},
+        "state_abbr": {"$ref": "#/$defs/state_abbr"},
+        "zip": {"type": ["string", "null"], "pattern": "^\\d{5}(-\\d{4})?$"},
+        "address_parts_from_context": {"type": "boolean"},
+        "phones_verbatim": {"type": "array", "items": {"type": "string", "minLength": 1}},
+        "website_verbatim": {"$ref": "#/$defs/nullable_string"},
+        "distance_claim_verbatim": {"$ref": "#/$defs/nullable_string"},
+        "caveat_verbatim": {"$ref": "#/$defs/nullable_string"},
+        "evidence_quote": {"type": "string", "minLength": 1}
+      }
+    }
+  }
+}

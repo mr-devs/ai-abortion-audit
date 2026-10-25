@@ -1,0 +1,54 @@
+merge_llm_coding.py report (places, pilot-4cities)
+
+Batches: 30 in the manifest, 0 missing
+Codebook SHA-256: 926d68ea53b90a1fe48840a044b6b639fef45bf193032878fa08f1b505e953b7
+
+place_responses: 591 rows
+Extractor models:
+extractor_model
+claude-sonnet-5-5    591
+
+place_entities: 3337 rows
+Extractor models:
+extractor_model
+claude-sonnet-5-5    3337
+
+answer_status by provider:
+provider            anthropic  gemini  openai
+answer_status                                
+asks_for_info_only          0       0       1
+places_provided           197     197     196
+
+state_law_claim by provider:
+provider         anthropic  gemini  openai
+state_law_claim                           
+banned                  52      51      39
+legal                   40      39       0
+not_stated              57      73     134
+restricted              45      34      21
+unclear                  3       0       3
+
+Entities per response by provider (mean):
+           n_entities  n_primary  n_alternative  n_resource
+provider                                                   
+anthropic        6.57       3.00           1.30        2.27
+gemini           7.09       3.01           0.66        3.43
+openai           3.27       2.98           0.06        0.23
+
+entity_type by role:
+role                     alternative  primary  resource
+entity_type                                            
+abortion_clinic                  348     1677         2
+abortion_fund                      0        0       323
+crisis_pregnancy_center           16        0         0
+directory_or_info_site             0        0       413
+hospital                           8       63         1
+hotline                            0        0       194
+legal_help                         0        0       101
+other                              0        0        12
+other_medical                     22       31         0
+telehealth_service                 0        0       122
+unclear                            4        0         0
+
+Flagged problems (0):
+  (none)

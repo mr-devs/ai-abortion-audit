@@ -13,6 +13,13 @@ Each audit script discovers runs through taxman's `manifest.json` files (complet
 - [`clean_token_usage.py`](clean_token_usage.py): Builds the long-format `token_usage` table, with a `unit` for every token type.
 - [`select_state_cities.py`](select_state_cities.py): Selects the pilot-4cities sample from the Census file: the two most and two least populated incorporated places in each state (DC excluded, zero-population places dropped), with official and everyday city names.
 - [`clean_guttmacher.py`](clean_guttmacher.py): Turns the newest raw Guttmacher download into one JSONL record per state and a CSV of each state's policy category and rank.
+- [`build_city_boundaries.py`](build_city_boundaries.py): Joins the city sample to the Census 2025 TIGER/Line places file on the place GEOID, adding each city's legal limits and Census internal point.
+- [`build_state_neighbors.py`](build_state_neighbors.py): Builds the lookup of states that physically touch (land borders, plus the two Four Corners point contacts, flagged) from the Census 1:500k state outlines.
+- [`prepare_llm_coding.py`](prepare_llm_coding.py): Writes the blinded input batches and manifest for a coding task (`--task places` or `--task domains`) that the workflows in [`.claude/workflows/`](../../.claude/workflows/) code.
+- [`check_coding_batch.py`](check_coding_batch.py): Checks one coded batch against its input and the task's schema (and, for places, that every copied span is in the response); the workflow agents run it on their own output.
+- [`merge_llm_coding.py`](merge_llm_coding.py): Checks and combines a task's coded batches into tables in [`data/processed/coding/`](../../data/processed/coding/), mapping every item back to its response and audit.
+- [`sample_for_human_coding.py`](sample_for_human_coding.py): Draws, from the task manifest, the 100 items human coders code blind (responses balanced across providers, or domains at random) and their coding order.
+- [`codebooks/`](codebooks/): The codebooks and JSON Schemas for the coding tasks.
 
 ## Other instructions
 
@@ -34,5 +41,26 @@ Every audit script except [`build_link_events.py`](build_link_events.py) accepts
 The output filenames do not change with the prefix, so a filtered run overwrites the full tables; run every script with the same prefix.
 Use `--audit-prefix pilot-4cities-` for the pilot-4cities audits alone; `pilot-` matches both pilots.
 Each script also writes a short summary to [`results/reports/`](../../results/reports/).
+
+### Geography and coding
+
+Build the city boundaries and state neighbors after downloading the Census boundary files ([`code/data_collection/download_census_boundaries.py`](../data_collection/download_census_boundaries.py)):
+
+```bash
+uv run python code/cleaning/build_city_boundaries.py
+uv run python code/cleaning/build_state_neighbors.py
+```
+
+The coding tasks run after the audit tables are built; see [`.claude/workflows/README.md`](../../.claude/workflows/README.md) for the workflow step:
+
+```bash
+uv run python code/cleaning/prepare_llm_coding.py --task places   # then run the workflow
+uv run python code/cleaning/merge_llm_coding.py --task places
+uv run python code/cleaning/sample_for_human_coding.py --task places   # once, before human coding
+uv run python code/data_collection/geocode_place_addresses.py
+uv run python code/analysis/compute_place_geography.py
+```
+
+The same first three steps with `--task domains` code the domains shown to readers.
 
 [`select_state_cities.py`](select_state_cities.py) and [`clean_guttmacher.py`](clean_guttmacher.py) read the newest download in [`data/raw/census/`](../../data/raw/census/) and [`data/raw/guttmacher/`](../../data/raw/guttmacher/); see [`code/data_collection/README.md`](../data_collection/README.md) for the order to run them in.

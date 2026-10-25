@@ -12,6 +12,16 @@ Notes:
     - category_rank numbers the categories 1 (Most Restrictive) to
       7 (Most Protective).
 
+    Total bans:
+    - total_ban is true when the state's "abortion ban" policies include
+      Guttmacher's own "Total abortion ban" label (TOTAL_BAN_TITLE), so the
+      split of states into total-ban and all others comes straight from the
+      data. States with gestational bans (e.g., a 6-week ban) are not total
+      bans, even though some share the "Most Restrictive" category.
+    - Every state's entry lists exactly one ban policy (a total ban, a
+      gestational ban, or "No gestational ban"); the script stops if one
+      lists none, so a missing label never reads as "no total ban".
+
     Dates:
     - as_of is the date Guttmacher last edited the state's entry in its CMS
       (the entry's `_modified` timestamp, in UTC). It is not necessarily the
@@ -63,9 +73,12 @@ Output:
         - state_slug (str): as above.
         - environment_type (str): policy category, lowercase.
         - category_rank (int): as above.
+        - total_ban (bool): the state enforces a total abortion ban (see
+          Notes).
         - as_of (str): as above.
         - downloaded_on (str): as above.
-    - results/reports/clean_guttmacher_report.txt: states per category.
+    - results/reports/clean_guttmacher_report.txt: states per category, and
+      the states with a total ban.
 
 Author: Matthew DeVerna
 """
@@ -103,6 +116,9 @@ CATEGORIES = [
 ]
 CATEGORY_LOOKUP = {c.lower(): c for c in CATEGORIES}
 
+# Guttmacher's title for a total ban, in the "abortion ban" policy group.
+TOTAL_BAN_TITLE = "Total abortion ban"
+
 # Policy groups as they appear in the API, mapped to JSON-friendly keys.
 GROUPS = {
     "abortion-ban": "abortion_ban",
@@ -129,6 +145,7 @@ CSV_COLUMNS = [
     "state_slug",
     "environment_type",
     "category_rank",
+    "total_ban",
     "as_of",
     "downloaded_on",
 ]
@@ -270,10 +287,14 @@ def category_row(record):
         Values for CSV_COLUMNS; environment_type is lowercased.
     """
     environment_type = record["environment_type"]
+    bans = [policy["title"] for policy in record["policies"]["abortion_ban"]]
+    if len(bans) != 1:
+        raise ValueError(f"{record['state_slug']} lists {len(bans)} ban policies: {bans}")
     return {
         "state_slug": record["state_slug"],
         "environment_type": environment_type.lower() if environment_type else None,
         "category_rank": record["category_rank"],
+        "total_ban": bans[0] == TOTAL_BAN_TITLE,
         "as_of": record["as_of"],
         "downloaded_on": record["downloaded_on"],
     }
@@ -306,6 +327,8 @@ def write_report(records, raw_path):
     for category in CATEGORIES + [c for c in counts if c not in CATEGORIES]:
         if category in counts:
             lines.append(f"  {category:<30} {counts[category]}")
+    total_ban = [r["state"] for r in records if category_row(r)["total_ban"]]
+    lines += ["", f"States with a total ban ({len(total_ban)}): {', '.join(total_ban)}"]
     REPORT_PATH.parent.mkdir(parents=True, exist_ok=True)
     REPORT_PATH.write_text("\n".join(lines) + "\n", encoding="utf-8")
 

@@ -11,3 +11,5 @@ States per category (most restrictive first):
   Protective                     8
   Very Protective                7
   Most Protective                7
+
+States with a total ban (13): Alabama, Arkansas, Idaho, Indiana, Kentucky, Louisiana, Mississippi, North Dakota, Oklahoma, South Dakota, Tennessee, Texas, West Virginia

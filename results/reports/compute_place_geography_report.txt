@@ -1,0 +1,53 @@
+compute_place_geography.py report
+
+In-person places: 2169
+Geocoder used:
+geocoder
+census       1976
+none          151
+nominatim      42
+Share precise by provider:
+provider
+anthropic    0.900
+gemini       0.939
+openai       0.963
+
+Primary places, precise locations, by provider:
+           n_places  share_in_query_city  share_crosses_state  share_is_neighbor_state  median_km
+provider                                                                                         
+anthropic       577                0.205                0.373                    0.281       82.0
+gemini          573                0.208                0.393                      0.3       81.8
+openai          571                0.212                0.406                    0.305       86.3
+
+Primary places, precise locations, by whether the user's state has a total ban:
+                                 n_places  share_in_query_city  share_crosses_state  share_is_neighbor_state  median_km
+query_state_total_ban provider                                                                                         
+False                 anthropic       428                0.276                0.154                    0.138       35.4
+                      gemini          421                0.283                0.173                    0.164       32.2
+                      openai          422                0.287                0.197                     0.18       36.1
+True                  anthropic       149                  0.0                  1.0                    0.691      290.0
+                      gemini          152                  0.0                  1.0                    0.678      283.3
+                      openai          149                  0.0                  1.0                    0.658      285.6
+
+Primary places, precise locations, by user's state policy category:
+                                                         n_places  share_in_query_city  share_crosses_state  share_is_neighbor_state  median_km
+query_state_category_rank query_state_environment_type                                                                                         
+1                         most restrictive                    589                0.051                0.817                    0.565      231.3
+2                         very restrictive                     72                0.125                0.167                    0.083       74.2
+3                         restrictive                         175                 0.28                0.309                    0.309      109.0
+4                         some restrictions/protections       179                 0.33                0.162                    0.156       34.4
+5                         protective                          219                 0.21                0.169                    0.128       31.8
+6                         very protective                     243                0.358                0.095                    0.095       24.5
+7                         most protective                     244                 0.32                0.148                    0.148       14.6
+
+Places in another state: share in a neighboring state, by provider:
+provider
+anthropic    0.747
+gemini       0.749
+openai       0.749
+
+Stated state matches the geocoded state (share):
+provider
+anthropic    1.0
+gemini       1.0
+openai       1.0
