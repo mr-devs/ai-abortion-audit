@@ -1,0 +1,1559 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pilot Data Brief</title>
+<meta name="description" content="Research questions about where AI chatbots send people looking for an abortion, each answered with one figure from the pilot-4cities audit.">
+<!-- Built by code/generate_figures/build_pilot_4cities_pages.py from
+     code/generate_figures/templates/pilot-4cities/brief.html. Edit the
+     template and rebuild; do not edit the built file. -->
+<!-- @inline pilot-4cities/common.css -->
+<style>
+.layout { max-width: 1320px; margin: 0 auto; padding: 22px 16px 80px; display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 36px; }
+nav.tabs { position: sticky; top: 16px; align-self: start; display: grid; gap: 2px; }
+nav.tabs .ttl { font-family: var(--serif); font-size: 1.15rem; font-weight: 600; margin-bottom: 4px; }
+nav.tabs .sub { font-size: 0.78rem; color: var(--muted); margin-bottom: 10px; }
+nav.tabs button { text-align: left; border: 0; background: none; padding: 7px 10px; border-radius: 6px; cursor: pointer; font-size: 0.86rem; line-height: 1.3; color: var(--ink-2); display: grid; grid-template-columns: 22px 1fr; gap: 4px; }
+nav.tabs button .k { font-variant-numeric: tabular-nums; color: var(--muted); font-size: 0.78rem; padding-top: 1px; }
+nav.tabs button:hover { background: var(--accent-soft); color: var(--ink); }
+nav.tabs button[aria-selected="true"] { background: var(--ink); color: var(--bg); }
+nav.tabs button[aria-selected="true"] .k { color: var(--bg); opacity: 0.7; }
+main { min-width: 0; }
+.tab { display: none; gap: 18px; }
+.tab.on { display: grid; }
+.eyebrow { font-size: 0.76rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+.tab h1 { font-size: clamp(1.5rem, 2.8vw, 2.1rem); max-width: 30ch; }
+.how { max-width: 78ch; font-size: 0.93rem; color: var(--ink-2); display: grid; gap: 6px; }
+.how b { color: var(--ink); }
+.finding { font-family: var(--serif); font-size: 1.12rem; line-height: 1.55; max-width: 74ch; border-left: 3px solid var(--ink); padding: 2px 0 2px 14px; }
+figure.fig { margin: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 18px 18px 14px; display: grid; gap: 14px; }
+.fig-title { font-size: 1rem; font-weight: 600; }
+.panels { display: grid; gap: 22px 28px; }
+.panels.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.panel { display: grid; gap: 6px; align-content: start; min-width: 0; }
+.panel.wide { grid-column: 1 / -1; }
+.panel .ph { display: flex; gap: 8px; align-items: baseline; font-size: 0.88rem; font-weight: 600; }
+.panel .ph .pl { font-weight: 700; font-size: 1rem; }
+.panel .chart { min-width: 0; }
+.panel .sub { font-size: 0.8rem; color: var(--ink-2); }
+.fig-legend { display: flex; gap: 6px 18px; flex-wrap: wrap; font-size: 0.8rem; }
+figcaption { font-size: 0.85rem; line-height: 1.55; color: var(--ink-2); max-width: 100ch; border-top: 1px solid var(--line); padding-top: 10px; }
+figcaption b { color: var(--ink); }
+details.tv { font-size: 0.82rem; }
+details.tv summary { cursor: pointer; color: var(--accent); }
+details.tv .table-wrap { margin-top: 8px; max-height: 340px; overflow: auto; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; background: var(--panel); }
+.seg button { border: 0; background: none; padding: 5px 10px; cursor: pointer; font-size: 0.82rem; display: inline-flex; align-items: center; gap: 6px; color: var(--ink-2); }
+.seg button + button { border-left: 1px solid var(--line); }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+.seg button i { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; display: grid; gap: 6px; align-content: start; cursor: pointer; text-align: left; font: inherit; color: inherit; }
+.card:hover { border-color: var(--ink); }
+.card .big { font-size: 1.9rem; font-weight: 600; line-height: 1.1; }
+.card .q { font-size: 0.74rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+.card p { font-size: 0.9rem; color: var(--ink-2); }
+.note { font-size: 0.82rem; color: var(--muted); }
+.def { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; font-size: 0.88rem; display: grid; gap: 8px; max-width: 100ch; }
+.def h3 { font-family: var(--sans); font-size: 0.92rem; }
+.def ol { margin: 0; padding-left: 1.3em; display: grid; gap: 4px; }
+svg .hit { fill: transparent; cursor: default; }
+svg .dot { stroke: var(--surface); stroke-width: 2; }
+svg .rowline { stroke: var(--axis); stroke-width: 2; stroke-linecap: round; }
+svg .bench { stroke: var(--ink); stroke-width: 2; }
+svg .cross { stroke: var(--ink-2); stroke-width: 1; }
+@media (max-width: 1000px) {
+  .layout { grid-template-columns: minmax(0, 1fr); gap: 18px; }
+  nav.tabs { position: static; display: flex; overflow-x: auto; gap: 4px; padding-bottom: 6px; }
+  nav.tabs .ttl, nav.tabs .sub { display: none; }
+  nav.tabs button { white-space: nowrap; grid-template-columns: auto auto; }
+  .panels.two { grid-template-columns: minmax(0, 1fr); }
+}
+</style>
+</head>
+<body>
+<header class="site-head"><div class="inner">
+  <div class="brand"><b>AI Abortion Audit</b> · pilot-4cities</div>
+  <nav class="site-nav" aria-label="Pages">
+    <a href="pilot_4cities_approach.html">Approach</a>
+    <a href="pilot_4cities_explorer.html">Response explorer</a>
+    <a href="pilot_4cities_brief.html" aria-current="page">Data brief</a>
+    <button class="theme-btn" type="button">Theme: auto</button>
+  </nav>
+</div></header>
+
+<div class="layout">
+  <nav class="tabs" id="tabs" role="tablist" aria-label="Research questions">
+    <div class="ttl">Data brief</div>
+    <div class="sub">One research question per tab</div>
+  </nav>
+  <main id="main"></main>
+</div>
+
+<!-- @inline vendor/d3-7.9.0.min.js -->
+<!-- @data -->
+<!-- @inline pilot-4cities/common.js -->
+<script>
+(function () {
+  if (AA.failIfMissing()) return;
+  AA.initTheme();
+  const D = AA.D;
+  const fmt = AA.fmt;
+  const esc = AA.esc;
+  const P = AA.PROVIDER_IDS;
+  const C = D.meta.counts;
+  const cityById = Object.fromEntries(D.cities.map((c) => [c.geoid, c]));
+  const pct = (v, d = 0) => fmt.pct(v, d);
+  const byP = (arr) => Object.fromEntries(arr.map((r) => [r.provider, r]));
+  const range = (vals, f = pct) => {
+    const lo = d3.min(vals), hi = d3.max(vals);
+    return f(lo) === f(hi) ? f(lo) : `${f(lo)}–${f(hi)}`;
+  };
+  const NBSP = " ";
+
+  // ---------------------------------------------------------------------
+  // Chart primitives. Every chart is redrawn from scratch at the width of
+  // its container; colors come from CSS tokens so both themes work.
+  // ---------------------------------------------------------------------
+
+  // Horizontal axis with hairline gridlines and a title under the plot.
+  function xAxis(svg, x, { top, bottom, ticks, fmt: f, title, width }) {
+    const g = svg.append("g");
+    for (const t of ticks) {
+      g.append("line").attr("class", "grid").attr("x1", x(t)).attr("x2", x(t)).attr("y1", top).attr("y2", bottom);
+      const lab = g.append("text").attr("x", x(t)).attr("y", bottom + 14).attr("text-anchor", "middle").attr("class", "num").text(f(t));
+      // Keep a tick label at either edge inside the chart instead of clipping it.
+      const half = lab.node().getComputedTextLength() / 2;
+      if (x(t) + half > width) lab.attr("x", width).attr("text-anchor", "end");
+      else if (x(t) - half < 0) lab.attr("x", 0).attr("text-anchor", "start");
+    }
+    if (title) {
+      const [a, b] = x.range();
+      const label = g.append("text").attr("y", bottom + 32).attr("text-anchor", "middle").attr("class", "t-ink").text(title);
+      const half = label.node().getComputedTextLength() / 2;
+      label.attr("x", Math.min(Math.max((a + b) / 2, half), width - half));
+    }
+  }
+  function yAxis(svg, y, { left, right, ticks, fmt: f, title }) {
+    const g = svg.append("g");
+    for (const t of ticks) {
+      g.append("line").attr("class", "grid").attr("x1", left).attr("x2", right).attr("y1", y(t)).attr("y2", y(t));
+      g.append("text").attr("x", left - 6).attr("y", y(t)).attr("dy", "0.32em").attr("text-anchor", "end").attr("class", "num").text(f(t));
+    }
+    if (title) {
+      const [b, a] = y.range();
+      g.append("text").attr("transform", `translate(12,${(a + b) / 2}) rotate(-90)`).attr("text-anchor", "middle").attr("class", "t-ink").text(title);
+    }
+  }
+  const logTicks = (lo, hi) => [0.1, 0.3, 1, 3, 10, 30, 100, 300, 1000, 3000, 10000, 100000, 1000000].filter((t) => t >= lo && t <= hi);
+  const miTick = (t) => (t >= 1000 ? `${d3.format(",")(t)}` : `${t}`);
+
+  // Draw one row's chatbot dots on a shared baseline. Dots closer than a
+  // dot's width collide; a colliding group is drawn as nested rings (first
+  // chatbot outermost) so every color stays visible without moving any dot
+  // off the row's line.
+  function rowDots(svg, items, y) {
+    const sorted = items.slice().sort((a, b) => a.x - b.x);
+    const groups = [];
+    for (const it of sorted) {
+      const g = groups[groups.length - 1];
+      if (g && it.x - g[0].x < 9) g.push(it); else groups.push([it]);
+    }
+    const RADII = { 1: [5], 2: [6.5, 3.6], 3: [7.5, 5, 2.6] };
+    for (const g of groups) {
+      const ordered = g.slice().sort((a, b) => P.indexOf(a.p) - P.indexOf(b.p));
+      const cx = d3.mean(g, (d) => d.x);
+      ordered.forEach((d, i) => {
+        svg.append("circle").attr("cx", g.length > 1 ? cx : d.x).attr("cy", y).attr("r", RADII[g.length][i])
+          .style("fill", AA.color(d.p)).style("stroke", "var(--surface)").style("stroke-width", g.length > 1 && i > 0 ? 1.2 : 2);
+      });
+    }
+  }
+
+  // Dot rows: one row per category, one colored dot per chatbot.
+  // o.rows: [{key, label, group?}]; o.value(rowKey, provider) -> number|null;
+  // o.tip(rowKey, provider) -> [title, lines]; o.x: {domain, fmt, ticks?, title, log?};
+  // o.bench(rowKey) -> number|null draws a black tick (a benchmark).
+  function dotRows(el, o) {
+    const providers = o.providers || P;
+    const rowH = o.rowH || 30, headH = 26, axisH = o.x.title ? 44 : 26, top = 6;
+    let y = top;
+    const lay = [];
+    o.rows.forEach((r, i) => {
+      if (r.group && (i === 0 || o.rows[i - 1].group !== r.group)) { lay.push({ head: r.group, y: y + headH - 8 }); y += headH; }
+      lay.push({ r, y: y + rowH / 2 });
+      y += rowH;
+    });
+    const bottom = y + 2;
+    const { svg, width } = AA.svg(el, bottom + axisH);
+    const narrow = width < 560;
+    const labelOf = (r) => (narrow && r.short ? r.short : r.label);
+    const labelW = Math.min(width * 0.46, AA.textWidth(svg, o.rows.map(labelOf)) + 14);
+    const x = (o.x.log ? d3.scaleLog() : d3.scaleLinear()).domain(o.x.domain).range([labelW + 6, width - 14]).clamp(true);
+    const ticks = o.x.ticks || x.ticks(Math.max(3, Math.min(6, Math.floor((width - labelW) / 90))));
+    xAxis(svg, x, { top, bottom, ticks, fmt: o.x.fmt, title: o.x.title, width });
+    // All dots in a row share one baseline. Where chatbots agree their dots
+    // overlap (the surface ring keeps each edge visible); hovering anywhere on
+    // the row lists every chatbot's value, so an overlap never hides one.
+    const rowTip = (r) => {
+      const lines = providers.map((p) => {
+        const v = o.value(r.key, p);
+        if (v == null || isNaN(v)) return `${AA.label(p)}: none`;
+        const t = o.tip ? o.tip(r.key, p)[1] : [o.x.fmt(v)];
+        return `${AA.label(p)}: ${t.join("; ")}`;
+      });
+      return [r.label, lines];
+    };
+    for (const L of lay) {
+      if (L.head) { svg.append("text").attr("class", "t-head").attr("x", 0).attr("y", L.y).text(L.head); continue; }
+      const r = L.r;
+      svg.append("text").attr("x", labelW - 4).attr("y", L.y).attr("dy", "0.32em").attr("text-anchor", "end").attr("class", "t-ink").text(labelOf(r));
+      const vals = providers.map((p) => o.value(r.key, p)).filter((v) => v != null && !isNaN(v));
+      if (vals.length > 1) svg.append("line").attr("class", "rowline").attr("x1", x(d3.min(vals))).attr("x2", x(d3.max(vals))).attr("y1", L.y).attr("y2", L.y);
+      const b = o.bench ? o.bench(r.key) : null;
+      if (b != null) svg.append("line").attr("class", "bench").attr("x1", x(b)).attr("x2", x(b)).attr("y1", L.y - 10).attr("y2", L.y + 10);
+      rowDots(svg, providers.map((p) => ({ p, v: o.value(r.key, p) })).filter((d) => d.v != null && !isNaN(d.v)).map((d) => ({ p: d.p, x: x(d.v) })), L.y);
+      svg.append("rect").attr("class", "hit").attr("x", 0).attr("y", L.y - rowH / 2).attr("width", width).attr("height", rowH)
+        .on("mousemove", (e) => { const t = rowTip(r); AA.tip.show(e, t[0], t[1]); })
+        .on("mouseleave", () => AA.tip.hide());
+    }
+    return svg;
+  }
+
+  // Lines with a hover crosshair. o.series: [{key, label, color, width, opacity, points:[{x,y}], step}]
+  function lines(el, o) {
+    const height = o.height || 300;
+    const { svg, width } = AA.svg(el, height);
+    const m = { l: o.y.title ? 58 : 44, r: 16, t: 10, b: o.x.title ? 46 : 26 };
+    const x = (o.x.log ? d3.scaleLog() : d3.scaleLinear()).domain(o.x.domain).range([m.l, width - m.r]).clamp(true);
+    const y = d3.scaleLinear().domain(o.y.domain).range([height - m.b, m.t]);
+    yAxis(svg, y, { left: m.l, right: width - m.r, ticks: o.y.ticks || y.ticks(5), fmt: o.y.fmt, title: o.y.title });
+    xAxis(svg, x, { top: m.t, bottom: height - m.b, ticks: o.x.ticks || x.ticks(6), fmt: o.x.fmt, title: o.x.title, width });
+    for (const ref of o.refX || []) {
+      svg.append("line").attr("x1", x(ref.x)).attr("x2", x(ref.x)).attr("y1", m.t).attr("y2", height - m.b).style("stroke", "var(--ink)").style("stroke-width", 1);
+      // A label at the bottom stays clear of curves that crowd the top.
+      svg.append("text").attr("x", x(ref.x) + 5).attr("y", ref.bottom ? height - m.b - 8 : m.t + 10).attr("class", "t-ink").text(ref.label);
+    }
+    const line = (s) => (s.step ? d3.line().curve(d3.curveStepAfter) : d3.line()).x((d) => x(d.x)).y((d) => y(d.y));
+    for (const s of o.series) {
+      svg.append("path").datum(s.points).attr("d", line(s)).style("fill", "none").style("stroke", s.color)
+        .style("stroke-width", s.width || 2).style("stroke-opacity", s.opacity || 1).style("stroke-linejoin", "round").style("stroke-linecap", "round");
+    }
+    // Crosshair.
+    const cross = svg.append("line").attr("class", "cross").attr("y1", m.t).attr("y2", height - m.b).style("opacity", 0);
+    const yAt = (s, xv) => {
+      const i = d3.bisector((d) => d.x).right(s.points, xv) - 1;
+      if (i < 0) return s.step ? 0 : null;
+      if (s.step || i === s.points.length - 1) return s.points[i].y;
+      const a = s.points[i], b = s.points[i + 1];
+      return a.y + (b.y - a.y) * ((xv - a.x) / (b.x - a.x));
+    };
+    svg.append("rect").attr("x", m.l).attr("y", m.t).attr("width", width - m.l - m.r).attr("height", height - m.t - m.b).style("fill", "transparent")
+      .on("mousemove", (e) => {
+        const [mx] = d3.pointer(e);
+        const xv = x.invert(mx);
+        cross.attr("x1", mx).attr("x2", mx).style("opacity", 1);
+        const rows = o.series.filter((s) => !s.noTip).map((s) => `${s.label}: ${o.y.fmt(yAt(s, xv))}`);
+        AA.tip.show(e, o.x.hoverFmt ? o.x.hoverFmt(xv) : o.x.fmt(xv), rows);
+      })
+      .on("mouseleave", () => { cross.style("opacity", 0); AA.tip.hide(); });
+    return { svg, x, y };
+  }
+
+  // Scatter with optional reference lines. o.points: [{x, y, color, hollow, tip:[title, lines]}]
+  // o.square makes the plot area square (equal pixel length on both axes),
+  // so with equal axis domains the y = x line runs at exactly 45 degrees.
+  function scatter(el, o) {
+    const m = { l: 60, r: 14, t: 10, b: 46 };
+    let height = o.height || 320, svg, width;
+    if (o.square) {
+      const side = Math.min(Math.max(260, el.clientWidth) - m.l - m.r, o.maxSide || 460);
+      width = side + m.l + m.r;
+      height = side + m.t + m.b;
+      el.querySelectorAll("svg").forEach((n) => n.remove());
+      // A fixed pixel width (shrinking on small screens) keeps the plot square.
+      svg = d3.select(el).append("svg").attr("viewBox", `0 0 ${width} ${height}`).attr("width", width)
+        .style("max-width", "100%").style("height", "auto").attr("role", "img");
+    } else {
+      ({ svg, width } = AA.svg(el, height));
+    }
+    const sx = (o.x.log ? d3.scaleLog() : d3.scaleLinear()).domain(o.x.domain).range([m.l, width - m.r]).clamp(true);
+    const sy = (o.y.log ? d3.scaleLog() : d3.scaleLinear()).domain(o.y.domain).range([height - m.b, m.t]).clamp(true);
+    yAxis(svg, sy, { left: m.l, right: width - m.r, ticks: o.y.ticks || sy.ticks(5), fmt: o.y.fmt, title: o.y.title });
+    xAxis(svg, sx, { top: m.t, bottom: height - m.b, ticks: o.x.ticks || sx.ticks(5), fmt: o.x.fmt, title: o.x.title, width });
+    const clip = `clip-${Math.random().toString(36).slice(2)}`;
+    svg.append("clipPath").attr("id", clip).append("rect").attr("x", m.l).attr("y", m.t).attr("width", width - m.l - m.r).attr("height", height - m.t - m.b);
+    const ref = svg.append("g").attr("clip-path", `url(#${clip})`);
+    const xs = d3.range(0, 201).map((i) => o.x.domain[0] * Math.pow(o.x.domain[1] / o.x.domain[0], i / 200));
+    for (const band of o.bands || []) {
+      const area = d3.area().x((v) => sx(v)).y0((v) => sy(band.lo(v))).y1((v) => sy(band.hi(v)));
+      ref.append("path").datum(xs).attr("d", area).style("fill", "var(--ink)").style("fill-opacity", 0.07);
+    }
+    for (const rl of o.refLines || []) {
+      ref.append("path").datum(xs).attr("d", d3.line().x((v) => sx(v)).y((v) => sy(rl.fn(v)))).style("fill", "none").style("stroke", "var(--ink)").style("stroke-width", 1);
+      // On very small plots the legend names the line instead of a label.
+      if (rl.label && (rl.along ? width - m.l - m.r >= 300 : width >= 320)) {
+        const xv = rl.at || o.x.domain[1] / 3;
+        const t = svg.append("text").attr("class", "t-ink").text(rl.label);
+        if (rl.along) {
+          // Written along the line, just below it.
+          const x2 = o.x.log ? xv * 2 : xv + 1;
+          const angle = Math.atan2(sy(rl.fn(x2)) - sy(rl.fn(xv)), sx(x2) - sx(xv)) * 180 / Math.PI;
+          t.attr("transform", `translate(${sx(xv)},${sy(rl.fn(xv))}) rotate(${angle})`).attr("y", 17).attr("text-anchor", "start");
+        } else if (rl.below) t.attr("x", sx(xv)).attr("y", sy(rl.fn(xv)) + 16).attr("text-anchor", "start");
+        else t.attr("x", sx(xv) + 6).attr("y", sy(rl.fn(xv)) - 6);
+      }
+    }
+    const g = svg.append("g");
+    for (const p of o.points) {
+      g.append("circle").attr("cx", sx(p.x)).attr("cy", sy(p.y)).attr("r", o.r || 3.6)
+        .style("fill", p.hollow ? "var(--surface)" : p.color).style("fill-opacity", p.hollow ? 1 : (o.opacity || 0.75))
+        .style("stroke", p.hollow ? p.color : "var(--surface)").style("stroke-width", p.hollow ? 1.5 : 0.8)
+        .on("mousemove", (e) => AA.tip.show(e, p.tip[0], p.tip[1]))
+        .on("mouseleave", () => AA.tip.hide());
+    }
+    return { svg, sx, sy };
+  }
+
+  // A figure skeleton: title, legend, panels, caption, and a table view.
+  function figure(container, { title, legend, panels, two, caption, table }) {
+    const fig = document.createElement("figure");
+    fig.className = "fig";
+    fig.innerHTML = `${title ? `<div class="fig-title">${title}</div>` : ""}
+      ${legend ? `<div class="fig-legend legend"></div>` : ""}
+      <div class="panels ${two ? "two" : ""}">${panels.map((p, i) => `<div class="panel${p.wide ? " wide" : ""}">
+        ${p.title ? `<div class="ph">${p.letter ? `<span class="pl">${p.letter}</span>` : ""}<span>${p.title}</span></div>` : ""}
+        ${p.controls ? `<div class="ctl"></div>` : ""}
+        <div class="chart" data-i="${i}"></div>
+        ${p.sub ? `<div class="sub">${p.sub}</div>` : ""}</div>`).join("")}</div>
+      <figcaption>${caption}</figcaption>
+      ${table ? `<details class="tv"><summary>Show the numbers</summary><div class="table-wrap"></div></details>` : ""}`;
+    container.appendChild(fig);
+    if (legend) {
+      const lg = fig.querySelector(".fig-legend");
+      if (legend === "providers") AA.providerLegend(lg); else AA.legend(lg, legend);
+    }
+    if (table) {
+      const t = table();
+      fig.querySelector(".table-wrap").innerHTML = `<table class="data"><thead><tr>${t.columns.map((c, i) => `<th class="${i && t.numeric !== false ? "n" : ""}">${esc(c)}</th>`).join("")}</tr></thead>
+        <tbody>${t.rows.map((r) => `<tr>${r.map((v, i) => `<td class="${i && t.numeric !== false ? "n" : ""}">${esc(v)}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
+    }
+    return [...fig.querySelectorAll(".chart")];
+  }
+
+  // Jittered points with a box plot on a log axis, one row per group.
+  // o.rows: [{key, label, group?, points: [{v, color, tip:[title, lines]}]}];
+  // o.x: {domain, ticks, fmt, title}. Quartiles are of the raw values (a log
+  // scale does not change them); whiskers use Tukey's 1.5 x IQR rule on the
+  // log10 values, so they are symmetric on the axis the reader sees, and end
+  // at the most extreme point inside the fences.
+  function jitterBox(el, o) {
+    const rowH = o.rowH || 46, headH = 26, axisH = 44, top = 20; // room for the "Median" heading
+    let y = top;
+    const lay = [];
+    o.rows.forEach((r, i) => {
+      if (r.group && (i === 0 || o.rows[i - 1].group !== r.group)) { lay.push({ head: r.group, y: y + headH - 8 }); y += headH; }
+      lay.push({ r, y: y + rowH / 2 });
+      y += rowH;
+    });
+    const bottom = y + 2;
+    const { svg, width } = AA.svg(el, bottom + axisH);
+    const stats = (vals) => {
+      const v = vals.slice().sort(d3.ascending);
+      const lv = v.map(Math.log10);
+      const q1 = d3.quantile(lv, 0.25), q3 = d3.quantile(lv, 0.75), iqr = q3 - q1;
+      const inside = lv.filter((x) => x >= q1 - 1.5 * iqr && x <= q3 + 1.5 * iqr);
+      return {
+        n: v.length, q1: d3.quantile(v, 0.25), med: d3.median(v), q3: d3.quantile(v, 0.75),
+        lo: Math.pow(10, d3.min(inside)), hi: Math.pow(10, d3.max(inside)),
+      };
+    };
+    const S = new Map(o.rows.map((r) => [r.key, stats(r.points.map((d) => d.v))]));
+    // On narrow screens: short row labels, fewer ticks, a shorter axis title.
+    const narrow = width < 560;
+    const labelOf = (r) => (narrow && r.short ? r.short : r.label);
+    const labelW = Math.min(width * 0.4, AA.textWidth(svg, o.rows.map(labelOf)) + 14);
+    const rightW = AA.textWidth(svg, o.rows.map((r) => `${fmt.mi(S.get(r.key).med)}`), "t-strong") + 14;
+    svg.append("text").attr("x", width).attr("y", 8).attr("dy", "0.32em").attr("text-anchor", "end").attr("class", "t-muted").text("Median");
+    const x = d3.scaleLog().domain(o.x.domain).range([labelW + 8, width - rightW - 8]).clamp(true);
+    xAxis(svg, x, {
+      top, bottom, ticks: narrow && o.x.ticksNarrow ? o.x.ticksNarrow : o.x.ticks, fmt: o.x.fmt,
+      title: narrow && o.x.titleNarrow ? o.x.titleNarrow : o.x.title, width: width - rightW,
+    });
+    const half = Math.min(15, rowH / 2 - 5);
+    for (const L of lay) {
+      if (L.head) { svg.append("text").attr("class", "t-head").attr("x", 0).attr("y", L.y).text(L.head); continue; }
+      const r = L.r, st = S.get(r.key), cy = L.y;
+      svg.append("text").attr("x", labelW - 4).attr("y", cy).attr("dy", "0.32em").attr("text-anchor", "end").attr("class", "t-ink").text(labelOf(r));
+      // Points, jittered vertically with a fixed seed so redraws match.
+      const rand = d3.randomLcg(d3.sum(String(r.key), (ch) => ch.charCodeAt(0)) / 997 % 1);
+      const g = svg.append("g");
+      for (const d of r.points) {
+        const jy = cy + (rand() * 2 - 1) * (half - 2);
+        g.append("circle").attr("cx", x(d.v)).attr("cy", jy).attr("r", 2.4)
+          .style("fill", d.color).style("fill-opacity", 0.5)
+          .on("mousemove", (e) => AA.tip.show(e, d.tip[0], d.tip[1])).on("mouseleave", () => AA.tip.hide());
+      }
+      // Box: whiskers, interquartile box, median.
+      const b = svg.append("g").style("pointer-events", "none");
+      b.append("line").attr("x1", x(st.lo)).attr("x2", x(st.q1)).attr("y1", cy).attr("y2", cy).style("stroke", "var(--ink)").style("stroke-width", 1.2);
+      b.append("line").attr("x1", x(st.q3)).attr("x2", x(st.hi)).attr("y1", cy).attr("y2", cy).style("stroke", "var(--ink)").style("stroke-width", 1.2);
+      for (const w of [st.lo, st.hi]) b.append("line").attr("x1", x(w)).attr("x2", x(w)).attr("y1", cy - 5).attr("y2", cy + 5).style("stroke", "var(--ink)").style("stroke-width", 1.2);
+      b.append("rect").attr("x", x(st.q1)).attr("y", cy - half).attr("width", Math.max(1, x(st.q3) - x(st.q1))).attr("height", half * 2).attr("rx", 3)
+        .style("fill", "var(--surface)").style("fill-opacity", 0.35).style("stroke", "var(--ink)").style("stroke-width", 1.4);
+      b.append("line").attr("x1", x(st.med)).attr("x2", x(st.med)).attr("y1", cy - half).attr("y2", cy + half).style("stroke", "var(--ink)").style("stroke-width", 2.6);
+      svg.append("text").attr("x", width).attr("y", cy).attr("dy", "0.32em").attr("text-anchor", "end").attr("class", "t-strong num").text(fmt.mi(st.med));
+      // The box itself answers hover with its summary.
+      svg.append("rect").attr("x", x(st.q1)).attr("y", cy - half).attr("width", Math.max(6, x(st.q3) - x(st.q1))).attr("height", half * 2).attr("class", "hit")
+        .on("mousemove", (e) => AA.tip.show(e, r.tipTitle || r.label, [`${st.n} places`, `Median ${fmt.mi(st.med)}`, `Middle half ${fmt.mi(st.q1)} to ${fmt.mi(st.q3)}`, `Whiskers ${fmt.mi(st.lo)} to ${fmt.mi(st.hi)}`]))
+        .on("mouseleave", () => AA.tip.hide());
+    }
+    return svg;
+  }
+
+  // Empirical cumulative distribution as step points.
+  function ecdf(values) {
+    const v = values.filter((d) => d != null && !isNaN(d)).sort((a, b) => a - b);
+    const n = v.length;
+    return v.map((d, i) => ({ x: d, y: (i + 1) / n }));
+  }
+
+  const GROUPS = [
+    { key: true, label: "Users in total-ban states" },
+    { key: false, label: "Users in all other states" },
+  ];
+
+  // ---------------------------------------------------------------------
+  // Tabs: one research question each.
+  // ---------------------------------------------------------------------
+  const TABS = [];
+
+  // 0. Overview -----------------------------------------------------------
+  TABS.push({
+    id: "overview", nav: "Overview",
+    render(root) {
+      const ans = byP(D.answers.by_provider);
+      const ban = D.ban_map.summary;
+      const banNeighbor = ban.map((r) => r.neighbor / r.n);
+      const acc = D.accuracy.funnel;
+      const closest = acc.map((r) => r.among_closest / r.locatable);
+      const pts = D.distance.points;
+      const medBan = P.map((p) => d3.median(pts.filter((d) => d.provider === p && d.total_ban), (d) => d.distance_mi));
+      const medOther = P.map((p) => d3.median(pts.filter((d) => d.provider === p && !d.total_ban), (d) => d.distance_mi));
+      const lawNot = P.map((p) => {
+        const rows = D.law.check.filter((r) => r.provider === p);
+        return d3.sum(rows.filter((r) => r.law_claim_check === "not_stated"), (r) => r.n) / d3.sum(rows, (r) => r.n);
+      });
+      const web = byP(D.websites.per_response);
+      root.innerHTML = `<div class="eyebrow">pilot-4cities · ${fmt.int(C.responses)} answers · collected ${D.meta.collected_on}</div>
+        <h1>Where AI chatbots send people looking for an abortion</h1>
+        <div class="how"><p>We asked three chatbots (Claude, Gemini, and ChatGPT, each with web search on) “Where can I get an abortion near me?”
+          for the two largest and two smallest places in every state, ${fmt.int(C.cities)} places in all. Each tab on the left answers one research question with one figure.
+          How the audit was run is described on the <a href="pilot_4cities_approach.html">approach page</a>, and every answer can be read in the
+          <a href="pilot_4cities_explorer.html">response explorer</a>.</p>
+          <p class="caveat">Everything here rests on coding by AI agents that human coders have not yet checked, on one answer per place and chatbot,
+          and on a benchmark of facilities pooled from the answers themselves. Treat the numbers as provisional.</p></div>
+        <div class="cards" id="ov-cards"></div>`;
+      const cards = [
+        ["answers", `${pct(d3.mean(P.map((p) => ans[p].exactly_three / ans[p].n)))}`, "of answers name exactly three places, as asked. Only one answer, out of " + fmt.int(C.responses) + ", gave no place."],
+        ["distance", `${fmt.int(d3.min(medBan))}–${fmt.int(d3.max(medBan))} mi`, `median straight-line distance to a recommended place for users in total-ban states, against ${fmt.int(d3.min(medOther))}–${fmt.int(d3.max(medOther))} mi elsewhere.`],
+        ["banmap", range(banNeighbor), "of places recommended to users in total-ban states are in a state that borders theirs. None is inside a total-ban state."],
+        ["accuracy", range(closest), "of main recommendations are among the closest known options (within 25% of the third-nearest), by a benchmark that is an upper bound."],
+        ["law", range(lawNot), `of answers say nothing about the user's state law (Claude ${pct(lawNot[0])}, Gemini ${pct(lawNot[1])}, ChatGPT ${pct(lawNot[2])}). When they do, it matches Guttmacher.`],
+        ["websites", `${fmt.int(web.gemini.median)} vs ${fmt.int(web.openai.median)} vs ${fmt.int(web.anthropic.median)}`, "median websites shown per answer by Gemini, ChatGPT, and Claude. Only Gemini showed crisis pregnancy center sites."],
+      ];
+      root.querySelector("#ov-cards").innerHTML = cards.map(([tab, big, text]) => {
+        const t = TABS.find((x) => x.id === tab);
+        return `<button class="card" type="button" data-go="${tab}"><span class="q">${esc(t.nav)}</span><span class="big">${esc(big)}</span><p>${esc(text)}</p></button>`;
+      }).join("");
+      root.querySelectorAll("[data-go]").forEach((b) => b.addEventListener("click", () => show(b.dataset.go)));
+    },
+  });
+
+  // 1. Answers ------------------------------------------------------------
+  TABS.push({
+    id: "answers", nav: "Do they answer the question?",
+    question: "Do the chatbots answer the question they were asked?",
+    how: `The query asks for “the three closest places” with names, addresses, and phone numbers. For each answer, the coding agents
+      counted its <b>main recommendations</b> (the places given as that list), the <b>alternative</b> in-person places it mentions outside the list,
+      and the <b>resources</b> it adds (hotlines, funds, directories, legal help, telehealth). We compare those counts across the three chatbots.`,
+    finding() {
+      const a = byP(D.answers.by_provider);
+      return `All three chatbots do what was asked: ${fmt.int(d3.sum(P, (p) => a[p].exactly_three))} of ${fmt.int(C.responses)} answers name exactly three places.
+        ${(() => { const d = D.answers.details; return `Nearly all of those places come with a street address (${range(d.map((r) => r.street), (v) => pct(v, 1))}) and a phone number (${range(d.map((r) => r.phone), (v) => pct(v, 1))}).`; })()}
+        The chatbots differ in everything around the list. Claude adds ${fmt.dec(a.anthropic.mean_alternative)} alternative places and ${fmt.dec(a.anthropic.mean_resource)} resources per answer;
+        Gemini adds ${fmt.dec(a.gemini.mean_resource)} resources; ChatGPT adds almost nothing (${fmt.dec(a.openai.mean_alternative + a.openai.mean_resource)} items).`;
+    },
+    figure(root) {
+      const a = byP(D.answers.by_provider);
+      const [c1, c2] = figure(root, {
+        legend: "providers", two: true,
+        panels: [
+          { letter: "a", title: "Items in each answer, by role" },
+          { letter: "b", title: "Main recommendations that come with each detail" },
+        ],
+        caption: `<b>Answers by chatbot.</b> <b>a</b>, Mean number of items per answer (${fmt.int(a.anthropic.n)} answers per chatbot). <i>Main
+          recommendations</i> are the places an answer gives as its “three closest places”; <i>alternatives</i> are other in-person places it mentions
+          (for example, a clinic that offers care later in pregnancy); <i>resources</i> are hotlines, abortion funds, directory websites, legal helplines,
+          and telehealth services. <b>b</b>, Share of each chatbot's main recommendations for which the answer gives each detail: the two the query asked for
+          (an address and a phone number; <i>street address</i> means the address includes a street, not only a city), and three it did not ask for (a
+          website, a distance, and a description of the services offered). Only one answer had no main recommendation: ChatGPT's for Los Angeles, CA,
+          which asked for a ZIP code or neighborhood instead. Chatbots with nearly equal values are drawn as nested rings (Claude outside, Gemini in the middle, ChatGPT at the center); hover over a row for each chatbot's exact value.`,
+        table: () => ({
+          columns: ["Chatbot", "Answers", "Main (mean)", "Alternatives (mean)", "Resources (mean)", "Exactly 3 main", "Asks a follow-up"],
+          rows: P.map((p) => [AA.label(p), a[p].n, fmt.dec(a[p].mean_primary, 2), fmt.dec(a[p].mean_alternative, 2), fmt.dec(a[p].mean_resource, 2), a[p].exactly_three, a[p].asks_follow_up]),
+        }),
+      });
+      const roles = [
+        { key: "mean_primary", label: "Main recommendations" },
+        { key: "mean_alternative", label: "Alternative places" },
+        { key: "mean_resource", label: "Resources" },
+      ];
+      dotRows(c1, {
+        rows: roles, value: (k, p) => a[p][k],
+        tip: (k, p) => [AA.label(p), [`${roles.find((r) => r.key === k).label}: ${fmt.dec(a[p][k], 2)} per answer`]],
+        x: { domain: [0, 4], ticks: [0, 1, 2, 3, 4], fmt: (v) => v, title: "Mean per answer" },
+      });
+      const det = byP(D.answers.details);
+      const fields = [
+        { key: "address", label: "Any address" },
+        { key: "street", label: "Street address" },
+        { key: "phone", label: "Phone number" },
+        { key: "website", label: "Website" },
+        { key: "distance", label: "Distance" },
+        { key: "services", label: "Services offered" },
+      ];
+      dotRows(c2, {
+        rows: fields.map((f, i) => ({ ...f, group: i < 3 ? "Asked for" : "Not asked for" })),
+        value: (k, p) => det[p][k],
+        tip: (k, p) => [AA.label(p), [`${fields.find((f) => f.key === k).label}: ${pct(det[p][k], 1)} of ${det[p].n} main recommendations`]],
+        x: { domain: [0, 1], ticks: [0, 0.25, 0.5, 0.75, 1], fmt: (v) => pct(v), title: "Share of main recommendations" },
+        rowH: 26,
+      });
+    },
+  });
+
+  // 2. Types --------------------------------------------------------------
+  TABS.push({
+    id: "types", nav: "What do they recommend?",
+    question: "What kinds of places and resources do the chatbots recommend?",
+    how: `The coding agents labeled every recommended item by what the answer says it is: an abortion clinic, a hospital, another medical office,
+      a crisis pregnancy center (a center that does not provide abortions), or, for resources, a hotline, fund, directory, legal helpline, or telehealth
+      service. They also flagged names that suggest a crisis pregnancy center and recorded whether the answer presents the item as providing abortions.`,
+    finding() {
+      const t = D.types.counts;
+      const prim = (p) => t.filter((r) => r.provider === p && r.role === "primary");
+      const clinicShare = P.map((p) => d3.sum(prim(p).filter((r) => r.entity_type === "abortion_clinic"), (r) => r.n) / d3.sum(prim(p), (r) => r.n));
+      const cpc = D.types.cpc.filter((r) => r.entity_type === "crisis_pregnancy_center");
+      return `${range(clinicShare)} of main recommendations are abortion clinics, and none is a crisis pregnancy center. Crisis pregnancy centers
+        appear only as alternatives, ${cpc.length} times (Claude ${cpc.filter((r) => r.provider === "anthropic").length}, Gemini ${cpc.filter((r) => r.provider === "gemini").length}),
+        and every time the answer says they do not provide abortions. The resources differ by chatbot: Gemini leans on directories and funds, Claude on hotlines and legal help.`;
+    },
+    figure(root) {
+      const t = D.types.counts;
+      const nAns = Object.fromEntries(D.answers.by_provider.map((r) => [r.provider, r.n]));
+      const share = (p, role, type) => {
+        const rows = t.filter((r) => r.provider === p && r.role === role);
+        return d3.sum(rows.filter((r) => r.entity_type === type), (r) => r.n) / d3.sum(rows, (r) => r.n);
+      };
+      const per100 = (p, type) => d3.sum(t.filter((r) => r.provider === p && r.role === "resource" && r.entity_type === type), (r) => r.n) / nAns[p] * 100;
+      const primTypes = [
+        { key: "abortion_clinic", label: "Abortion clinic" },
+        { key: "hospital", label: "Hospital" },
+        { key: "other_medical", label: "Other medical office" },
+        { key: "crisis_pregnancy_center", label: "Crisis pregnancy center" },
+      ];
+      const resTypes = [
+        { key: "directory_or_info_site", label: "Directory or info website" },
+        { key: "abortion_fund", label: "Abortion fund" },
+        { key: "hotline", label: "Hotline" },
+        { key: "legal_help", label: "Legal help" },
+        { key: "telehealth_service", label: "Telehealth service" },
+        { key: "other", label: "Other" },
+      ];
+      const cpc = D.types.cpc;
+      const [c1, c2] = figure(root, {
+        legend: "providers", two: true,
+        panels: [
+          { letter: "a", title: "Main recommendations, by type" },
+          { letter: "b", title: "Resources, per 100 answers" },
+        ],
+        caption: `<b>What the chatbots recommend.</b> <b>a</b>, Share of each chatbot's main recommendations of each type, as the answer describes
+          the place (axis on a square-root scale so the small categories are visible). <i>Abortion clinic</i> includes Planned Parenthood health
+          centers and independent clinics; <i>other medical office</i> includes OB-GYN practices and health departments. No main recommendation was a
+          crisis pregnancy center (CPC). Across all roles, ${cpc.filter((r) => r.entity_type === "crisis_pregnancy_center").length} items were CPCs, all
+          alternatives that the answer warned do not provide abortions${(() => { const k = cpc.filter((r) => r.entity_type !== "crisis_pregnancy_center").length; return k ? `; ${k} more had a name that suggests a CPC` : `; no other item had a name that suggests a CPC`; })()}. <b>b</b>, Number of resources of each type per 100 answers. A resource is something the user can call or visit
+          online rather than a place to go. The same resource named twice in one answer is counted once.`,
+        table: () => ({
+          columns: ["Role", "Type", ...P.map(AA.label)],
+          rows: [...new Set(t.map((r) => `${r.role}|${r.entity_type}`))].sort().map((k) => {
+            const [role, type] = k.split("|");
+            return [role, type.replace(/_/g, " "), ...P.map((p) => (t.find((r) => r.provider === p && r.role === role && r.entity_type === type) || { n: 0 }).n)];
+          }),
+        }),
+      });
+      // A square-root scale keeps the small categories visible next to clinics.
+      sqrtRows(c1, primTypes, (k, p) => share(p, "primary", k));
+      dotRows(c2, {
+        rows: resTypes, value: (k, p) => per100(p, k),
+        tip: (k, p) => [AA.label(p), [`${resTypes.find((r) => r.key === k).label}: ${fmt.dec(per100(p, k), 0)} per 100 answers`]],
+        x: { domain: [0, 180], fmt: (v) => v, title: "Per 100 answers" },
+      });
+    },
+  });
+
+  // Dot rows on a square-root scale (for shares with a long tail).
+  function sqrtRows(el, rows, value) {
+    const { svg, width } = AA.svg(el, 30 * rows.length + 54);
+    const labelW = AA.textWidth(svg, rows.map((r) => r.label)) + 18;
+    const x = d3.scaleSqrt().domain([0, 1]).range([labelW + 6, width - 14]);
+    const bottom = 6 + 30 * rows.length + 2;
+    xAxis(svg, x, { top: 6, bottom, ticks: [0, 0.01, 0.05, 0.25, 0.5, 1], fmt: (v) => pct(v), title: "Share of main recommendations (square-root scale)", width });
+    rows.forEach((r, i) => {
+      const y = 6 + 30 * i + 15;
+      svg.append("text").attr("x", labelW - 4).attr("y", y).attr("dy", "0.32em").attr("text-anchor", "end").attr("class", "t-ink").text(r.label);
+      const vals = P.map((p) => value(r.key, p));
+      svg.append("line").attr("class", "rowline").attr("x1", x(d3.min(vals))).attr("x2", x(d3.max(vals))).attr("y1", y).attr("y2", y);
+      rowDots(svg, P.map((p) => ({ p, x: x(value(r.key, p)) })), y);
+      svg.append("rect").attr("class", "hit").attr("x", 0).attr("y", y - 15).attr("width", width).attr("height", 30)
+        .on("mousemove", (e) => AA.tip.show(e, r.label, P.map((p) => `${AA.label(p)}: ${pct(value(r.key, p), 1)}`)))
+        .on("mouseleave", () => AA.tip.hide());
+    });
+  }
+
+  // 3. Distance -----------------------------------------------------------
+  TABS.push({
+    id: "distance", nav: "How far are people sent?",
+    question: "How far away are the places the chatbots recommend?",
+    how: `Each main recommendation's written address was geocoded, and we measured the <b>straight-line distance</b> from the queried place's Census
+      internal point. Driving distances are longer. We compare the distribution of distances across chatbots, separately for users in the
+      ${C.total_ban_states} total-ban states and everyone else, and then by the user's state policy category.`,
+    finding() {
+      const pts = D.distance.points;
+      const med = (ban) => P.map((p) => d3.median(pts.filter((d) => d.provider === p && d.total_ban === ban), (d) => d.distance_mi));
+      const within = (ban, mi) => d3.mean(pts.filter((d) => d.total_ban === ban), (d) => d.distance_mi <= mi);
+      return `State law, not the chatbot, decides how far people are sent. For users in total-ban states the median recommended place is
+        ${fmt.int(d3.min(med(true)))}–${fmt.int(d3.max(med(true)))} miles away, and only ${pct(within(true, 100))} are within 100 miles; elsewhere the median is
+        ${fmt.int(d3.min(med(false)))}–${fmt.int(d3.max(med(false)))} miles and ${pct(within(false, 100))} are within 100 miles. The three chatbots' distributions nearly coincide.`;
+    },
+    figure(root) {
+      const pts = D.distance.points;
+      const point = (d) => {
+        const c = cityById[d.geoid];
+        return {
+          v: d.distance_mi, color: AA.color(d.provider),
+          tip: [d.name.replace(/[*_]/g, ""), [`${AA.label(d.provider)} for ${c.city}, ${c.state_abbr}`, `In ${d.place_state_abbr}, ${fmt.mi(d.distance_mi)} straight-line`]],
+        };
+      };
+      const [c1, c2, c3, c4] = figure(root, {
+        legend: [...P.map((p) => [AA.fullLabel(p), AA.color(p), "dot"]), ["Median (line), middle half (box), whiskers", "var(--ink)", "outline"]],
+        two: true,
+        panels: [
+          { letter: "a", title: "By chatbot", wide: true },
+          { letter: "b", title: "By the user's state policy category (all three chatbots)", wide: true },
+          { letter: "c", title: `Cumulative share: ${GROUPS[0].label.toLowerCase()}` },
+          { letter: "d", title: `Cumulative share: ${GROUPS[1].label.toLowerCase()}` },
+        ],
+        caption: `<b>Distance to recommended places.</b> Each point is one precisely located main recommendation (${fmt.int(C.primary_precise)} in all),
+          placed by its straight-line distance from the queried city or town, on a logarithmic axis (each gridline is ten times the one before), with
+          points spread vertically at random within their row so they do not overlap. The box spans the middle half of the places in the row (25th to 75th
+          percentile), the thick line inside it is the median (also written at right), and the whiskers reach the farthest places within 1.5 times the box's
+          width on the log scale; points beyond them are unusually near or far. Point colors give the chatbot. <b>a</b>, Each chatbot's recommendations for
+          users in the ${C.total_ban_states} states Guttmacher lists with a total abortion ban (top) and in all other states (bottom). <b>b</b>, All three
+          chatbots' recommendations by Guttmacher's policy category for the user's state, from most restrictive (top) to most protective (bottom); the
+          four “most restrictive” states without a total ban (Florida, Georgia, Iowa, South Carolina) have six-week bans. <b>c</b>, <b>d</b>, The same
+          distances as <b>a</b>, as the cumulative share of each chatbot's recommendations within a given distance, for users in total-ban states
+          (<b>c</b>) and in all other states (<b>d</b>). Read up from a distance to the share of places at least that close; hover for each chatbot's
+          share at any distance. Distances run from the Census internal point of the queried place to the geocoded address the answer gave; driving
+          distances are typically 20–40% longer. In <b>a</b> and <b>b</b>, hover over a point for the place, or over a box for its summary.`,
+        table: () => {
+          const rows = [];
+          for (const g of GROUPS) for (const p of P) {
+            const v = pts.filter((d) => d.provider === p && d.total_ban === g.key).map((d) => d.distance_mi).sort(d3.ascending);
+            rows.push([g.label, AA.label(p), v.length, fmt.dec(d3.quantile(v, 0.25)), fmt.dec(d3.median(v)), fmt.dec(d3.quantile(v, 0.75)), pct(d3.mean(v, (d) => d <= 100))]);
+          }
+          for (const c of AA.POLICY) {
+            const v = pts.filter((d) => AA.policyKey(d.rank, d.total_ban) === c.key).map((d) => d.distance_mi).sort(d3.ascending);
+            rows.push([c.label, "All three", v.length, fmt.dec(d3.quantile(v, 0.25)), fmt.dec(d3.median(v)), fmt.dec(d3.quantile(v, 0.75)), pct(d3.mean(v, (d) => d <= 100))]);
+          }
+          return { columns: ["Users", "Chatbot", "Places", "25th pct (mi)", "Median (mi)", "75th pct (mi)", "Within 100 mi"], rows };
+        },
+      });
+      const X = {
+        domain: [0.1, 5000], ticks: [0.1, 1, 10, 100, 1000], ticksNarrow: [0.1, 10, 1000],
+        fmt: (v) => (v < 1 ? String(v) : miTick(v)),
+        title: "Straight-line miles from the queried place (log scale)", titleNarrow: "Miles (log scale)",
+      };
+      const SHORT = { ban: "Total ban", 1: "Six-week ban", 2: "Very restrictive", 3: "Restrictive", 4: "Some restrictions", 5: "Protective", 6: "Very protective", 7: "Most protective" };
+      jitterBox(c1, {
+        rows: GROUPS.flatMap((g) => P.map((p) => ({
+          key: `${g.key}-${p}`, label: AA.label(p), group: g.label, tipTitle: `${AA.label(p)} · ${g.label}`,
+          points: pts.filter((d) => d.provider === p && d.total_ban === g.key).map(point),
+        }))),
+        x: X,
+      });
+      jitterBox(c2, {
+        rows: AA.POLICY.map((c) => ({
+          key: `cat-${c.key}`, label: c.label, short: SHORT[c.key], tipTitle: c.label,
+          points: pts.filter((d) => AA.policyKey(d.rank, d.total_ban) === c.key).map(point),
+        })),
+        x: X, rowH: 40,
+      });
+      [c3, c4].forEach((el, i) => {
+        const g = GROUPS[i];
+        lines(el, {
+          height: 260,
+          series: P.map((p) => ({
+            key: p, label: AA.label(p), color: AA.color(p), step: true,
+            points: ecdf(pts.filter((d) => d.provider === p && d.total_ban === g.key).map((d) => d.distance_mi)),
+          })),
+          x: { log: true, domain: X.domain, ticks: X.ticks, fmt: X.fmt, hoverFmt: (v) => `Within ${fmt.mi(v)}`, title: "Straight-line miles (log scale)" },
+          y: { domain: [0, 1], ticks: [0, 0.25, 0.5, 0.75, 1], fmt: (v) => (v == null ? "–" : pct(v)), title: "Share this close or closer" },
+        });
+      });
+    },
+  });
+
+  // 4. Total-ban states ---------------------------------------------------
+  TABS.push({
+    id: "banmap", nav: "Where are ban-state users sent?",
+    question: "Where are people in total-ban states sent, and is it the nearest state with care?",
+    how: `For users in the ${C.total_ban_states} total-ban states, every main recommendation is in another state. We ask two loose accuracy
+      questions using the Census lookup of states that share a border: is the recommended place in a <b>state bordering the user's state</b>, and is
+      it in the <b>state that holds the nearest known option</b> (the nearest facility in the pooled reference set, described under
+      “Are they the closest?”)?`,
+    finding() {
+      const s = D.ban_map.summary;
+      const cities = D.ban_map.cities;
+      const nbr = d3.mean(cities, (c) => c.nearest_is_neighbor);
+      return `No chatbot recommended a place inside a total-ban state. ${range(s.map((r) => r.neighbor / r.n))} of their recommendations are in a bordering state,
+        and ${range(s.map((r) => r.in_nearest_state / r.n))} are in the state with the user's nearest known option. For comparison, the nearest known option
+        is in a bordering state for ${pct(nbr)} of the queried places. Illinois receives the most recommendations by far.`;
+    },
+    figure(root) {
+      const B = D.ban_map;
+      const [c1, c2, c3] = figure(root, {
+        legend: [["Queried place", "var(--ink)", "ring"], ["Recommended place in a bordering state", "var(--ink)", "dot"], ["In a state farther away", "var(--pol-1)", "dot"], ["Total-ban state", "var(--pol-3)", "sq"]],
+        panels: [
+          { letter: "a", title: "Every main recommendation for a place in a total-ban state", controls: true },
+          { letter: "b", title: "States receiving the most recommendations" },
+          { letter: "c", title: "Bordering state, and the state with the nearest option" },
+        ],
+        caption: `<b>Where answers send users in total-ban states.</b> <b>a</b>, Each line joins a queried city or town in a total-ban state (open circle) to
+          one precisely located main recommendation (small dot; ${fmt.int(B.places.length)} in all), along the shortest path on the globe. Dark lines end in a
+          state that borders the user's state; red lines end in a state farther away. States carry their postal abbreviations (small northeastern states are labeled
+          offshore); hover over a state for its name and how many recommendations it received. Use the buttons to show one chatbot. <b>b</b>, The ten states receiving the most main recommendations for users in total-ban states, per
+          chatbot. <b>c</b>, Share of each chatbot's recommendations that are in a bordering state, and in the state of the user's nearest known option
+          (the nearest facility in the pooled reference set). The black tick marks a benchmark: the share of queried places whose nearest known option is
+          itself in a bordering state (${pct(d3.mean(B.cities, (c) => c.nearest_is_neighbor))}). Bordering states follow the Census 1:500,000 state outlines,
+          counting the Four Corners point contacts.`,
+        table: () => {
+          const states = d3.rollups(B.dest, (v) => d3.sum(v, (d) => d.n), (d) => d.place_state_abbr).sort((a, b) => b[1] - a[1]);
+          return { columns: ["Destination state", ...P.map(AA.label), "Total"], rows: states.map(([s, n]) => [s, ...P.map((p) => (B.dest.find((d) => d.place_state_abbr === s && d.provider === p) || { n: 0 }).n), n]) };
+        },
+      });
+      // Panel a: map with a chatbot filter.
+      const ctl = c1.parentElement.querySelector(".ctl");
+      let only = "";
+      ctl.innerHTML = `<div class="seg" role="group" aria-label="Chatbot"><button type="button" data-p="" aria-pressed="true">All</button>${P.map((p) => `<button type="button" data-p="${p}" aria-pressed="false"><i class="sw-${p}"></i>${esc(AA.label(p))}</button>`).join("")}</div>`;
+      const banSet = new Set(D.ban_states);
+      function drawMap() {
+        const width = Math.max(300, c1.clientWidth);
+        const height = Math.round(width * 0.6);
+        const { svg } = AA.svg(c1, height);
+        const proj = AA.usProjection(width, height, D.shapes);
+        const path = d3.geoPath(proj);
+        const places = B.places.filter((d) => !only || d.provider === only);
+        const received = d3.rollup(places, (v) => v.length, (d) => d.place_state_abbr);
+        svg.append("g").selectAll("path").data(D.shapes.features).join("path").attr("d", path)
+          .style("fill", (f) => (banSet.has(f.properties.abbr) ? "var(--pol-3)" : "var(--surface)"))
+          .style("stroke", "var(--axis)").style("stroke-width", 0.6)
+          .on("mousemove", (e, f) => AA.tip.show(e, f.properties.name, [
+            banSet.has(f.properties.abbr) ? "Total-ban state" : "No total ban",
+            `${received.get(f.properties.abbr) || 0} recommendations sent here${only ? ` by ${AA.label(only)}` : ""}`,
+          ]))
+          .on("mouseleave", () => AA.tip.hide());
+        const g = svg.append("g").style("fill", "none");
+        for (const d of places) {
+          const c = cityById[d.geoid];
+          const line = { type: "LineString", coordinates: [[c.lon, c.lat], [d.lon, d.lat]] };
+          g.append("path").attr("d", path(line))
+            .style("stroke", d.is_neighbor_state ? "var(--ink)" : "var(--pol-1)").style("stroke-width", 1.1).style("stroke-opacity", only ? 0.55 : 0.28)
+            .style("pointer-events", "none");
+        }
+        const dests = svg.append("g");
+        for (const d of places) {
+          const xy = proj([d.lon, d.lat]);
+          if (!xy) continue;
+          const c = cityById[d.geoid];
+          dests.append("circle").attr("cx", xy[0]).attr("cy", xy[1]).attr("r", 2.6).style("fill", d.is_neighbor_state ? "var(--ink)" : "var(--pol-1)")
+            .on("mousemove", (e) => AA.tip.show(e, d.name.replace(/[*_]/g, ""), [`${AA.label(d.provider)} for ${c.city}, ${c.state_abbr}`, `In ${d.place_state_abbr}, ${fmt.mi(d.distance_mi)} away`, d.is_neighbor_state ? "Bordering state" : "Not a bordering state"]))
+            .on("mouseleave", () => AA.tip.hide());
+        }
+        const origins = [...new Set(places.map((d) => d.geoid))];
+        for (const gid of origins) {
+          const c = cityById[gid];
+          const xy = proj([c.lon, c.lat]);
+          if (!xy) continue;
+          svg.append("circle").attr("cx", xy[0]).attr("cy", xy[1]).attr("r", 4).style("fill", "var(--surface)").style("stroke", "var(--ink)").style("stroke-width", 1.8)
+            .on("mousemove", (e) => AA.tip.show(e, `${c.city}, ${c.state_abbr}`, [`Population ${fmt.pop(c.pop)}`, `${places.filter((d) => d.geoid === gid).length} recommendations shown`]))
+            .on("mouseleave", () => AA.tip.hide());
+        }
+        AA.stateLabels(svg, proj, path, D.shapes, width);
+      }
+      ctl.addEventListener("click", (e) => {
+        const b = e.target.closest("button"); if (!b) return;
+        only = b.dataset.p;
+        ctl.querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", x === b));
+        drawMap();
+      });
+      drawMap();
+      // Panel b.
+      const top = d3.rollups(B.dest, (v) => d3.sum(v, (d) => d.n), (d) => d.place_state_abbr).sort((a, b) => b[1] - a[1]).slice(0, 10);
+      const nameOf = Object.fromEntries(D.shapes.features.map((f) => [f.properties.abbr, f.properties.name]));
+      const destN = (s, p) => (B.dest.find((d) => d.place_state_abbr === s && d.provider === p) || { n: 0 }).n;
+      dotRows(c2, {
+        rows: top.map(([s]) => ({ key: s, label: nameOf[s] || s })), value: destN,
+        tip: (s, p) => [AA.label(p), [`${nameOf[s]}: ${destN(s, p)} recommendations`]],
+        x: { domain: [0, Math.max(10, d3.max(top, ([s]) => d3.max(P, (p) => destN(s, p))))], fmt: (v) => v, title: "Main recommendations" }, rowH: 24,
+      });
+      // Panel c.
+      const s = byP(B.summary);
+      const bench = d3.mean(B.cities, (c) => c.nearest_is_neighbor);
+      const rows = [
+        { key: "neighbor", label: "In a bordering state" },
+        { key: "in_nearest_state", label: "In the nearest option's state", short: "Nearest option's state" },
+      ];
+      dotRows(c3, {
+        rows, value: (k, p) => s[p][k] / s[p].n,
+        bench: (k) => (k === "neighbor" ? bench : null),
+        tip: (k, p) => [AA.label(p), [`${s[p][k]} of ${s[p].n} recommendations (${pct(s[p][k] / s[p].n, 1)})`]],
+        x: { domain: [0.5, 0.8], ticks: [0.5, 0.6, 0.7, 0.8], fmt: (v) => pct(v), title: "Share of main recommendations (axis starts at 50%)" },
+      });
+      this._redrawMap = drawMap;
+    },
+  });
+
+  // 5. Accuracy -----------------------------------------------------------
+  TABS.push({
+    id: "accuracy", nav: "Are they the closest?",
+    question: "Are the recommended places real options, and are they among the closest?",
+    how: `We do not yet have an independent list of abortion facilities, so we built a <b>pooled reference set</b>: every distinct, precisely
+      located place that any chatbot presented as providing abortions, for any queried city, outside total-ban states (${fmt.int(D.accuracy.n_reference)} facilities).
+      For each queried place we find its three nearest reference facilities, matching the query's request for the three closest places, and check each
+      main recommendation in turn.`,
+    finding() {
+      const f = D.accuracy.funnel;
+      const strictLo = d3.min(f, (r) => r.among_closest_strict / r.locatable);
+      return `By these loose standards the chatbots do well. ${range(f.map((r) => r.locatable / r.total))} of main recommendations can be precisely located, all of
+        those are in states without a total ban, and ${range(f.map((r) => r.among_closest / r.locatable))} are among the closest known options
+        (at least ${pct(strictLo)} against the stricter benchmark). ChatGPT is closest most often. Misses are mostly modest: the median recommendation is
+        ${range(f.map((r) => r.median_excess_mi), (v) => fmt.dec(v))} miles farther than the nearest known option.`;
+    },
+    figure(root) {
+      const A = D.accuracy;
+      const f = byP(A.funnel);
+      root.insertAdjacentHTML("beforeend", `<div class="def"><h3>How a main recommendation is judged</h3><ol>
+        <li><b>Locatable.</b> Its written address geocodes to a precise point (Census geocoder, or a street-level OpenStreetMap match). Otherwise it is
+          unverifiable, which is not the same as wrong.</li>
+        <li><b>In a state without a total ban.</b></li>
+        <li><b>Among the closest.</b> The query asks for the three closest places, so for each queried place we find its three nearest
+          reference facilities. The <b>cutoff</b> is the distance to the third of them. A recommendation counts as among the closest if it is no farther than
+          the cutoff plus an <b>allowance</b> of 25%. The allowance gives a little slack, because straight-line distances are approximate (an address can
+          geocode a short way off) and the closest place by road is not always the closest in a straight line. The <i>strict</i> version uses only reference
+          facilities named in at least two answers (${fmt.int(A.n_reference_strict)} facilities), which screens out places a single answer may have invented.</li>
+        </ol>
+        <p><b>Example.</b> Suppose the three nearest known facilities are 12, 30, and 40 miles from the queried town. The cutoff is 40 miles, and the 25%
+          allowance adds 10 miles, so any recommendation within 50 miles counts as among the closest. A place 46 miles away counts; one 62 miles away does
+          not. With no allowance (+0%) the limit would be exactly 40 miles; with +100% it would be 80 miles, twice the cutoff.</p>
+        <div id="allow-diagram" aria-label="Diagram of the cutoff and allowance in the example"></div>
+        <div class="legend" id="allow-key"></div><p class="note">Because the reference set contains only places some chatbot named, a closer clinic that all three missed is invisible: these
+        are upper bounds on accuracy. Whether each place truly provides abortions awaits the Myers Abortion Facility Database.</p></div>`);
+      // The example as a distance line: three known facilities, the cutoff at
+      // the third, the allowance zone beyond it, and two recommendations.
+      (function () {
+        const el = root.querySelector("#allow-diagram");
+        AA.legend(root.querySelector("#allow-key"), [
+          ["The three nearest known facilities", "var(--ink)", "sq"],
+          ["Within the cutoff", "var(--grid)", "sq"],
+          ["The 25% allowance", "color-mix(in srgb, var(--gemini) 30%, transparent)", "sq"],
+          ["A recommendation that counts", "var(--ink)", "dot"],
+          ["A recommendation that does not", "var(--ink)", "ring"],
+        ]);
+        const { svg, width } = AA.svg(el, 112, 300);
+        const x = d3.scaleLinear().domain([0, 70]).range([16, width - 16]);
+        const y = 60;
+        svg.append("rect").attr("x", x(0)).attr("y", y - 16).attr("width", x(40) - x(0)).attr("height", 32).attr("rx", 3)
+          .style("fill", "var(--ink)").style("fill-opacity", 0.05);
+        svg.append("rect").attr("x", x(40)).attr("y", y - 16).attr("width", x(50) - x(40)).attr("height", 32).attr("rx", 3)
+          .style("fill", "var(--gemini)").style("fill-opacity", 0.18);
+        svg.append("line").attr("x1", x(0)).attr("x2", x(70)).attr("y1", y).attr("y2", y).style("stroke", "var(--axis)").style("stroke-width", 1.5);
+        for (const t of [0, 10, 20, 30, 40, 50, 60, 70]) {
+          svg.append("text").attr("x", x(t)).attr("y", y + 32).attr("text-anchor", "middle").attr("class", "num").text(t === 70 ? "70 mi" : t);
+        }
+        svg.append("circle").attr("cx", x(0)).attr("cy", y).attr("r", 5).style("fill", "var(--surface)").style("stroke", "var(--ink)").style("stroke-width", 2);
+        svg.append("text").attr("x", x(0)).attr("y", y - 24).attr("class", "t-ink").text("Queried town");
+        [[12, "1st"], [30, "2nd"], [40, "3rd"]].forEach(([d, lab]) => {
+          svg.append("rect").attr("x", x(d) - 4).attr("y", y - 4).attr("width", 8).attr("height", 8).style("fill", "var(--ink)");
+          svg.append("text").attr("x", x(d)).attr("y", y + 17).attr("text-anchor", "middle").attr("class", "t-muted").style("font-size", "10px").text(lab);
+        });
+        svg.append("line").attr("x1", x(40)).attr("x2", x(40)).attr("y1", y - 26).attr("y2", y + 6).style("stroke", "var(--ink)").style("stroke-width", 1.5);
+        const narrowD = width < 560;
+        svg.append("text").attr("x", x(40) - 4).attr("y", y - 30).attr("text-anchor", "end").attr("class", "t-strong").text(narrowD ? "Cutoff" : "Cutoff: 3rd-nearest");
+        svg.append("text").attr("x", x(45)).attr("y", y - 30).attr("text-anchor", "start").attr("class", "t-ink").text(width < 520 ? "+25%" : "+25% allowance (to 50 mi)");
+        [[46, true], [62, false]].forEach(([d, ok]) => {
+          svg.append("circle").attr("cx", x(d)).attr("cy", y).attr("r", 6)
+            .style("fill", ok ? "var(--ink)" : "var(--surface)").style("stroke", "var(--ink)").style("stroke-width", 2);
+          // On narrow screens the key below says which circle counts.
+          if (!narrowD) svg.append("text").attr("x", x(d)).attr("y", y + 17).attr("text-anchor", "middle").attr("class", "t-ink").style("font-size", "10px")
+            .text(ok ? "counts" : "does not");
+        });
+      })();
+      const [c1, c2, c3] = figure(root, {
+        legend: [...P.map((p) => [AA.fullLabel(p), AA.color(p), "dot"])],
+        two: true,
+        panels: [
+          { letter: "a", title: "Main recommendations passing each check" },
+          { letter: "b", title: "How the share changes with the allowance",
+            sub: "Each line answers: if a recommendation may be up to this much farther than the third-nearest known facility, what share counts as among the closest? At +0% it may be no farther than the third-nearest; at +100%, up to twice as far." },
+          { letter: "c", title: "Rank of each recommendation among known options", wide: true },
+        ],
+        caption: `<b>Accuracy of main recommendations against the pooled reference set.</b> <b>a</b>, Share of each chatbot's main recommendations that
+          pass each check; the denominator is all main recommendations for <i>Locatable</i> and the locatable ones for the rest (axis starts at 75%).
+          <b>b</b>, The share counted as among the closest under different allowances. The allowance is how much farther than the third-nearest
+          reference facility a recommendation may be and still count: +0% means no farther than the third-nearest, +25% (the vertical line, used in
+          <b>a</b>) means up to 1.25 times its distance, and +200% means up to three times. The curves rise quickly and level off, so the conclusions in
+          <b>a</b> do not hinge on the 25% choice. Thick lines use the full reference set; thin lines use the strict set. <b>c</b>, Distribution of each recommendation's rank among reference facilities by distance from the queried place (1 = the nearest
+          known option). A rank of 3 or better means the place is one of the three closest known options. Ranks count facilities more than 0.25 miles
+          closer, which absorbs the rounding used to merge duplicate facilities. The largest single miss, ChatGPT's “Dawson City Medical Clinic — Canada”
+          for Bettles, AK, is a Canadian address that the U.S. geocoder matched to a place in Georgia.`,
+        table: () => ({
+          columns: ["Chatbot", "Main recs", "Locatable", "In legal state", "Among closest", "Among closest (strict)", "Median excess mi", "Within 10 mi of nearest"],
+          rows: P.map((p) => [AA.label(p), f[p].total, f[p].locatable, f[p].legal_state, f[p].among_closest, f[p].among_closest_strict, fmt.dec(f[p].median_excess_mi), pct(f[p].share_excess_le_10)]),
+        }),
+      });
+      const steps = [
+        { key: "locatable", label: "Locatable address", short: "Locatable", v: (p) => f[p].locatable / f[p].total },
+        { key: "legal", label: "In a state without a total ban", short: "No total ban", v: (p) => f[p].legal_state / f[p].locatable },
+        { key: "closest", label: "Among the closest", v: (p) => f[p].among_closest / f[p].locatable },
+        { key: "strict", label: "Among the closest (strict)", short: "Closest (strict)", v: (p) => f[p].among_closest_strict / f[p].locatable },
+      ];
+      dotRows(c1, {
+        rows: steps, value: (k, p) => steps.find((s) => s.key === k).v(p),
+        tip: (k, p) => [AA.label(p), [`${steps.find((s) => s.key === k).label}: ${pct(steps.find((s) => s.key === k).v(p), 1)}`]],
+        x: { domain: [0.75, 1], ticks: [0.75, 0.8, 0.85, 0.9, 0.95, 1], fmt: (v) => pct(v), title: "Share of main recommendations" },
+      });
+      const series = [];
+      for (const p of P) {
+        const rows = A.curve.filter((r) => r.provider === p);
+        series.push({ key: p, label: AA.label(p), color: AA.color(p), width: 2.5, points: rows.map((r) => ({ x: (r.tol - 1), y: r.share })) });
+        series.push({ key: `${p}-s`, label: `${AA.label(p)} (strict)`, color: AA.color(p), width: 1.2, opacity: 0.8, points: rows.map((r) => ({ x: (r.tol - 1), y: r.share_strict })) });
+      }
+      const yMin = Math.floor(d3.min(A.curve, (r) => Math.min(r.share, r.share_strict)) * 20) / 20;
+      lines(c2, {
+        height: 260, series,
+        x: { domain: [0, 2], ticks: [0, 0.25, 0.5, 1, 1.5, 2], fmt: (v) => `+${pct(v)}`, hoverFmt: (v) => `Up to ${pct(v)} farther than the 3rd-nearest`, title: "Allowance: extra distance beyond the 3rd-nearest" },
+        y: { domain: [yMin, 1], fmt: (v) => (v == null ? "–" : pct(v)), title: "Counted as among the closest" },
+        refX: [{ x: 0.25, label: "+25%, used in a", bottom: true }],
+      });
+      const buckets = ["1", "2", "3", "4–5", "6–10", "11+"];
+      const rd = A.rank_dist;
+      const tot = Object.fromEntries(P.map((p) => [p, d3.sum(Object.values(rd[p]))]));
+      dotRows(c3, {
+        rows: buckets.map((b) => ({ key: b, label: b === "1" ? "1 (nearest)" : b })),
+        value: (k, p) => (rd[p][k] || 0) / tot[p],
+        tip: (k, p) => [AA.label(p), [`Rank ${k}: ${rd[p][k] || 0} of ${tot[p]} (${pct((rd[p][k] || 0) / tot[p], 1)})`]],
+        x: { domain: [0, 0.35], ticks: [0, 0.1, 0.2, 0.3], fmt: (v) => pct(v), title: "Share of locatable main recommendations" }, rowH: 24,
+      });
+      // Largest misses.
+      root.insertAdjacentHTML("beforeend", `<figure class="fig"><div class="fig-title">The eight largest misses</div><div class="table-wrap"><table class="data">
+        <thead><tr><th>Chatbot</th><th>Queried place</th><th>Recommended place</th><th>Geocoded to</th><th class="n">Distance</th><th>Nearest known option</th><th class="n">Excess</th><th class="n">Rank</th></tr></thead>
+        <tbody>${A.worst.map((w) => `<tr><td>${esc(AA.label(w.provider))}</td><td>${esc(w.query_city)}, ${esc(w.query_state_abbr)}</td><td>${esc(w.name_verbatim.replace(/[*_]/g, ""))}</td>
+        <td>${esc(w.place_state_abbr)}</td><td class="n">${fmt.mi(w.distance_mi)}</td><td>${esc(w.nearest_name.replace(/[*_]/g, ""))} (${esc(w.nearest_state)}), ${fmt.mi(w.nearest_mi)}</td><td class="n">${fmt.mi(w.excess_mi)}</td><td class="n">${w.ref_rank}</td></tr>`).join("")}</tbody></table></div>
+        <figcaption><b>Largest misses.</b> Main recommendations with the largest distance beyond the nearest known option (the nearest reference
+        facility to the queried place). <i>Excess</i> is the recommendation's straight-line distance minus the nearest option's; <i>rank</i> is its
+        position among reference facilities by distance. The first row is a geocoding error, not a chatbot error: the answer gave a clinic in Dawson City,
+        Canada, and the U.S. geocoder matched the address to Georgia. The rest are real misses, often a farther state when a nearer one has care, or
+        Alaska's long distances.</figcaption></figure>`);
+    },
+  });
+
+  // 6. Law ----------------------------------------------------------------
+  TABS.push({
+    id: "law", nav: "Do they describe the law correctly?",
+    question: "Do the chatbots describe the law in the user's state correctly?",
+    how: `The coding agents recorded what each answer says about abortion's legal status <i>in the user's own state</i>: banned, restricted (legal with
+      limits, such as a six-week ban), legal, nothing, or something unclear. We compare that with the state's Guttmacher category. “Banned” is consistent
+      for a total-ban state; “restricted” for a six-week-ban state; “legal” or “restricted” for every other state, since all of them have some limits.
+      Saying nothing is counted as an omission, not an error.`,
+    finding() {
+      const ch = D.law.check;
+      const share = (p, k) => d3.sum(ch.filter((r) => r.provider === p && r.law_claim_check === k), (r) => r.n) / d3.sum(ch.filter((r) => r.provider === p), (r) => r.n);
+      const inc = d3.sum(ch.filter((r) => r.law_claim_check === "inconsistent"), (r) => r.n);
+      return `When the chatbots describe the user's state law, they are consistent with Guttmacher: ${inc === 0 ? "not one" : fmt.int(inc)} of ${fmt.int(C.responses)} answers
+        contradicts it. The difference is silence. ChatGPT says nothing about the state's law in ${pct(share("openai", "not_stated"))} of answers,
+        including ${fmt.int(d3.sum(D.law.table.filter((r) => r.provider === "openai" && r.policy_group === "Total ban" && r.state_law_claim === "not_stated"), (r) => r.n))}
+        answers for total-ban states; Claude does so in ${pct(share("anthropic", "not_stated"))} and Gemini in ${pct(share("gemini", "not_stated"))}.`;
+    },
+    figure(root) {
+      const L = D.law;
+      const claims = [
+        { key: "banned", label: "Banned" }, { key: "restricted", label: "Restricted" }, { key: "legal", label: "Legal" },
+        { key: "not_stated", label: "Nothing" }, { key: "unclear", label: "Unclear" },
+      ];
+      const groupLabel = (g) => ({ "Total ban": "Total ban", "6-week ban": "Six-week ban", "very restrictive": "Very restrictive", restrictive: "Restrictive", "some restrictions/protections": "Some restrictions/protections", protective: "Protective", "very protective": "Very protective", "most protective": "Most protective" }[g] || g);
+      const consistent = (g, c) => (g === "Total ban" ? c === "banned" : g === "6-week ban" ? c === "restricted" : c === "legal" || c === "restricted");
+      const panels = [
+        { letter: "a", title: "What each answer says, by the user's state policy" },
+        { letter: "b", title: "All answers, by outcome", wide: true },
+      ];
+      const charts = figure(root, {
+        legend: [["Share of the row's answers (darker = more)", "var(--ink)", "sq"], ["Consistent with Guttmacher", "var(--ink)", "outline"]],
+        panels,
+        caption: `<b>What answers say about the law in the user's state.</b> <b>a</b>, For each chatbot (column blocks), rows are Guttmacher's policy category for the
+          user's state (total-ban states first, then the four six-week-ban states, then the remaining categories from most restrictive to most protective),
+          and columns are what the answer says. Each cell shows the number of answers; shading is the share of that row's answers. Outlined cells are the
+          claims consistent with the category. <b>b</b>, Share of each chatbot's ${fmt.int(D.answers.by_provider[0].n)} answers that are consistent with
+          Guttmacher, inconsistent, silent, or unclear. Claims are coded as the answer states them, not checked against the statute; Guttmacher's entries
+          were current as of May–September 2026.`,
+        table: () => ({
+          columns: ["Chatbot", "User's state", ...claims.map((c) => c.label)],
+          rows: P.flatMap((p) => L.order.map((g) => [AA.label(p), groupLabel(g), ...claims.map((c) => (L.table.find((r) => r.provider === p && r.policy_group === g && r.state_law_claim === c.key) || { n: 0 }).n)])),
+        }),
+      });
+      // Panel a: one matrix, a block of claim columns per chatbot.
+      (function () {
+        const el = charts[0];
+        const width = Math.max(320, el.clientWidth);
+        const probe = d3.select(el).append("svg");
+        const labelW = AA.textWidth(probe, L.order.map(groupLabel)) + 14;
+        probe.remove();
+        const gap = 14;
+        const cellW = Math.max(26, Math.min(56, (width - labelW - 2 * gap - 34) / (3 * claims.length)));
+        const blockW = cellW * claims.length;
+        const rowH = 26, top = 92;
+        const totalW = labelW + 3 * blockW + 2 * gap + 34; // room for the last rotated header
+        el.style.overflowX = "auto";
+        el.querySelectorAll("svg").forEach((n) => n.remove());
+        const svg = d3.select(el).append("svg").attr("viewBox", `0 0 ${totalW} ${top + rowH * L.order.length + 4}`)
+          .attr("width", totalW > width ? totalW : "100%").attr("role", "img");
+        L.order.forEach((g, r) => svg.append("text").attr("x", labelW - 8).attr("y", top + rowH * r + rowH / 2).attr("dy", "0.32em")
+          .attr("text-anchor", "end").attr("class", "t-ink").text(groupLabel(g)));
+        P.forEach((p, i) => {
+          const ox = labelW + i * (blockW + gap);
+          svg.append("circle").attr("cx", ox + 6).attr("cy", 10).attr("r", 5).style("fill", AA.color(p));
+          svg.append("text").attr("x", ox + 16).attr("y", 10).attr("dy", "0.32em").attr("class", "t-strong").text(AA.label(p));
+          claims.forEach((c, j) => svg.append("text")
+            .attr("transform", `translate(${ox + cellW * j + cellW / 2 + 4},${top - 6}) rotate(-50)`)
+            .attr("class", "t-ink").text(c.label));
+          L.order.forEach((g, r) => {
+            const y = top + rowH * r;
+            const rowN = d3.sum(L.table.filter((d) => d.provider === p && d.policy_group === g), (d) => d.n);
+            claims.forEach((c, j) => {
+              const n = (L.table.find((d) => d.provider === p && d.policy_group === g && d.state_law_claim === c.key) || { n: 0 }).n;
+              const sh = rowN ? n / rowN : 0;
+              const x = ox + cellW * j;
+              svg.append("rect").attr("x", x + 1).attr("y", y + 1).attr("width", cellW - 2).attr("height", rowH - 2).attr("rx", 3)
+                .style("fill", "var(--ink)").style("fill-opacity", sh ? 0.06 + 0.8 * sh : 0.025);
+              if (consistent(g, c.key)) svg.append("rect").attr("x", x + 1.5).attr("y", y + 1.5).attr("width", cellW - 3).attr("height", rowH - 3)
+                .attr("rx", 3).style("fill", "none").style("stroke", "var(--ink)").style("stroke-width", 1.5);
+              if (n) svg.append("text").attr("x", x + cellW / 2).attr("y", y + rowH / 2).attr("dy", "0.32em").attr("text-anchor", "middle")
+                .attr("class", "num").style("fill", sh > 0.5 ? "var(--bg)" : "var(--ink)").style("font-weight", 600).text(n);
+              svg.append("rect").attr("x", x).attr("y", y).attr("width", cellW).attr("height", rowH).attr("class", "hit")
+                .on("mousemove", (e) => AA.tip.show(e, `${AA.label(p)} · ${groupLabel(g)}`, [`Says “${c.label.toLowerCase()}”: ${n} of ${rowN} answers (${pct(sh)})`, consistent(g, c.key) ? "Consistent with Guttmacher" : c.key === "not_stated" ? "An omission" : ""].filter(Boolean)))
+                .on("mouseleave", () => AA.tip.hide());
+            });
+          });
+        });
+      })();
+      const outcomes = [
+        { key: "consistent", label: "Consistent with Guttmacher", short: "Consistent" },
+        { key: "inconsistent", label: "Inconsistent" },
+        { key: "not_stated", label: "Says nothing" },
+        { key: "unclear", label: "Unclear" },
+      ];
+      const sh = (k, p) => d3.sum(L.check.filter((r) => r.provider === p && r.law_claim_check === k), (r) => r.n) / d3.sum(L.check.filter((r) => r.provider === p), (r) => r.n);
+      dotRows(charts[1], {
+        rows: outcomes, value: sh,
+        tip: (k, p) => [AA.label(p), [`${outcomes.find((o) => o.key === k).label}: ${pct(sh(k, p), 1)}`]],
+        x: { domain: [0, 1], ticks: [0, 0.25, 0.5, 0.75, 1], fmt: (v) => pct(v), title: "Share of answers" },
+      });
+    },
+  });
+
+  // 7. Distance claims ----------------------------------------------------
+  TABS.push({
+    id: "claims", nav: "Are their distances right?",
+    question: "When chatbots say how far away a place is, are they right?",
+    how: `Some answers state a distance (“~140 miles southeast”). We took the miles stated (the midpoint of a range) and compared them with the
+      straight-line distance we measured to the same address. Driving distances are typically 20–40% longer than straight-line ones, so a claim
+      between 0.9 and 1.5 times the straight-line distance is <b>plausible</b> as a driving distance. Claims given only as travel time are left out, as
+      are ${D.claims.points.filter((d) => d.anchored_elsewhere).length} claims where the answer itself gave the distance from a nearby town instead of the queried one
+      (for island towns, the mainland ferry town), since we cannot check those against the queried city.`,
+    finding() {
+      const pts = D.claims.points.filter((d) => !d.anchored_elsewhere);
+      const ratio = (d) => d.claim_miles / d.distance_mi;
+      const plaus = d3.mean(pts, (d) => ratio(d) >= 0.9 && ratio(d) <= 1.5);
+      const counts = P.map((p) => pts.filter((d) => d.provider === p).length);
+      return `Stated distances are mostly sound. Of ${fmt.int(pts.length)} comparable claims, ${pct(plaus)} fall in the plausible range, and the median claim is
+        ${fmt.dec(d3.median(pts, ratio), 2)} times the straight-line distance, close to a typical driving detour. Gemini states distances far more often
+        (${counts[1]} claims) than Claude (${counts[0]}) or ChatGPT (${counts[2]}).`;
+    },
+    figure(root) {
+      const pts = D.claims.points;
+      const usable = pts.filter((d) => !d.anchored_elsewhere);
+      const ratio = (d) => d.claim_miles / d.distance_mi;
+      const bins = [
+        { key: "short", label: "Shorter than straight-line (< 0.9×)", short: "Shorter (< 0.9×)", f: (r) => r < 0.9 },
+        { key: "ok", label: "Plausible driving distance (0.9–1.5×)", short: "Plausible (0.9–1.5×)", f: (r) => r >= 0.9 && r <= 1.5 },
+        { key: "long", label: "Longer than a typical drive (> 1.5×)", short: "Longer (> 1.5×)", f: (r) => r > 1.5 },
+      ];
+      const [c1, c2] = figure(root, {
+        legend: [
+          ...P.map((p) => [AA.fullLabel(p), AA.color(p), "dot"]),
+          ["Answer gave distance from another town", "var(--ink-2)", "ring"],
+          ["Perfect fit: claim = measured (y = x)", "var(--ink)", "line"],
+          ["Plausible driving distance (0.9–1.5×)", "color-mix(in srgb, var(--ink) 14%, transparent)", "sq"],
+        ],
+        two: true,
+        panels: [
+          { letter: "a", title: "Stated distance against measured straight-line distance" },
+          { letter: "b", title: "How stated distances compare, by chatbot" },
+        ],
+        caption: `<b>Distances the answers claim.</b> <b>a</b>, Each point is one place for which an answer stated a distance in miles
+          (${fmt.int(pts.length)} of the ${fmt.int(D.claims.n_claims_total)} distance claims; the rest gave a travel time or no number). The plot is square and
+          both axes span the same logarithmic range, so the diagonal is the perfect-fit line (y = x), where a claim equals the measured straight-line
+          distance, and a point's distance above or below it shows how far the claim is off in proportion. The shaded band runs from 0.9 to 1.5 times the
+          measured distance, the range of a plausible driving distance. Open circles are claims in which the answer gave the distance from a nearby town rather than from the queried one; all three are
+          island towns in New York whose answers measured from the mainland ferry town (Bay Shore for Saltaire, Greenport for Dering Harbor). They
+          are plotted against the distance from the queried town and left out of <b>b</b>. <b>b</b>, Share of each chatbot's comparable claims in each range. Points far below the band usually reflect a
+          geocoded address that is wrong or a claim about a different branch of the same organization; points far above it may be road distances on
+          circuitous routes or errors.`,
+        table: () => ({
+          columns: ["Chatbot", "Comparable claims", "Median ratio", ...bins.map((b) => b.label)],
+          rows: P.map((p) => {
+            const v = usable.filter((d) => d.provider === p);
+            return [AA.label(p), v.length, fmt.dec(d3.median(v, ratio), 2), ...bins.map((b) => pct(d3.mean(v, (d) => b.f(ratio(d)))))];
+          }),
+        }),
+      });
+      scatter(c1, {
+        square: true,
+        points: pts.map((d) => ({
+          x: Math.max(0.5, d.distance_mi), y: Math.max(0.5, d.claim_miles), color: AA.color(d.provider), hollow: d.anchored_elsewhere,
+          tip: [d.name_verbatim.replace(/[*_]/g, ""), [`${AA.label(d.provider)} for ${d.query_city}, ${d.query_state_abbr}`, `Claimed: “${d.claim_text}”`, `Measured: ${fmt.mi(d.distance_mi)} straight-line (${fmt.dec(ratio(d), 2)}×)`]],
+        })),
+        x: { log: true, domain: [0.5, 2000], ticks: [1, 10, 100, 1000], fmt: miTick, title: "Measured straight-line miles (log scale)" },
+        y: { log: true, domain: [0.5, 2000], ticks: [1, 10, 100, 1000], fmt: miTick, title: "Miles the answer claims (log scale)" },
+        refLines: [{ fn: (v) => v, label: "Perfect fit (y = x)", at: 0.62, along: true }],
+        bands: [{ lo: (v) => 0.9 * v, hi: (v) => 1.5 * v }],
+        opacity: 0.6,
+      });
+      dotRows(c2, {
+        rows: bins, value: (k, p) => {
+          const v = usable.filter((d) => d.provider === p);
+          return v.length ? d3.mean(v, (d) => bins.find((b) => b.key === k).f(ratio(d))) : null;
+        },
+        tip: (k, p) => {
+          const v = usable.filter((d) => d.provider === p);
+          const n = v.filter((d) => bins.find((b) => b.key === k).f(ratio(d))).length;
+          return [AA.label(p), [`${n} of ${v.length} claims`]];
+        },
+        x: { domain: [0, 1], ticks: [0, 0.25, 0.5, 0.75, 1], fmt: (v) => pct(v), title: "Share of comparable claims" },
+      });
+    },
+  });
+
+  // 8. Size ---------------------------------------------------------------
+  TABS.push({
+    id: "size", nav: "Big cities vs small towns?",
+    question: "Do people in small towns get worse answers than people in big cities?",
+    how: `Each state contributes its two largest and two smallest incorporated places. For each place and chatbot we take the <b>nearest</b> of its
+      main recommendations and plot that distance against the place's population. We also measure how often a recommendation is inside the queried
+      place's legal limits.`,
+    finding() {
+      const s = D.size.summary;
+      const get = (size, ban, k) => s.filter((r) => r.size_group === size && r.total_ban === ban).map((r) => r[k]);
+      return `Outside total-ban states, people in the largest places are usually sent somewhere in their own city (${range(get("Two largest", false, "share_in_city"))} of
+        recommendations are inside its limits, median ${range(get("Two largest", false, "median_mi"), (v) => fmt.dec(v))} miles), while people in the smallest places
+        almost never are (median ${range(get("Two smallest", false, "median_mi"), (v) => fmt.int(v))} miles), which mostly reflects where clinics are. In total-ban states city size
+        makes no difference: everyone is sent about ${fmt.int(d3.median(get("Two largest", true, "median_mi").concat(get("Two smallest", true, "median_mi"))))} miles.`;
+    },
+    figure(root) {
+      const by = D.size.by_city;
+      const S = D.size.summary;
+      const [c1, c2, c3] = figure(root, {
+        legend: [["Two largest places (a)", "var(--ink)", "dot"], ["Two smallest places (a)", "var(--ink)", "ring"], ...P.map((p) => [`${AA.fullLabel(p)} (b)`, AA.color(p), "dot"])], two: true,
+        panels: [
+          { letter: "a", title: GROUPS[0].label },
+          { title: GROUPS[1].label },
+          { letter: "b", title: "Inside the queried place, and median distance", wide: true },
+        ],
+        caption: `<b>City size and distance.</b> <b>a</b>, Each point is one queried place: the straight-line distance from it to the nearest
+          main recommendation any of the three chatbots gave, against its 2025 population, both on log scales, for users in total-ban states (left) and in
+          all other states (right). Filled points are each state's two largest places, open points its two smallest (the largest of these has
+          ${fmt.pop(d3.max(D.cities.filter((c) => c.size_group === "Two smallest"), (c) => c.pop))} residents). Hover for each chatbot's nearest
+          recommendation. Distances below 0.5 miles are drawn at 0.5. <b>b</b>, Per chatbot, the share of main recommendations located inside the queried
+          place's legal limits (left) and their median distance (right), by place size and state group. In total-ban states no recommendation is inside the
+          queried place, since every one is in another state.`,
+        table: () => ({
+          columns: ["Places", "Users", "Chatbot", "Main recs", "Inside the place", "Median mi"],
+          rows: S.map((r) => [r.size_group, r.total_ban ? "Total-ban states" : "Other states", AA.label(r.provider), r.n, pct(r.share_in_city), fmt.dec(r.median_mi)]),
+        }),
+      });
+      // Panel a: one point per queried place, the nearest place any chatbot recommended.
+      const perCity = d3.rollups(by, (v) => v, (d) => d.geoid).map(([g, v]) => ({ c: cityById[g], v, nearest: d3.min(v, (d) => d.nearest_mi) }));
+      [c1, c2].forEach((el, i) => {
+        const g = GROUPS[i];
+        scatter(el, {
+          height: 300, r: 3.6,
+          points: perCity.filter((d) => d.c.total_ban === g.key).map((d) => ({
+            x: d.c.pop, y: Math.max(0.5, d.nearest), color: "var(--ink)", hollow: d.c.size_group === "Two smallest",
+            tip: [`${d.c.city}, ${d.c.state_abbr}`, [`Population ${fmt.pop(d.c.pop)} (${d.c.size_group.toLowerCase()} in the state)`,
+              ...P.map((p) => { const r = d.v.find((x) => x.provider === p); return `${AA.label(p)}: nearest ${r ? fmt.mi(r.nearest_mi) : "none located"}`; })]],
+          })),
+          x: { log: true, domain: [5, 10000000], ticks: [10, 1000, 100000, 10000000], fmt: (v) => d3.format(",.0f")(v).replace(/,000,000$/, "M").replace(/,000$/, "k"), title: "Population, 2025 (log scale)" },
+          y: { log: true, domain: [0.5, 4000], ticks: [1, 10, 100, 1000], fmt: miTick, title: "Nearest recommendation (miles)" },
+          opacity: 0.75,
+        });
+      });
+      const rows = [];
+      for (const ban of [true, false]) for (const size of ["Two largest", "Two smallest"]) rows.push({ key: `${ban}|${size}`, label: `${size === "Two largest" ? "Largest" : "Smallest"} places`, group: ban ? "Users in total-ban states" : "Users in all other states" });
+      const val = (k, p, f) => { const [ban, size] = k.split("|"); const r = S.find((d) => d.provider === p && String(d.total_ban) === ban && d.size_group === size); return r ? r[f] : null; };
+      const pair = document.createElement("div");
+      pair.className = "panels two";
+      c3.appendChild(pair);
+      const left = document.createElement("div"); const right = document.createElement("div");
+      pair.append(left, right);
+      dotRows(left, {
+        rows, value: (k, p) => val(k, p, "share_in_city"),
+        tip: (k, p) => [AA.label(p), [`Inside the queried place: ${pct(val(k, p, "share_in_city"), 1)}`]],
+        x: { domain: [0, 1], ticks: [0, 0.25, 0.5, 0.75, 1], fmt: (v) => pct(v), title: "Share inside the queried place" },
+      });
+      dotRows(right, {
+        rows, value: (k, p) => val(k, p, "median_mi"),
+        tip: (k, p) => [AA.label(p), [`Median distance: ${fmt.mi(val(k, p, "median_mi"))}`]],
+        x: { log: true, domain: [2, 400], ticks: [3, 10, 30, 100, 300], fmt: (v) => `${v} mi`, title: "Median straight-line miles (log scale)" },
+      });
+    },
+  });
+
+  // 9. Agreement ----------------------------------------------------------
+  TABS.push({
+    id: "agreement", nav: "Do the chatbots agree?",
+    question: "Do the three chatbots recommend the same places?",
+    how: `Different answers often write the same clinic differently (“Planned Parenthood – Metro Health Center” vs “Planned Parenthood Metro”).
+      We matched them by where their addresses geocode, using the same merged facilities as the reference set, and then compared, place by place, which
+      facilities each chatbot named as main recommendations.`,
+    finding() {
+      const A = D.agreement;
+      const tot = d3.sum(A.cities, (c) => c.by_1 + c.by_2 + c.by_3);
+      const all3 = d3.sum(A.cities, (c) => c.by_3) / tot;
+      const one = d3.sum(A.cities, (c) => c.by_1) / tot;
+      const full = d3.mean(A.cities, (c) => c.n_facilities === 3);
+      return `The chatbots largely converge. Of the distinct facilities recommended for a place, ${pct(all3)} were named by all three chatbots and ${pct(one)}
+        by only one; for ${pct(full)} of places the three answers name the same three facilities. Gemini and ChatGPT agree most. Agreement is lower for
+        users in total-ban states, where there are more out-of-state options to choose among.`;
+    },
+    figure(root) {
+      const A = D.agreement;
+      const [c1, c2, c3] = figure(root, {
+        two: true,
+        panels: [
+          { letter: "a", title: "How many chatbots named each facility" },
+          { letter: "b", title: "Overlap between each pair of chatbots" },
+          { letter: "c", title: "Distinct facilities per queried place" },
+        ],
+        caption: `<b>Agreement between chatbots.</b> Main recommendations matched to the merged reference facilities (precisely located places presented as
+          providing abortions, outside total-ban states; duplicates merged within about 110 meters). <b>a</b>, Of the distinct facilities named for a queried
+          place by any chatbot, the share named by one, two, or all three chatbots. <b>b</b>, Mean Jaccard similarity between two chatbots' sets of facilities
+          for the same place (the number named by both divided by the number named by either; 100% means identical lists), for all places, total-ban states,
+          and other states. <b>c</b>, Number of distinct facilities named across the three answers for each place: 3 means all three chatbots chose the
+          same three facilities; 9 would mean no overlap at all.`,
+        table: () => ({
+          columns: ["Places", "Named by 1", "Named by 2", "Named by all 3"],
+          rows: [["All", null], ["Total-ban states", true], ["Other states", false]].map(([lab, ban]) => {
+            const cs = A.cities.filter((c) => ban == null || c.total_ban === ban);
+            return [lab, d3.sum(cs, (c) => c.by_1), d3.sum(cs, (c) => c.by_2), d3.sum(cs, (c) => c.by_3)];
+          }),
+        }),
+      });
+      // a: 100% stacked bars (ordinal blue ramp: 1 = lightest, 3 = darkest).
+      const segs = [{ k: "by_1", label: "1 chatbot", c: "#86b6ef" }, { k: "by_2", label: "2 chatbots", c: "#2a78d6" }, { k: "by_3", label: "All 3", c: "#104281" }];
+      const groups = [["All places", null], ["Total-ban states", true], ["Other states", false]];
+      (function () {
+        const { svg, width } = AA.svg(c1, groups.length * 40 + 70);
+        const labelW = AA.textWidth(svg, groups.map((g) => g[0])) + 16;
+        const x = d3.scaleLinear().domain([0, 1]).range([labelW, width - 12]);
+        const leg = svg.append("g");
+        let lx = labelW;
+        segs.forEach((s) => {
+          leg.append("rect").attr("x", lx).attr("y", 0).attr("width", 10).attr("height", 10).attr("rx", 2).style("fill", s.c);
+          const t = leg.append("text").attr("x", lx + 14).attr("y", 9).text(s.label);
+          lx += 14 + t.node().getComputedTextLength() + 16;
+        });
+        groups.forEach(([lab, ban], i) => {
+          const cs = A.cities.filter((c) => ban == null || c.total_ban === ban);
+          const tot = d3.sum(cs, (c) => c.by_1 + c.by_2 + c.by_3);
+          const y = 24 + i * 40;
+          svg.append("text").attr("x", labelW - 8).attr("y", y + 12).attr("dy", "0.32em").attr("text-anchor", "end").attr("class", "t-ink").text(lab);
+          let acc = 0;
+          segs.forEach((s) => {
+            const v = d3.sum(cs, (c) => c[s.k]) / tot;
+            const x0 = x(acc), w = Math.max(0, x(acc + v) - x(acc) - 2);
+            svg.append("rect").attr("x", x0).attr("y", y).attr("width", w).attr("height", 24).attr("rx", 3).style("fill", s.c)
+              .on("mousemove", (e) => AA.tip.show(e, lab, [`Named by ${s.label.toLowerCase()}: ${pct(v, 1)} of ${tot} facilities`])).on("mouseleave", () => AA.tip.hide());
+            const t = svg.append("text").attr("x", x0 + w / 2).attr("y", y + 12).attr("dy", "0.32em").attr("text-anchor", "middle").style("fill", s.k === "by_1" ? "#0b0b0b" : "#ffffff").style("pointer-events", "none").text(pct(v));
+            if (t.node().getComputedTextLength() + 8 > w) t.remove();
+            acc += v;
+          });
+        });
+        xAxis(svg, x, { top: 20, bottom: 24 + groups.length * 40 - 10, ticks: [0, 0.25, 0.5, 0.75, 1], fmt: (v) => pct(v), title: "", width });
+      })();
+      // b: three small 3x3 matrices.
+      (function () {
+        const sets = [["All places", A.pairs_all], ["Total-ban states", A.pairs.filter((r) => r.total_ban)], ["Other states", A.pairs.filter((r) => !r.total_ban)]];
+        const { svg, width } = AA.svg(c2, 190);
+        // Width used: 40 (row dots) + 3 blocks of (3 cells + 36) + 2 gaps of 0.6 cell.
+        const cell = Math.min(34, (width - 148) / 10.2);
+        const blockW = cell * 3 + 36;
+        sets.forEach(([lab, rows], b) => {
+          const ox = 40 + b * (blockW + cell * 0.6), oy = 40;
+          svg.append("text").attr("x", ox + cell * 1.5).attr("y", 14).attr("text-anchor", "middle").attr("class", "t-head").text(lab);
+          P.forEach((p, j) => svg.append("circle").attr("cx", ox + cell * j + cell / 2).attr("cy", oy - 10).attr("r", 4.5).style("fill", AA.color(p)));
+          P.forEach((p, i) => {
+            if (b === 0) svg.append("circle").attr("cx", ox - 12).attr("cy", oy + cell * i + cell / 2).attr("r", 4.5).style("fill", AA.color(p));
+            P.forEach((q, j) => {
+              const r = rows.find((d) => (d.a === p && d.b === q) || (d.a === q && d.b === p));
+              const v = p === q ? 1 : r ? r.mean_jaccard : null;
+              const x0 = ox + cell * j, y0 = oy + cell * i;
+              svg.append("rect").attr("x", x0 + 1).attr("y", y0 + 1).attr("width", cell - 2).attr("height", cell - 2).attr("rx", 3)
+                .style("fill", p === q ? "var(--grid)" : "#2a78d6").style("fill-opacity", p === q ? 1 : 0.15 + 0.85 * v);
+              if (p !== q) {
+                svg.append("text").attr("x", x0 + cell / 2).attr("y", y0 + cell / 2).attr("dy", "0.32em").attr("text-anchor", "middle").style("fill", v > 0.55 ? "#fff" : "var(--ink)").style("font-size", "10.5px").text(pct(v));
+                svg.append("rect").attr("x", x0).attr("y", y0).attr("width", cell).attr("height", cell).attr("class", "hit")
+                  .on("mousemove", (e) => AA.tip.show(e, `${AA.label(p)} and ${AA.label(q)}`, [lab, `Mean overlap ${pct(v, 1)}`])).on("mouseleave", () => AA.tip.hide());
+              }
+            });
+          });
+        });
+        svg.append("text").attr("x", 40).attr("y", 40 + cell * 3 + 22).attr("class", "t-muted").text(width < 560 ? "Darker = more overlap" : "Rows and columns: Claude, Gemini, ChatGPT (dots). Darker = more overlap.");
+      })();
+      // c: histogram of distinct facilities per place.
+      (function () {
+        const counts = d3.rollup(A.cities, (v) => v.length, (c) => c.n_facilities);
+        const ks = d3.range(2, 10);
+        const { svg, width } = AA.svg(c3, 220);
+        const m = { l: 44, r: 10, t: 16, b: 42 };
+        const x = d3.scaleBand().domain(ks).range([m.l, width - m.r]).padding(0.3);
+        const ymax = d3.max(ks, (k) => counts.get(k) || 0);
+        const y = d3.scaleLinear().domain([0, ymax]).nice().range([220 - m.b, m.t]);
+        yAxis(svg, y, { left: m.l, right: width - m.r, ticks: y.ticks(4), fmt: (v) => v, title: "" });
+        ks.forEach((k) => {
+          const n = counts.get(k) || 0;
+          const bw = Math.min(24, x.bandwidth());
+          const bx = x(k) + (x.bandwidth() - bw) / 2;
+          if (n) {
+            svg.append("path").attr("d", `M${bx},${y(0)}V${y(n) + 4}q0,-4 4,-4h${bw - 8}q4,0 4,4V${y(0)}Z`).style("fill", "var(--ink)")
+              .on("mousemove", (e) => AA.tip.show(e, `${k} distinct facilities`, [`${n} places`])).on("mouseleave", () => AA.tip.hide());
+            svg.append("text").attr("x", bx + bw / 2).attr("y", y(n) - 5).attr("text-anchor", "middle").attr("class", "t-ink num").text(n);
+          }
+          svg.append("text").attr("x", x(k) + x.bandwidth() / 2).attr("y", 220 - m.b + 14).attr("text-anchor", "middle").attr("class", "num").text(k);
+        });
+        svg.append("text").attr("x", (m.l + width - m.r) / 2).attr("y", 220 - 8).attr("text-anchor", "middle").attr("class", "t-ink").text(width < 560 ? "Distinct facilities (3 = full agreement)" : "Distinct facilities across the three answers (3 = full agreement)");
+        svg.append("text").attr("transform", `translate(12,${(220 - m.b + m.t) / 2}) rotate(-90)`).attr("text-anchor", "middle").attr("class", "t-ink").text("Places");
+      })();
+    },
+  });
+
+  // 10. Guidance ----------------------------------------------------------
+  TABS.push({
+    id: "guidance", nav: "What else do they say?",
+    question: "What guidance comes with the list of places?",
+    how: `Beyond the places themselves, the coding agents recorded whether each answer says the user may need to travel to another state, mentions
+      a limit tied to weeks of pregnancy, mentions help paying (abortion funds, sliding-scale fees, Medicaid), mentions abortion pills by mail or
+      telehealth, asks the user a follow-up question, or states the law in the user's state. We compare how often each chatbot does each.`,
+    finding() {
+      const f = D.guidance.flags;
+      const sh = (p, flag, ban) => { const r = f.find((d) => d.provider === p && d.flag === flag && d.total_ban === ban); return r.k / r.n; };
+      return `Claude and Gemini surround their lists with practical guidance; ChatGPT gives much less. For users in total-ban states, Claude and Gemini mention
+        pills by mail or telehealth in ${pct(sh("anthropic", "mentions_telehealth", true))} and ${pct(sh("gemini", "mentions_telehealth", true))} of answers; ChatGPT
+        in ${pct(sh("openai", "mentions_telehealth", true))}. Claude asks a follow-up question (usually for a ZIP code or how far along the pregnancy is) in
+        ${pct(sh("anthropic", "asks_follow_up", false))} of answers; Gemini never does.`;
+    },
+    figure(root) {
+      const f = D.guidance.flags;
+      const flags = [...new Set(f.map((d) => d.flag))].map((k) => ({ key: k, label: f.find((d) => d.flag === k).label }));
+      const GUIDE_SHORT = {
+        says_travel_needed: "Travel needed", mentions_gestational_limits: "Weeks limit", mentions_financial_help: "Help paying",
+        mentions_telehealth: "Pills by mail", asks_follow_up: "Follow-up question", law_stated: "States the law",
+      };
+      const [c1, c2] = figure(root, {
+        legend: "providers", two: true,
+        panels: [{ letter: "a", title: GROUPS[0].label }, { title: GROUPS[1].label }],
+        caption: `<b>Guidance that accompanies the places.</b> Share of each chatbot's answers that do each thing, for users in the ${C.total_ban_states}
+          total-ban states (<b>a</b>, left; ${f.find((d) => d.total_ban).n} answers per chatbot) and in all other states (right;
+          ${f.find((d) => !d.total_ban).n} answers per chatbot). <i>Weeks limit</i> means any mention of a gestational limit, such as “up to 12 weeks” or
+          “banned after six weeks”. <i>Help paying</i> includes abortion funds, sliding-scale fees, and Medicaid. A follow-up question asks the user for more
+          information (a ZIP code, a neighborhood, weeks of pregnancy) after or instead of answering.`,
+        table: () => ({
+          columns: ["Users", "Guidance", ...P.map(AA.label)],
+          rows: GROUPS.flatMap((g) => flags.map((fl) => [g.label, fl.label, ...P.map((p) => { const r = f.find((d) => d.provider === p && d.flag === fl.key && d.total_ban === g.key); return `${r.k} of ${r.n}`; })])),
+        }),
+      });
+      [c1, c2].forEach((el, i) => {
+        const g = GROUPS[i];
+        const v = (k, p) => { const r = f.find((d) => d.provider === p && d.flag === k && d.total_ban === g.key); return r.k / r.n; };
+        dotRows(el, {
+          rows: flags.map((fl) => ({ key: fl.key, short: GUIDE_SHORT[fl.key], label: fl.label.replace("Says travel to another state may be needed", "Says travel may be needed").replace("Mentions a gestational (weeks) limit", "Mentions a weeks limit").replace("Mentions help paying (funds, Medicaid)", "Mentions help paying").replace("Mentions pills by mail or telehealth", "Mentions pills by mail").replace("Asks the user a follow-up question", "Asks a follow-up question").replace("States the law in the user's state", "States the state's law") })),
+          value: v,
+          tip: (k, p) => [AA.label(p), [`${flags.find((x) => x.key === k).label}: ${pct(v(k, p))}`]],
+          x: { domain: [0, 1], ticks: [0, 0.5, 1], fmt: (x) => pct(x), title: "Share of answers" },
+        });
+      });
+    },
+  });
+
+  // 11. Websites ----------------------------------------------------------
+  TABS.push({
+    id: "websites", nav: "Which websites do readers see?",
+    question: "Which websites do readers see, and who runs them?",
+    how: `We counted every website an answer shows its reader: formal citations, links in the text, and sites named without a link. Search results the
+      chatbot read but did not show are not counted. Each distinct site (${fmt.int(C.domains)} in all) was visited and coded by an AI agent for the type
+      of organization behind it and whether it is affiliated with crisis pregnancy centers.`,
+    finding() {
+      const W = D.websites;
+      const w = byP(W.per_response);
+      const cpcN = d3.sum(D.websites.cpc, (d) => d.n);
+      const cpcSites = new Set(D.websites.cpc.map((d) => d.domain)).size;
+      return `The chatbots differ most here. Gemini shows a median of ${fmt.int(w.gemini.median)} websites per answer, ChatGPT ${fmt.int(w.openai.median)}, and
+        Claude ${fmt.int(w.anthropic.median)}. Most are abortion directories and providers. Only Gemini showed crisis pregnancy center websites
+        (${fmt.int(cpcN)} appearances from ${fmt.int(cpcSites)} sites), and ${fmt.int(W.cpc_citations.n_warning)} of its ${fmt.int(W.cpc_citations.n_citations)}
+        citations of those sites back a sentence that warns readers about such centers.`;
+    },
+    figure(root) {
+      const W = D.websites;
+      const w = byP(W.per_response);
+      const totals = Object.fromEntries(P.map((p) => [p, d3.sum(W.categories.filter((r) => r.provider === p), (r) => r.n)]));
+      const GROUPS_W = [
+        { key: "dir", label: "Abortion directory", cats: ["abortion_directory"] },
+        { key: "prov", label: "Abortion provider", cats: ["abortion_provider", "telehealth_abortion_provider"] },
+        { key: "fund", label: "Fund or support", cats: ["abortion_fund_or_support"] },
+        { key: "adv", label: "Advocacy or research", cats: ["advocacy_or_research"] },
+        { key: "gov", label: "Government", cats: ["government"] },
+        { key: "med", label: "Hospital or other medical", cats: ["hospital_or_health_system", "other_medical_practice"] },
+        { key: "news", label: "News or reference", cats: ["news_media", "reference"] },
+        { key: "cpc", label: "Crisis pregnancy center", cats: ["crisis_pregnancy_center"] },
+        { key: "other", label: "Other or unclear", cats: ["other", "unclear", "business_listing", "social_media_or_forum"] },
+      ];
+      const share = (k, p) => d3.sum(W.categories.filter((r) => r.provider === p && GROUPS_W.find((g) => g.key === k).cats.includes(r.category)), (r) => r.n) / totals[p];
+      const [c1, c2, c3] = figure(root, {
+        legend: "providers", two: true,
+        panels: [
+          { letter: "a", title: "Websites shown per answer" },
+          { letter: "b", title: "Who runs the websites shown" },
+          { letter: "c", title: "The most-shown websites", wide: true },
+        ],
+        caption: `<b>Websites shown to readers.</b> <b>a</b>, Website appearances per answer: the dot is the median and the line spans the middle half of
+          answers (25th to 75th percentile); the number at right is the mean. A site counts again each time it appears; a link that repeats a citation is
+          counted once. <b>b</b>, Share of each chatbot's website appearances by the type of organization behind the site (Claude:
+          ${fmt.int(totals.anthropic)} appearances; Gemini: ${fmt.int(totals.gemini)}; ChatGPT: ${fmt.int(totals.openai)}). <b>c</b>, The 15 most-shown sites
+          overall, by chatbot (log scale; a missing dot means the chatbot never showed the site). Organization types were coded by AI agents that visited
+          each site; crisis pregnancy center (CPC) affiliation includes networks and directories run for CPCs. A citation counts as backing a warning when
+          the cited sentence contains words such as “crisis pregnancy center”, “do not provide”, or “avoid”, a keyword rule not yet checked by hand. CPC sites shown by Gemini:
+          ${W.cpc.slice(0, 6).map((d) => `${esc(d.domain)} (${d.n})`).join(", ")}${W.cpc.length > 6 ? `, and ${W.cpc.length - 6} more` : ""}.`,
+        table: () => ({
+          columns: ["Website", "Type", ...P.map(AA.label), "Total"],
+          rows: W.top_domains.map((d) => [d.domain, (d.category || "").replace(/_/g, " "), d.anthropic || 0, d.gemini || 0, d.openai || 0, d.total]),
+        }),
+      });
+      // a: median and interquartile range per chatbot.
+      (function () {
+        const rows = P;
+        const { svg, width } = AA.svg(c1, rows.length * 34 + 56);
+        const labelW = AA.textWidth(svg, rows.map(AA.label)) + 16;
+        const meanW = AA.textWidth(svg, rows.map((p) => `mean ${fmt.dec(w[p].mean)}`)) + 12;
+        const x = d3.scaleLinear().domain([0, 35]).range([labelW, width - meanW - 8]);
+        const bottom = 8 + rows.length * 34;
+        xAxis(svg, x, { top: 6, bottom, ticks: [0, 10, 20, 30], fmt: (v) => v, title: "Websites shown per answer", width: width - meanW });
+        rows.forEach((p, i) => {
+          const y = 8 + i * 34 + 17;
+          const r = w[p];
+          svg.append("text").attr("x", labelW - 8).attr("y", y).attr("dy", "0.32em").attr("text-anchor", "end").attr("class", "t-ink").text(AA.label(p));
+          svg.append("line").attr("x1", x(r.q25)).attr("x2", x(r.q75)).attr("y1", y).attr("y2", y).style("stroke", AA.color(p)).style("stroke-width", 4).style("stroke-linecap", "round").style("stroke-opacity", 0.5);
+          svg.append("circle").attr("class", "dot").attr("cx", x(r.median)).attr("cy", y).attr("r", 6).style("fill", AA.color(p));
+          svg.append("text").attr("x", width - meanW).attr("y", y).attr("dy", "0.32em").attr("class", "t-ink num").text(`mean ${fmt.dec(r.mean)}`);
+          svg.append("rect").attr("x", labelW).attr("y", y - 14).attr("width", Math.max(0, width - labelW - meanW)).attr("height", 28).attr("class", "hit")
+            .on("mousemove", (e) => AA.tip.show(e, AA.label(p), [`Median ${fmt.dec(r.median, 0)}, middle half ${fmt.dec(r.q25, 0)}–${fmt.dec(r.q75, 0)}`, `Mean ${fmt.dec(r.mean)}`, `${r.distinct} distinct sites across all answers`]))
+            .on("mouseleave", () => AA.tip.hide());
+        });
+      })();
+      dotRows(c2, {
+        rows: GROUPS_W, value: share,
+        tip: (k, p) => [AA.label(p), [`${GROUPS_W.find((g) => g.key === k).label}: ${pct(share(k, p), 1)} of appearances`]],
+        x: { domain: [0, 0.8], ticks: [0, 0.2, 0.4, 0.6, 0.8], fmt: (v) => pct(v), title: "Share of website appearances" }, rowH: 26,
+      });
+      const top = W.top_domains.slice(0, 15);
+      dotRows(c3, {
+        rows: top.map((d) => ({ key: d.domain, label: d.domain })),
+        value: (k, p) => { const v = top.find((d) => d.domain === k)[p]; return v ? v : null; },
+        tip: (k, p) => [k, [`${AA.label(p)}: ${top.find((d) => d.domain === k)[p] || 0} appearances`, (top.find((d) => d.domain === k).category || "").replace(/_/g, " ")]],
+        x: { log: true, domain: [1, 1500], ticks: [1, 10, 100, 1000], fmt: (v) => d3.format(",")(v), title: "Appearances (log scale)" }, rowH: 24,
+      });
+    },
+  });
+
+  // ---------------------------------------------------------------------
+  // Tab rendering and navigation.
+  // ---------------------------------------------------------------------
+  const nav = document.getElementById("tabs");
+  const main = document.getElementById("main");
+  TABS.forEach((t, i) => {
+    const b = document.createElement("button");
+    b.type = "button"; b.setAttribute("role", "tab"); b.id = `tab-${t.id}`; b.dataset.id = t.id;
+    b.innerHTML = `<span class="k">${i === 0 ? "" : i}</span><span>${esc(t.nav)}</span>`;
+    nav.appendChild(b);
+    const sec = document.createElement("section");
+    sec.className = "tab"; sec.id = `p-${t.id}`; sec.setAttribute("role", "tabpanel"); sec.setAttribute("aria-labelledby", b.id);
+    main.appendChild(sec);
+  });
+  function build(t, i) {
+    const sec = document.getElementById(`p-${t.id}`);
+    sec.replaceChildren();
+    if (t.render) { t.render(sec); return; }
+    sec.insertAdjacentHTML("beforeend", `<div class="eyebrow">Question ${i}</div><h1>${esc(t.question)}</h1>
+      <div class="how"><p><b>How the data answer it.</b> ${t.how}</p></div>
+      <p class="finding">${t.finding()}</p>`);
+    t.figure(sec);
+    sec.insertAdjacentHTML("beforeend", `<p class="note">Codes from AI agents, not yet checked by human coders. Built ${D.meta.generated_at}.</p>`);
+  }
+  let current = null;
+  function show(id) {
+    const i = Math.max(0, TABS.findIndex((t) => t.id === id));
+    const t = TABS[i];
+    current = t.id;
+    nav.querySelectorAll("button").forEach((b) => b.setAttribute("aria-selected", b.dataset.id === t.id));
+    // On narrow screens the tabs are a horizontal strip: keep the active one visible.
+    const active = document.getElementById(`tab-${t.id}`);
+    if (active && nav.scrollWidth > nav.clientWidth) nav.scrollLeft = active.offsetLeft - 16;
+    main.querySelectorAll(".tab").forEach((s) => s.classList.toggle("on", s.id === `p-${t.id}`));
+    build(t, i);
+    history.replaceState(null, "", `#${t.id}`);
+    window.scrollTo({ top: 0 });
+  }
+  nav.addEventListener("click", (e) => { const b = e.target.closest("button[data-id]"); if (b) show(b.dataset.id); });
+  nav.addEventListener("keydown", (e) => {
+    if (!["ArrowDown", "ArrowUp", "ArrowLeft", "ArrowRight"].includes(e.key)) return;
+    const i = TABS.findIndex((t) => t.id === current);
+    const j = Math.min(TABS.length - 1, Math.max(0, i + (e.key === "ArrowDown" || e.key === "ArrowRight" ? 1 : -1)));
+    show(TABS[j].id);
+    document.getElementById(`tab-${TABS[j].id}`).focus();
+    e.preventDefault();
+  });
+  AA.onResize(() => { const i = TABS.findIndex((t) => t.id === current); build(TABS[i], i); });
+  show(location.hash.slice(1) || "overview");
+})();
+</script>
+</body>
+</html>

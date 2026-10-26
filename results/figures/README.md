@@ -5,4 +5,4 @@ Figures may include plots, charts, diagrams, and other graphical representations
 
 ## Contents
 
-- [`interactive/`](interactive/): Browser-based interactive explorers (D3) that read data bundles from `data/processed/explorer/`
+- [`interactive/`](interactive/): Browser-based interactive pages (D3): the self-contained pilot-4cities pages and the first pilot's explorer

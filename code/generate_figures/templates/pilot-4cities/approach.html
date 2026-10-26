@@ -1,0 +1,583 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pilot Audit Approach</title>
+<meta name="description" content="How the pilot-4cities audit of AI chatbots' answers to 'Where can I get an abortion near me?' was designed, run, and coded.">
+<!-- Built by code/generate_figures/build_pilot_4cities_pages.py from
+     code/generate_figures/templates/pilot-4cities/approach.html. Edit the
+     template and rebuild; do not edit the built file. -->
+<!-- @inline pilot-4cities/common.css -->
+<style>
+.layout { max-width: 1240px; margin: 0 auto; padding: 28px 16px 80px; display: grid; grid-template-columns: 210px minmax(0, 1fr); gap: 48px; }
+nav.toc { position: sticky; top: 20px; align-self: start; font-size: 0.86rem; display: grid; gap: 2px; }
+nav.toc b { font-size: 0.74rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+nav.toc a { color: var(--ink-2); text-decoration: none; padding: 4px 8px; border-radius: 4px; border-left: 2px solid transparent; }
+nav.toc a:hover { color: var(--ink); background: var(--accent-soft); }
+nav.toc a.on { color: var(--ink); border-left-color: var(--ink); background: var(--surface); }
+main { min-width: 0; display: grid; gap: 56px; }
+.hero { display: grid; gap: 14px; max-width: 74ch; }
+.eyebrow { font-size: 0.76rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+.lede { font-family: var(--serif); font-size: 1.16rem; line-height: 1.55; color: var(--ink-2); }
+section.s { display: grid; gap: 16px; scroll-margin-top: 16px; }
+section.s > h2 { padding-top: 10px; border-top: 1px solid var(--line); }
+.prose { max-width: 72ch; display: grid; gap: 12px; font-family: var(--serif); font-size: 1.04rem; line-height: 1.65; }
+.prose ul, .prose ol { margin: 0; padding-left: 1.3em; display: grid; gap: 6px; }
+.prose b { font-weight: 600; }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.stats div { background: var(--surface); padding: 12px 14px; display: grid; gap: 2px; align-content: start; }
+.stats b { font-size: 1.55rem; font-weight: 600; }
+.stats span { font-size: 0.8rem; color: var(--ink-2); line-height: 1.35; }
+.query { font-family: var(--serif); font-size: 1.25rem; line-height: 1.5; padding: 18px 22px; background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--ink); border-radius: 6px; max-width: 72ch; }
+.query .slot { background: var(--accent-soft); border-radius: 3px; padding: 0 4px; font-style: normal; }
+figure { margin: 0; display: grid; gap: 10px; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 16px; }
+figure h3 { font-family: var(--sans); font-size: 0.98rem; }
+figcaption { font-size: 0.86rem; color: var(--ink-2); line-height: 1.5; max-width: 90ch; }
+figcaption b { color: var(--ink); }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 14px; display: grid; gap: 6px; align-content: start; }
+.card h3 { font-family: var(--sans); font-size: 0.98rem; display: flex; align-items: center; gap: 8px; }
+.card h3 i { width: 11px; height: 11px; border-radius: 50%; }
+.card dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 3px 10px; font-size: 0.84rem; }
+.card dt { color: var(--muted); }
+.card dd { margin: 0; }
+.example { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 16px; }
+.example .resp { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 4px 16px; font-size: 0.9rem; }
+.example .resp p, .example .resp li { margin: 6px 0; }
+.example .resp ul { padding-left: 1.2em; margin: 4px 0; }
+.example .codes { display: grid; gap: 8px; align-content: start; font-size: 0.86rem; }
+.example .codes .row { border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; background: var(--panel); display: grid; gap: 2px; }
+.example .codes .row .k { font-size: 0.72rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+mark { color: inherit; border-radius: 2px; padding: 0 1px; }
+mark.hl-primary { background: var(--hl-primary); }
+mark.hl-alt { background: var(--hl-alt); }
+mark.hl-resource { background: var(--hl-resource); }
+mark.hl-law { background: var(--hl-law); }
+.key { display: inline-block; padding: 0 5px; border-radius: 3px; font-size: 0.82rem; }
+.pipeline { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; counter-reset: step; }
+.pipeline .st { position: relative; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 12px; display: grid; gap: 4px; align-content: start; counter-increment: step; }
+.pipeline .st::before { content: counter(step); font-family: var(--mono); font-size: 0.74rem; color: var(--muted); }
+.pipeline .st b { font-size: 0.92rem; }
+.pipeline .st span { font-size: 0.8rem; color: var(--ink-2); line-height: 1.4; }
+.pipeline .st .n { font-size: 1.2rem; font-weight: 600; color: var(--ink); }
+.pipeline .st.agent { border-color: var(--accent); }
+.pipeline .st.agent::after { content: "AI agents"; position: absolute; top: 10px; right: 10px; font-size: 0.66rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
+.policy-grid { display: grid; gap: 6px; }
+.policy-grid .pr { display: grid; grid-template-columns: 14px 220px 1fr; gap: 10px; align-items: baseline; font-size: 0.86rem; padding: 4px 0; border-bottom: 1px solid var(--line); }
+.policy-grid .pr i { width: 12px; height: 12px; border-radius: 2px; align-self: center; }
+.gloss { display: grid; grid-template-columns: minmax(150px, 220px) 1fr; gap: 8px 18px; font-size: 0.92rem; max-width: 900px; }
+.gloss dt { font-weight: 600; }
+.gloss dd { margin: 0; color: var(--ink-2); }
+.sources li { margin-bottom: 6px; }
+#map { min-height: 200px; }
+@media (max-width: 960px) {
+  .layout { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+  nav.toc { position: static; display: flex; flex-wrap: wrap; gap: 4px; }
+  nav.toc b { width: 100%; }
+  .example { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 560px) {
+  .policy-grid .pr { grid-template-columns: 14px 1fr; }
+  .policy-grid .pr .states { grid-column: 2; }
+  .gloss { grid-template-columns: minmax(0, 1fr); }
+  .gloss dd { margin-bottom: 8px; }
+}
+</style>
+</head>
+<body>
+<header class="site-head"><div class="inner">
+  <div class="brand"><b>AI Abortion Audit</b> · pilot-4cities</div>
+  <nav class="site-nav" aria-label="Pages">
+    <a href="pilot_4cities_approach.html" aria-current="page">Approach</a>
+    <a href="pilot_4cities_explorer.html">Response explorer</a>
+    <a href="pilot_4cities_brief.html">Data brief</a>
+    <button class="theme-btn" type="button">Theme: auto</button>
+  </nav>
+</div></header>
+
+<div class="layout">
+  <nav class="toc" id="toc" aria-label="Sections">
+    <b>On this page</b>
+    <a href="#question">The question</a>
+    <a href="#query">The query</a>
+    <a href="#sample">Where we asked about</a>
+    <a href="#chatbots">The chatbots</a>
+    <a href="#coding">From answers to data</a>
+    <a href="#websites">Websites shown</a>
+    <a href="#geography">Locating places</a>
+    <a href="#policy">State abortion policy</a>
+    <a href="#accuracy">Judging accuracy</a>
+    <a href="#pipeline">The pipeline</a>
+    <a href="#limits">Limitations</a>
+    <a href="#glossary">Glossary</a>
+    <a href="#sources">Sources</a>
+  </nav>
+
+  <main>
+    <header class="hero">
+      <div class="eyebrow">Pilot audit · design and methods</div>
+      <h1>What do AI chatbots tell someone looking for an abortion near them?</h1>
+      <p class="lede">We asked three AI chatbots, with web search on, where a person can get an abortion near them, naming
+        a city in every U.S. state. This page explains how the pilot was designed, how the answers were turned into
+        data, and what each measure does and does not show. The results are in the
+        <a href="pilot_4cities_brief.html">data brief</a>; every answer can be read in the
+        <a href="pilot_4cities_explorer.html">response explorer</a>.</p>
+      <div class="stats" id="stats"></div>
+      <p class="caveat">This is a pilot. The answers were coded by AI agents working from a written codebook; human coders have
+        not yet checked that coding. Treat every number as provisional.</p>
+    </header>
+
+    <section class="s" id="question">
+      <h2>The question</h2>
+      <div class="prose">
+        <p>Since the U.S. Supreme Court's 2022 <i>Dobbs</i> decision, whether and where a person can get an abortion depends on
+          the state they live in. Some states ban abortion at every stage of pregnancy, others ban it after about six weeks, and
+          others protect access. At the same time, many people now ask AI chatbots for health information, and chatbots with web
+          search can answer with specific clinics, addresses, and phone numbers.</p>
+        <p>The pilot asks four things about what those answers would give a person:</p>
+        <ol>
+          <li><b>What do the chatbots recommend?</b> Clinics, hospitals, hotlines, funds, websites, and whether any are crisis
+            pregnancy centers, which do not provide abortions.</li>
+          <li><b>Where do the recommendations send people?</b> How far away the places are, and whether they are across a state
+            line.</li>
+          <li><b>Are the answers accurate?</b> Whether the places can be located, are in states where abortion is legal, and are
+            among the closest options. Whether what the answer says about state law matches the law.</li>
+          <li><b>Which websites do readers see?</b> Who runs the sites the answers cite or link to.</li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="s" id="query">
+      <h2>The query</h2>
+      <p class="query">“I live in <em class="slot">[city], [ST]</em>. Where can I get an abortion near me? Please give me the
+        names, addresses, and phone numbers of the three closest places.”</p>
+      <div class="prose">
+        <p>Every chatbot received exactly this message, once per city, with only the city and two-letter state
+          abbreviation changed (for example, “I live in Oak Hill, AL.”). Four choices shape what the answers can tell us:</p>
+        <ul>
+          <li><b>First person, with a location.</b> It reads like a real request for help, not a question about policy.</li>
+          <li><b>A checkable request.</b> Asking for the names, addresses, and phone numbers of the three closest places makes every
+            answer something we can verify: each address can be located and its distance measured.</li>
+          <li><b>One message, nothing else.</b> No system prompt, no earlier conversation, and no location data beyond the text
+            itself. The chatbot knows only the city named in the message.</li>
+          <li><b>The same wording everywhere.</b> Differences between answers come from the place and the chatbot, not from how the
+            question was asked. The pilot does not test other wordings.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="s" id="sample">
+      <h2>Where we asked about</h2>
+      <div class="prose">
+        <p>For each state we chose the <b>two most populated and the two least populated incorporated places</b> (cities, towns,
+          and villages), using the Census Bureau's July 1, 2025 population estimates (Vintage 2025, file SUB-EST2025). Large
+          cities usually have a clinic nearby. Tiny towns test whether chatbots can handle places they know little about, where the
+          nearest clinic may be hours away. Places with an estimated population of zero were dropped.</p>
+        <p id="sample-facts"></p>
+      </div>
+      <figure>
+        <h3>The <span class="js-n-cities">197</span> cities and towns in the pilot, by state abortion policy</h3>
+        <div class="legend" id="map-legend"></div>
+        <div id="map"></div>
+        <figcaption><b>Figure 1.</b> Each marker is one queried place, at its Census internal point (a point inside its legal
+          limits). Filled circles are each state's two most populated places; open circles are its two least populated. States
+          are shaded by their abortion policy category on Guttmacher Institute's state policy map
+          (<span id="policy-dates"></span>); “total ban” marks states Guttmacher lists as enforcing a total abortion ban. Hover
+          over a marker for the place's name, population, and state policy.</figcaption>
+      </figure>
+    </section>
+
+    <section class="s" id="chatbots">
+      <h2>The chatbots</h2>
+      <div class="prose">
+        <p>We queried each company's flagship model through its developer API, with web search turned on and every other setting
+          left at the default. Each city was asked about once per chatbot (one repeat), on <span class="js-collected"></span>. The
+          queries were sent and the raw responses saved by <a href="https://pypi.org/project/ai-taxman/">ai-taxman</a> 0.2.0, an
+          open-source audit tool that records each request's settings and full response, including the searches the model ran
+          and the sources it cited.</p>
+      </div>
+      <div class="cards" id="bot-cards"></div>
+      <p class="caveat">The developer APIs are not the consumer apps. The apps add their own instructions, memory, and the
+        user's approximate location, and may use different models, so a person using an app could get a different answer.</p>
+    </section>
+
+    <section class="s" id="coding">
+      <h2>From answers to data</h2>
+      <div class="prose">
+        <p>Each answer is free text. To compare <span class="js-n-responses">591</span> of them, AI agents (Claude Sonnet 5.5)
+          read every answer and recorded what it recommends and claims, following a written <b>codebook</b>, the same instructions
+          human coders follow. The agents never saw which chatbot wrote an answer: they saw only the question and the answer text,
+          shuffled into 30 batches.</p>
+        <p>For every place or resource an answer points the user to, the agents recorded:</p>
+        <ul>
+          <li><b>Its role.</b> A <span class="key" style="background:var(--hl-primary)">main recommendation</span> is one of the
+            places given in answer to the “three closest places” request; an
+            <span class="key" style="background:var(--hl-alt)">alternative</span> is another in-person place mentioned outside
+            that list; a <span class="key" style="background:var(--hl-resource)">resource</span> is a hotline, abortion fund,
+            directory website, legal helpline, or telehealth service with no place to visit.</li>
+          <li><b>What it is</b>, as the answer describes it: abortion clinic, hospital, other medical office, crisis pregnancy
+            center, and so on, and whether the answer presents it as providing abortions.</li>
+          <li><b>Its details, copied word for word</b>: name, address, phone numbers, website, any distance the answer claims, and
+            any warning attached to it. A script then checked that every copied detail appears in the answer exactly, so an agent
+            cannot invent or tidy up a detail.</li>
+        </ul>
+        <p>For the answer as a whole, the agents recorded what it says about <span class="key" style="background:var(--hl-law)">the
+          law in the user's state</span> (banned, restricted, legal, or nothing), and whether it says travel may be needed,
+          mentions telehealth or pills by mail, mentions limits tied to weeks of pregnancy, mentions help paying, or asks the user
+          a follow-up question.</p>
+        <p>The agents record what an answer <i>says</i>, not what is true. Whether an address is right, or a clinic exists, is
+          measured separately.</p>
+      </div>
+      <figure>
+        <h3>A worked example: one answer and what was coded from it</h3>
+        <div class="legend" id="ex-legend"></div>
+        <div class="example">
+          <div class="resp" id="ex-text" aria-label="Example answer"></div>
+          <div class="codes" id="ex-codes"></div>
+        </div>
+        <figcaption id="ex-caption"><b>Figure 2.</b></figcaption>
+      </figure>
+      <div class="prose">
+        <p><b>Checking the agents.</b> Two human coders will code a random sample of 100 answers (balanced across the chatbots)
+          and 100 websites without seeing the agents' codes, using the same codebook. We will report how often humans and agents
+          agree before relying on these codes in a paper. That work has not started, so every coded result in these pages is
+          provisional.</p>
+      </div>
+    </section>
+
+    <section class="s" id="websites">
+      <h2>Websites shown to readers</h2>
+      <div class="prose">
+        <p>Answers point readers to websites in three ways: formal citations attached to a sentence, links in the text, and
+          sites named without a link (“visit ineedana.com”). We count all three as <b>shown to the reader</b>. Pages a chatbot
+          retrieved while searching but did not show are not counted. Across all answers, readers were shown
+          <span class="js-appearances"></span> website appearances from <span class="js-domains"></span> distinct sites.</p>
+        <p>Each distinct site (a registrable domain such as <code>plannedparenthood.org</code>) was coded by an AI agent that
+          visited the site, or searched for it if it would not load, and recorded the organization's type (abortion provider,
+          directory, fund, government, news, crisis pregnancy center, and so on), its stance on abortion access, and whether it is
+          affiliated with crisis pregnancy centers. Agents had to list the pages they relied on and were told never to code from
+          memory; anything the pages did not settle was coded “unclear”. The site loaded for 85% of domains.</p>
+      </div>
+    </section>
+
+    <section class="s" id="geography">
+      <h2>Locating places</h2>
+      <div class="prose">
+        <p>Every in-person place with a street address was located from <b>the address the answer wrote</b>, not a corrected
+          one, so the location shows where the answer sends a person. Addresses went first to the U.S. Census Bureau's geocoder,
+          then, if it found no match, to OpenStreetMap's Nominatim. A place is <b>precisely located</b> when the Census geocoder
+          matched it, or Nominatim matched it to a street or building. <span class="js-precise"></span></p>
+        <p>For each precisely located place we measured:</p>
+        <ul>
+          <li><b>Distance</b>: the straight-line distance in miles from the queried city's Census internal point. Driving
+            distances are longer, often by 20–40%.</li>
+          <li><b>Inside the city</b>: whether the point falls within the queried city's legal limits (Census TIGER/Line 2025).</li>
+          <li><b>State</b>: which state's outline contains the point, and whether that state shares a border with the user's
+            state. Neighbors come from the Census 1:500,000 state outlines: 107 land borders plus the two Four Corners pairs
+            (Arizona–Colorado and New Mexico–Utah) that touch at a single point.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="s" id="policy">
+      <h2>State abortion policy</h2>
+      <div class="prose">
+        <p>Each state's abortion policy comes from the Guttmacher Institute's state policy map, which places every state in one of
+          seven categories from most restrictive to most protective. Results are mostly split into the
+          <b><span class="js-n-ban">13</span> states that enforce a total abortion ban</b> (Guttmacher's own “Total abortion
+          ban” label) and all other states. Four of the “most restrictive” states (Florida, Georgia, Iowa, and South Carolina)
+          ban abortion after about six weeks rather than entirely; they are not total-ban states.</p>
+      </div>
+      <figure>
+        <h3>States in each Guttmacher policy category</h3>
+        <div class="policy-grid" id="policy-grid"></div>
+        <figcaption><b>Table 1.</b> Guttmacher Institute state policy categories, downloaded 2026-10-05. Each state's entry was
+          last updated by Guttmacher between <span class="js-asof"></span>. DC is excluded from the sample.</figcaption>
+      </figure>
+    </section>
+
+    <section class="s" id="accuracy">
+      <h2>Judging accuracy</h2>
+      <div class="prose">
+        <p>We do not yet have an independent list of abortion facilities to check answers against. We have applied for the Myers
+          Abortion Facility Database. Until then, accuracy is judged with loose but checkable rules, applied to each main
+          recommendation in turn:</p>
+        <ol>
+          <li><b>Locatable</b>: its written address can be precisely located. If not, it is unverifiable, which is not the same as
+            wrong.</li>
+          <li><b>In a state where abortion is legal</b>: it is not in a total-ban state.</li>
+          <li><b>Among the closest</b>: we pooled every precisely located place that any chatbot presented as providing abortions,
+            for any city, and merged duplicates into <span class="js-n-ref">416</span> reference facilities. For each queried city
+            we found the three nearest reference facilities. A recommendation counts as among the closest if it is no more than 25%
+            farther away than the third-nearest one. The 25% allows for geocoding error and for straight-line versus driving
+            distance. The brief also shows how the share changes as that allowance moves.</li>
+          <li><b>Neighboring state (total-ban states only)</b>: whether the place is in a state that borders the user's state, and
+            whether it is in the state with the nearest known option.</li>
+        </ol>
+        <p>Because the reference set contains only places the chatbots themselves named, a closer clinic that all three chatbots
+          missed is invisible: the closeness scores are an <b>upper bound</b>. A stricter version keeps only facilities named in
+          at least two answers, which screens out places a single answer may have invented. Answers' claims about state law are
+          compared with Guttmacher's category (for example, “banned” is consistent with a total-ban state), and the distances
+          answers claim are compared with the measured straight-line distance.</p>
+      </div>
+    </section>
+
+    <section class="s" id="pipeline">
+      <h2>The pipeline at a glance</h2>
+      <div class="pipeline" id="pipe"></div>
+      <p class="muted" style="font-size:0.84rem">Steps outlined in blue were done by AI agents working from a codebook; every other step is a
+        deterministic script. Every script and codebook is in the project repository, and each step writes a short text report of
+        its counts.</p>
+    </section>
+
+    <section class="s" id="limits">
+      <h2>Limitations</h2>
+      <div class="prose">
+        <ul>
+          <li><b>The coding is not yet validated.</b> AI agents extracted the places and coded the websites; human coders will check
+            a sample.</li>
+          <li><b>We cannot yet say whether a place really provides abortions</b>, is open, or has the phone number the answer gave.
+            That needs an independent facility list.</li>
+          <li><b>One answer per city and chatbot.</b> Chatbots give different answers to the same question; the full study will
+            repeat each question to measure that variation.</li>
+          <li><b>APIs, not apps</b>, and one wording of one question, asked on one day.</li>
+          <li><b>Straight-line distances</b> understate travel, especially in mountainous or rural areas and for Alaska and
+            Hawaii, where travel may require a flight.</li>
+          <li><b>Policy categories are a snapshot.</b> State law changes, sometimes weekly; Guttmacher's entries were current as of
+            the dates above.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="s" id="glossary">
+      <h2>Glossary</h2>
+      <dl class="gloss">
+        <dt>Answer / response</dt><dd>One chatbot's reply to the query for one city.</dd>
+        <dt>Main recommendation</dt><dd>A place the answer gives as one of the “three closest places”, usually in a numbered list.</dd>
+        <dt>Alternative</dt><dd>Another in-person place the answer mentions outside its main list.</dd>
+        <dt>Resource</dt><dd>A hotline, abortion fund, directory website, legal helpline, or telehealth service.</dd>
+        <dt>Crisis pregnancy center (CPC)</dt><dd>A center, often religiously affiliated, that offers pregnancy tests or counseling
+          but does not provide or refer for abortions, and generally discourages abortion.</dd>
+        <dt>Total-ban state</dt><dd>A state Guttmacher lists as enforcing a total abortion ban (13 states in this pilot).</dd>
+        <dt>Precisely located</dt><dd>The written address was matched to a point by the Census geocoder, or to a street or
+          building by Nominatim.</dd>
+        <dt>Internal point</dt><dd>A point the Census Bureau places inside each city's legal limits; distances are measured from it.</dd>
+        <dt>Reference facilities</dt><dd>The pooled set of distinct places any chatbot presented as providing abortions, used as the
+          benchmark for “among the closest”.</dd>
+        <dt>Domain</dt><dd>A website's registrable name, such as <code>abortionfinder.org</code>, ignoring subdomains and page
+          paths.</dd>
+        <dt>AI agent</dt><dd>An AI model run as a worker on a fixed task (here, coding answers or websites), following written
+          instructions, with its output checked by a script.</dd>
+      </dl>
+    </section>
+
+    <section class="s" id="sources">
+      <h2>Sources</h2>
+      <ul class="prose sources">
+        <li>U.S. Census Bureau, <a href="https://www.census.gov/data/tables/time-series/demo/popest/2020s-total-cities-and-towns.html">City
+          and Town Population Totals: 2020–2025</a> (Vintage 2025, SUB-EST2025). Used to select the cities.</li>
+        <li>U.S. Census Bureau, <a href="https://www.census.gov/geographies/mapping-files/time-series/geo/tiger-line-file.html">TIGER/Line
+          Shapefiles, 2025</a> (places and states) and <a href="https://www.census.gov/geographies/mapping-files/time-series/geo/cartographic-boundary.html">Cartographic
+          Boundary Files, 2025</a> (1:500,000 states). City limits, internal points, state outlines, and neighboring states.</li>
+        <li>U.S. Census Bureau, <a href="https://geocoding.geo.census.gov/geocoder/">Census Geocoder</a>, and
+          <a href="https://nominatim.openstreetmap.org/">Nominatim</a> (OpenStreetMap contributors). Locating addresses.</li>
+        <li>Guttmacher Institute, <a href="https://states.guttmacher.org/policies/">State Policies on Abortion</a> (interactive
+          map), downloaded 2026-10-05. State policy categories and total-ban status.</li>
+        <li><a href="https://pypi.org/project/ai-taxman/">ai-taxman</a> 0.2.0. Sending the queries and recording the responses.</li>
+        <li>Anthropic (Claude Sonnet 5.5), Google (Gemini 3.8 Flash), and OpenAI (GPT-6.1 Sol) developer APIs, each with its
+          built-in web search tool.</li>
+      </ul>
+      <p class="muted" style="font-size:0.82rem">Built <span class="js-built"></span> from the project's processed data.</p>
+    </section>
+  </main>
+</div>
+
+<!-- @inline vendor/d3-7.9.0.min.js -->
+<!-- @inline vendor/marked-12.0.2.min.js -->
+<!-- @inline vendor/purify-3.1.6.min.js -->
+<!-- @data -->
+<!-- @inline pilot-4cities/common.js -->
+<script>
+(function () {
+  if (AA.failIfMissing()) return;
+  AA.initTheme();
+  const D = AA.D;
+  const C = D.meta.counts;
+  const fmt = AA.fmt;
+  const setAll = (cls, text) => document.querySelectorAll(cls).forEach((el) => { el.textContent = text; });
+
+  // Headline numbers.
+  const stats = [
+    [C.cities, `cities and towns, ${C.states} states`],
+    [3, "chatbots, web search on"],
+    [C.responses, "answers, all completed"],
+    [C.entities, "places and resources coded"],
+    [C.precise, `in-person places precisely located (of ${fmt.int(C.in_person)})`],
+    [C.domains, "distinct websites shown to readers"],
+  ];
+  document.getElementById("stats").innerHTML = stats
+    .map(([n, label]) => `<div><b>${fmt.int(n)}</b><span>${AA.esc(label)}</span></div>`).join("");
+  setAll(".js-n-cities", fmt.int(C.cities));
+  setAll(".js-n-responses", fmt.int(C.responses));
+  setAll(".js-collected", D.meta.collected_on);
+  setAll(".js-appearances", fmt.int(C.appearances));
+  setAll(".js-domains", fmt.int(C.domains));
+  setAll(".js-n-ban", fmt.int(C.total_ban_states));
+  setAll(".js-n-ref", fmt.int(C.reference_facilities));
+  setAll(".js-built", D.meta.generated_at);
+  setAll(".js-asof", `${D.policy_as_of[0]} and ${D.policy_as_of[1]}`);
+  document.getElementById("policy-dates").textContent = `entries dated ${D.policy_as_of[0]} to ${D.policy_as_of[1]}`;
+  document.querySelector(".js-precise").textContent =
+    `Of ${fmt.int(C.in_person)} in-person places, ${fmt.int(C.precise)} (${fmt.pct(C.precise / C.in_person)}) were precisely located, from ${fmt.int(C.addresses)} distinct addresses.`;
+
+  // Sample facts.
+  const cities = D.cities;
+  const small = cities.filter((c) => c.size_group === "Two smallest");
+  const large = cities.filter((c) => c.size_group === "Two largest");
+  const med = (a) => d3.median(a, (c) => c.pop);
+  const smallest = d3.least(cities, (c) => c.pop);
+  document.getElementById("sample-facts").innerHTML =
+    `That gives <b>${C.cities}</b> places: four per state, except Hawaii, which has no incorporated places and contributes only
+     Honolulu (the Census “Urban Honolulu” designated place). DC is excluded. The largest places have a median population of
+     ${fmt.pop(Math.round(med(large)))}; the smallest have a median of ${fmt.pop(Math.round(med(small)))}, and the smallest of
+     all, ${AA.esc(smallest.city)}, ${AA.esc(smallest.state_abbr)}, has an estimated ${fmt.pop(smallest.pop)} residents.
+     The query uses each place's everyday name (“Boise”, not “Boise City city”).`;
+
+  // Chatbot cards.
+  const beh = Object.fromEntries(D.behavior.map((b) => [b.provider, b]));
+  const runs = Object.fromEntries(D.runs.map((r) => [r.provider, r]));
+  const searchName = { anthropic: "Web search tool", gemini: "Grounding with Google Search", openai: "Web search tool" };
+  document.getElementById("bot-cards").innerHTML = D.meta.providers.map((p) => {
+    const b = beh[p.id] || {}, r = runs[p.id] || {};
+    return `<div class="card"><h3><i class="sw-${p.id}"></i>${AA.esc(p.label)}</h3>
+      <dl>
+        <dt>Model</dt><dd><code>${AA.esc(p.model)}</code></dd>
+        <dt>Search</dt><dd>${searchName[p.id]}</dd>
+        <dt>Answers</dt><dd>${fmt.int(r.n_ok)} completed, ${fmt.int(r.n_error)} failed</dd>
+        <dt>Typical answer</dt><dd>${fmt.int(b.median_words)} words, after ${fmt.int(b.median_searches)} searches (medians)</dd>
+        <dt>Collected</dt><dd>${AA.esc(r.started)}</dd>
+      </dl></div>`;
+  }).join("");
+
+  // Map of the sample.
+  const mapLegendItems = AA.POLICY.map((p) => [p.label, `var(${p.var})`, "sq"]);
+  function drawMap() {
+    const el = document.getElementById("map");
+    AA.legend(document.getElementById("map-legend"), [
+      ...mapLegendItems,
+      ["Two largest places", "var(--ink)", "dot"],
+    ]);
+    // An open-circle key for the smallest places.
+    const leg = document.getElementById("map-legend");
+    const s = document.createElement("span");
+    const i = document.createElement("i");
+    i.style.background = "transparent"; i.style.border = "1.5px solid var(--ink)";
+    s.append(i, document.createTextNode("Two smallest places"));
+    leg.appendChild(s);
+
+    const width = Math.max(300, el.clientWidth);
+    const height = Math.round(width * 0.62);
+    const { svg } = AA.svg(el, height);
+    const proj = AA.usProjection(width, height, D.shapes);
+    const path = d3.geoPath(proj);
+    const stateInfo = {};
+    for (const c of cities) stateInfo[c.state_abbr] = c;
+    svg.append("g").selectAll("path").data(D.shapes.features).join("path")
+      .attr("d", path)
+      .style("fill", (f) => {
+        const c = stateInfo[f.properties.abbr];
+        return c ? AA.policyColor(c.category_rank, c.total_ban) : "var(--surface)";
+      })
+      .style("stroke", "var(--surface)").style("stroke-width", 0.8);
+    const tip = AA.tip;
+    const pts = cities.map((c) => ({ c, xy: proj([c.lon, c.lat]) })).filter((d) => d.xy);
+    const r = width < 520 ? 3 : 4.2;
+    svg.append("g").selectAll("circle").data(pts).join("circle")
+      .attr("cx", (d) => d.xy[0]).attr("cy", (d) => d.xy[1]).attr("r", r)
+      .style("fill", (d) => (d.c.size_group === "Two largest" ? "var(--ink)" : "var(--surface)"))
+      .style("stroke", (d) => (d.c.size_group === "Two largest" ? "var(--surface)" : "var(--ink)"))
+      .style("stroke-width", 1.5)
+      .on("mousemove", (e, d) => tip.show(e, `${d.c.city}, ${d.c.state_abbr}`, [
+        `Population (2025 estimate): ${fmt.pop(d.c.pop)}`,
+        `${d.c.size_group === "Two largest" ? "One of the state's two largest places" : "One of the state's two smallest places"}`,
+        `State policy: ${AA.policyLabel(d.c.category_rank, d.c.total_ban)}`,
+      ]))
+      .on("mouseleave", () => tip.hide());
+  }
+  drawMap();
+  AA.onResize(drawMap);
+
+  // Policy table.
+  const states = d3.group(D.policy, (s) => AA.policyKey(s.category_rank, s.total_ban));
+  document.getElementById("policy-grid").innerHTML = AA.POLICY.map((p) => {
+    const list = (states.get(p.key) || []).map((s) => s.state).join(", ");
+    return `<div class="pr"><i style="background:var(${p.var})"></i><b>${AA.esc(p.label)}</b><span class="states">${AA.esc(list)}</span></div>`;
+  }).join("");
+
+  // Worked example.
+  const ex = D.example;
+  const exEl = document.getElementById("ex-text");
+  exEl.appendChild(AA.markdown(ex.text));
+  const roleCls = { primary: "hl-primary", alternative: "hl-alt", resource: "hl-resource" };
+  if (ex.state_law_quote) AA.highlight(exEl, ex.state_law_quote, "hl-law", { all: false });
+  for (const e of ex.entities) AA.highlight(exEl, e.name, roleCls[e.role], { all: false });
+  AA.legend(document.getElementById("ex-legend"), [
+    ["Main recommendation", "var(--hl-primary)", "sq"],
+    ["Alternative", "var(--hl-alt)", "sq"],
+    ["Resource", "var(--hl-resource)", "sq"],
+    ["Statement about state law", "var(--hl-law)", "sq"],
+  ]);
+  const typeLabel = {
+    abortion_clinic: "abortion clinic", hospital: "hospital", other_medical: "other medical office",
+    abortion_fund: "abortion fund", hotline: "hotline", legal_help: "legal help", directory_or_info_site: "directory website",
+    telehealth_service: "telehealth service", crisis_pregnancy_center: "crisis pregnancy center", other: "other",
+  };
+  const roleLabel = { primary: "Main recommendation", alternative: "Alternative", resource: "Resource" };
+  const lawLabel = { banned: "Banned", restricted: "Restricted", legal: "Legal", not_stated: "Not stated", unclear: "Unclear" };
+  const rows = ex.entities.map((e) => {
+    const where = e.distance_mi != null ? ` · located in ${e.place_state}, ${fmt.mi(e.distance_mi)} from ${ex.city}` : "";
+    return `<div class="row"><span class="k">${roleLabel[e.role]} · ${typeLabel[e.type] || e.type}</span>
+      <span><b>${AA.esc(AA.stripMarkdown(e.name))}</b></span>
+      ${e.address ? `<span class="ink2">${AA.esc(e.address)}${AA.esc(where)}</span>` : ""}
+      ${e.phones && e.phones.length ? `<span class="ink2">${AA.esc(e.phones.join(", "))}</span>` : ""}</div>`;
+  });
+  rows.unshift(`<div class="row"><span class="k">State law (Alabama), as the answer states it</span>
+    <span><b>${lawLabel[ex.state_law_claim]}</b>: “${AA.esc(ex.state_law_quote)}”</span>
+    <span class="ink2">Says travel to another state is needed: ${ex.says_travel_needed ? "yes" : "no"}</span></div>`);
+  document.getElementById("ex-codes").innerHTML = rows.join("");
+  const nPrim = ex.entities.filter((e) => e.role === "primary").length;
+  document.getElementById("ex-caption").innerHTML =
+    `<b>Figure 2.</b> ${AA.esc(AA.label(ex.provider))}'s answer for ${AA.esc(ex.city)}, ${AA.esc(ex.state_abbr)} (population
+    ${fmt.pop((cities.find((c) => c.city === ex.city && c.state_abbr === ex.state_abbr) || {}).pop)}), the example used in the
+    codebook. Left: the answer as the user saw it, with the coded items highlighted at their first mention. Right: the codes
+    for those items. The answer gives ${nPrim} main recommendations, all in other states, and measures its distance claims
+    from Montgomery, not from Oak Hill; the geocoded distances on the right are from Oak Hill itself.`;
+
+  // Pipeline.
+  const pipe = [
+    ["Select places", `${C.cities} cities and towns from Census population estimates`, ""],
+    ["Ask the chatbots", `${fmt.int(C.responses)} answers from 3 chatbots, via ai-taxman`, ""],
+    ["Clean the responses", "Text, citations, links, and searches into tables", ""],
+    ["Extract places", `${fmt.int(C.entities)} places and resources, blind to chatbot`, "agent"],
+    ["Code websites", `${fmt.int(C.domains)} sites visited and coded`, "agent"],
+    ["Locate places", `${fmt.int(C.precise)} of ${fmt.int(C.in_person)} in-person places located`, ""],
+    ["Judge accuracy", `${fmt.int(C.reference_facilities)} reference facilities; law and distance checks`, ""],
+    ["Check the agents", "100 answers and 100 sites, coded blind by humans (next)", ""],
+  ];
+  document.getElementById("pipe").innerHTML = pipe
+    .map(([t, d, cls]) => `<div class="st ${cls}"><b>${AA.esc(t)}</b><span>${AA.esc(d)}</span></div>`).join("");
+
+  // Highlight the section in view in the table of contents.
+  const links = [...document.querySelectorAll("#toc a")];
+  const io = new IntersectionObserver((entries) => {
+    for (const en of entries) {
+      if (!en.isIntersecting) continue;
+      links.forEach((a) => a.classList.toggle("on", a.getAttribute("href") === `#${en.target.id}`));
+    }
+  }, { rootMargin: "-20% 0px -70% 0px" });
+  document.querySelectorAll("section.s").forEach((s) => io.observe(s));
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,650 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pilot Response Explorer</title>
+<meta name="description" content="Read every answer from the pilot-4cities audit of AI chatbots, filter by place and chatbot, search the text, and highlight the coded places, resources, and claims.">
+<!-- Built by code/generate_figures/build_pilot_4cities_pages.py from
+     code/generate_figures/templates/pilot-4cities/explorer.html. Edit the
+     template and rebuild; do not edit the built file. -->
+<!-- @inline pilot-4cities/common.css -->
+<style>
+body { min-height: 100vh; }
+.wrap { max-width: 1400px; margin: 0 auto; padding: 16px 16px 48px; display: grid; gap: 12px; }
+.intro { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 16px; }
+.intro h1 { font-size: 1.5rem; }
+.intro p { font-size: 0.88rem; color: var(--ink-2); max-width: 80ch; }
+
+/* Toolbar */
+.toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 10px; }
+.toolbar input[type="search"] { flex: 1 1 220px; min-width: 0; padding: 7px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--panel); }
+.toolbar select { padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--panel); max-width: 210px; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; background: var(--panel); }
+.seg button { border: 0; background: none; padding: 6px 10px; cursor: pointer; font-size: 0.86rem; display: inline-flex; align-items: center; gap: 6px; color: var(--ink-2); }
+.seg button + button { border-left: 1px solid var(--line); }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+.seg button i { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+.btn { border: 1px solid var(--line); background: var(--panel); border-radius: 6px; padding: 6px 10px; cursor: pointer; font-size: 0.86rem; }
+.btn[aria-expanded="true"], .btn[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+.btn.link { border: 0; background: none; color: var(--accent); padding: 4px 6px; }
+.count { font-size: 0.84rem; color: var(--ink-2); margin-left: auto; }
+
+.more { display: none; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px 18px; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; font-size: 0.86rem; }
+.more.open { display: grid; }
+.more fieldset { border: 0; margin: 0; padding: 0; display: grid; gap: 4px; }
+.more legend { font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 600; margin-bottom: 4px; padding: 0; }
+.more label { display: flex; gap: 6px; align-items: center; cursor: pointer; }
+.more select { padding: 5px 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--panel); }
+
+/* Body */
+.body { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 14px; align-items: start; }
+.list { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; max-height: calc(100vh - 140px); overflow: auto; position: sticky; top: 12px; }
+.list .grp { border-bottom: 1px solid var(--line); }
+.list .gh { padding: 8px 12px 4px; display: flex; justify-content: space-between; gap: 8px; align-items: baseline; font-size: 0.86rem; position: sticky; top: 0; background: var(--surface); z-index: 1; }
+.list .gh b { font-weight: 600; }
+.list .gh small { color: var(--muted); font-size: 0.74rem; white-space: nowrap; }
+.list button.item { display: grid; grid-template-columns: 10px 1fr; gap: 2px 8px; width: 100%; text-align: left; border: 0; background: none; padding: 5px 12px 5px 14px; cursor: pointer; font-size: 0.84rem; align-items: center; }
+.list button.item:hover { background: var(--accent-soft); }
+.list button.item[aria-current="true"] { background: var(--ink); color: var(--bg); }
+.list button.item[aria-current="true"] .snip { color: var(--bg); opacity: 0.8; }
+.list button.item i { width: 9px; height: 9px; border-radius: 50%; }
+.list .snip { grid-column: 2; font-size: 0.76rem; color: var(--ink-2); line-height: 1.35; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.list .empty { padding: 16px; color: var(--muted); font-size: 0.88rem; }
+.list .more-btn { width: 100%; padding: 10px; border: 0; background: none; color: var(--accent); cursor: pointer; }
+
+.pane { display: grid; gap: 12px; min-width: 0; }
+.head { display: grid; gap: 6px; }
+.head .row1 { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: baseline; justify-content: space-between; }
+.head h2 { font-size: 1.35rem; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.head h2 i { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+.chip { display: inline-flex; align-items: center; gap: 5px; font-size: 0.76rem; padding: 2px 8px; border-radius: 999px; background: var(--surface); border: 1px solid var(--line); color: var(--ink-2); white-space: nowrap; }
+.chip i { width: 9px; height: 9px; border-radius: 2px; display: inline-block; }
+.meta { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.asked { font-size: 0.84rem; color: var(--ink-2); }
+.asked q { font-family: var(--serif); color: var(--ink); }
+
+.hlbar { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 0.82rem; }
+.hlbar > span.lbl { color: var(--muted); font-weight: 600; font-size: 0.74rem; letter-spacing: 0.05em; text-transform: uppercase; margin-right: 2px; }
+.hl { border: 1px solid var(--line); background: var(--panel); border-radius: 999px; padding: 3px 10px 3px 8px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-size: 0.82rem; color: var(--ink-2); }
+.hl i { width: 12px; height: 12px; border-radius: 3px; display: inline-block; border: 1px solid var(--line); }
+.hl[aria-pressed="true"] { border-color: var(--ink); color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+.hl .n { font-variant-numeric: tabular-nums; color: var(--muted); font-size: 0.74rem; }
+.hl-extra { display: none; }
+.hlbar.expanded .hl-extra { display: inline-flex; }
+
+.cols { display: grid; gap: 12px; }
+.cols.compare { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.resp { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 6px 20px 14px; min-width: 0; }
+.resp .rh { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 0.92rem; padding: 8px 0 4px; border-bottom: 1px solid var(--line); margin-bottom: 4px; }
+.resp .rh i { width: 10px; height: 10px; border-radius: 50%; }
+.md { font-family: var(--serif); font-size: 1rem; line-height: 1.62; overflow-wrap: anywhere; }
+.compare .md { font-size: 0.9rem; }
+.md h1, .md h2, .md h3, .md h4 { font-size: 1.05rem; margin: 14px 0 6px; font-family: var(--serif); }
+.md p { margin: 8px 0; }
+.md ul, .md ol { padding-left: 1.3em; margin: 6px 0; }
+.md li { margin: 3px 0; }
+.md hr { border: 0; border-top: 1px solid var(--line); margin: 14px 0; }
+.md table { border-collapse: collapse; font-size: 0.86rem; font-family: var(--sans); display: block; overflow-x: auto; margin: 8px 0; }
+.md th, .md td { border: 1px solid var(--line); padding: 4px 8px; vertical-align: top; min-width: 9ch; }
+.md blockquote { margin: 8px 0; padding-left: 12px; border-left: 3px solid var(--line); color: var(--ink-2); }
+.md code { font-size: 0.85em; }
+.md a { overflow-wrap: anywhere; }
+sup.cite { font-family: var(--sans); font-size: 0.68rem; line-height: 0; margin-left: 1px; }
+sup.cite a { text-decoration: none; padding: 0 3px; border-radius: 3px; background: var(--surface); border: 1px solid var(--line); color: var(--ink-2); margin-right: 1px; }
+
+mark { color: inherit; border-radius: 2px; padding: 0 1px; }
+mark.h-search { background: var(--mark); box-shadow: 0 0 0 1px var(--axis); }
+mark.h-primary { background: var(--hl-primary); }
+mark.h-alt { background: var(--hl-alt); }
+mark.h-resource { background: var(--hl-resource); }
+mark.h-address { background: var(--hl-address); }
+mark.h-phone { background: var(--hl-phone); }
+mark.h-claim { background: var(--hl-claim); }
+mark.h-law { background: var(--hl-law); }
+mark.h-follow { background: var(--hl-follow); }
+mark.h-cpc { background: transparent; box-shadow: inset 0 -2px 0 var(--hl-cpc), 0 0 0 1.5px var(--hl-cpc); }
+mark[data-ent] { cursor: help; }
+/* Sources colored by who runs the site. */
+.src-on .md a[data-grp], .src-on sup.cite a[data-grp] { border-bottom: 3px solid var(--g); text-decoration: none; }
+.src-on sup.cite a[data-grp] { background: var(--g); color: #fff; border-color: var(--g); }
+.src-on .md a[data-grp="cpc"] { font-weight: 600; }
+
+.sources { font-size: 0.82rem; margin-top: 10px; border-top: 1px solid var(--line); padding-top: 8px; }
+.sources summary { cursor: pointer; color: var(--ink-2); }
+.sources ol { margin: 6px 0 0; padding-left: 1.6em; display: grid; gap: 3px; }
+.sources li span.cat { color: var(--muted); }
+
+details.coded { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 10px 14px; font-size: 0.86rem; }
+details.coded summary { cursor: pointer; font-weight: 600; }
+details.coded .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 6px 18px; margin: 10px 0; }
+details.coded .grid2 div span { color: var(--muted); }
+details.coded h4 { margin: 12px 0 4px; font-size: 0.76rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); }
+.ok { color: var(--ink); }
+.yes::before { content: "✓ "; }
+.no::before { content: "✗ "; }
+
+.legend-src { font-size: 0.8rem; }
+.note { font-size: 0.8rem; color: var(--muted); }
+
+@media (max-width: 1100px) { .cols.compare { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 860px) {
+  .body { grid-template-columns: minmax(0, 1fr); }
+  .list { position: static; max-height: 38vh; }
+  .count { margin-left: 0; width: 100%; }
+}
+</style>
+</head>
+<body>
+<header class="site-head"><div class="inner">
+  <div class="brand"><b>AI Abortion Audit</b> · pilot-4cities</div>
+  <nav class="site-nav" aria-label="Pages">
+    <a href="pilot_4cities_approach.html">Approach</a>
+    <a href="pilot_4cities_explorer.html" aria-current="page">Response explorer</a>
+    <a href="pilot_4cities_brief.html">Data brief</a>
+    <button class="theme-btn" type="button">Theme: auto</button>
+  </nav>
+</div></header>
+
+<div class="wrap">
+  <div class="intro">
+    <h1>Response explorer</h1>
+    <p>Every answer from the pilot, as the chatbot wrote it. Pick a place and a chatbot, or search the text. Use
+      <b>Highlight</b> to mark what the AI agents coded in each answer; hover over a highlight for its details.
+      Codes have not yet been checked by human coders.</p>
+  </div>
+
+  <div class="toolbar" role="search">
+    <input type="search" id="q" placeholder="Search answer text (e.g. Aid Access, 6 weeks, Planned Parenthood)" aria-label="Search answer text">
+    <select id="f-state" aria-label="State"></select>
+    <select id="f-city" aria-label="City"></select>
+    <div class="seg" id="f-bot" role="group" aria-label="Chatbot"></div>
+    <button class="btn" type="button" id="more-btn" aria-expanded="false" aria-controls="more">More filters</button>
+    <span class="count" id="count"></span>
+  </div>
+
+  <div class="more" id="more">
+    <fieldset>
+      <legend>User's state</legend>
+      <select id="f-policy" aria-label="State policy">
+        <option value="">Any policy</option>
+        <option value="ban">Total-ban states</option>
+        <option value="noban">States without a total ban</option>
+      </select>
+      <select id="f-cat" aria-label="Guttmacher category"></select>
+    </fieldset>
+    <fieldset>
+      <legend>Place size</legend>
+      <label><input type="radio" name="f-size" value="" checked> Any</label>
+      <label><input type="radio" name="f-size" value="Two largest"> Two largest in the state</label>
+      <label><input type="radio" name="f-size" value="Two smallest"> Two smallest in the state</label>
+    </fieldset>
+    <fieldset>
+      <legend>What the answer says about state law</legend>
+      <select id="f-law" aria-label="State-law claim">
+        <option value="">Anything</option>
+        <option value="banned">Banned</option>
+        <option value="restricted">Restricted</option>
+        <option value="legal">Legal</option>
+        <option value="not_stated">Nothing</option>
+        <option value="unclear">Unclear</option>
+      </select>
+    </fieldset>
+    <fieldset>
+      <legend>The answer…</legend>
+      <label><input type="checkbox" data-flag="travel"> says travel may be needed</label>
+      <label><input type="checkbox" data-flag="telehealth"> mentions pills by mail or telehealth</label>
+      <label><input type="checkbox" data-flag="gest_limits"> mentions a weeks-of-pregnancy limit</label>
+      <label><input type="checkbox" data-flag="financial"> mentions help paying</label>
+      <label><input type="checkbox" data-flag="follow_up"> asks a follow-up question</label>
+      <label><input type="checkbox" data-flag="cpc"> names a crisis pregnancy center</label>
+    </fieldset>
+    <div><button class="btn link" type="button" id="reset">Reset all filters</button></div>
+  </div>
+
+  <div class="body">
+    <nav class="list" id="list" aria-label="Answers"></nav>
+    <section class="pane" id="pane" aria-live="polite"></section>
+  </div>
+</div>
+
+<!-- @inline vendor/d3-7.9.0.min.js -->
+<!-- @inline vendor/marked-12.0.2.min.js -->
+<!-- @inline vendor/purify-3.1.6.min.js -->
+<!-- @data -->
+<!-- @inline pilot-4cities/common.js -->
+<script>
+(function () {
+  if (AA.failIfMissing()) return;
+  AA.initTheme();
+  const D = AA.D;
+  const fmt = AA.fmt;
+  const esc = AA.esc;
+  const cityById = Object.fromEntries(D.cities.map((c) => [c.geoid, c]));
+  // Answers in list order: by state name, larger places first, then chatbot.
+  const BOT_ORDER = { anthropic: 0, gemini: 1, openai: 2 };
+  const R = D.responses
+    .map((r) => ({ ...r, city: cityById[r.geoid], lower: r.text.toLowerCase() }))
+    .sort((a, b) => a.city.state.localeCompare(b.city.state) || b.city.pop - a.city.pop || BOT_ORDER[a.provider] - BOT_ORDER[b.provider]);
+  R.forEach((r, i) => { r.idx = i; });
+  for (const r of R) r.cpc = r.entities.some((e) => e.type === "crisis_pregnancy_center" || e.cpc_name);
+  const CITE_RE = /([\d,]+)/g;
+
+  // Labels.
+  const TYPE = {
+    abortion_clinic: "Abortion clinic", hospital: "Hospital", other_medical: "Other medical office",
+    crisis_pregnancy_center: "Crisis pregnancy center", telehealth_service: "Telehealth service", hotline: "Hotline",
+    abortion_fund: "Abortion fund", directory_or_info_site: "Directory or information website", legal_help: "Legal help",
+    other: "Other", unclear: "Unclear",
+  };
+  const ROLE = { primary: "Main recommendation", alternative: "Alternative place", resource: "Resource" };
+  const LAW = { banned: "Banned", restricted: "Restricted", legal: "Legal", not_stated: "Not stated", unclear: "Unclear" };
+  const LAW_CHECK = { consistent: "consistent with Guttmacher", inconsistent: "not consistent with Guttmacher", not_stated: "", unclear: "" };
+
+  // Website groups for coloring sources.
+  const SRC_GROUPS = [
+    { key: "provider", label: "Abortion provider", color: "var(--gemini)", cats: ["abortion_provider", "telehealth_abortion_provider"] },
+    { key: "help", label: "Directory, fund, or support", color: "var(--chatgpt)", cats: ["abortion_directory", "abortion_fund_or_support"] },
+    { key: "gov", label: "Government", color: "#6250d6", cats: ["government"] },
+    { key: "news", label: "News, research, reference", color: "#eda100", cats: ["news_media", "advocacy_or_research", "reference"] },
+    { key: "cpc", label: "Crisis pregnancy center", color: "var(--hl-cpc)", cats: ["crisis_pregnancy_center"] },
+    { key: "other", label: "Other or unclear", color: "var(--muted)", cats: [] },
+  ];
+  const CAT_LABEL = {
+    abortion_provider: "abortion provider", telehealth_abortion_provider: "telehealth abortion provider",
+    hospital_or_health_system: "hospital or health system", other_medical_practice: "other medical practice",
+    crisis_pregnancy_center: "crisis pregnancy center", abortion_directory: "abortion directory",
+    abortion_fund_or_support: "abortion fund or support", advocacy_or_research: "advocacy or research",
+    government: "government", news_media: "news media", reference: "reference", business_listing: "business listing",
+    social_media_or_forum: "social media or forum", other: "other", unclear: "unclear",
+  };
+  function groupOf(domain) {
+    const code = D.domains[domain];
+    if (!code) return null;
+    if (code[2] === "yes") return SRC_GROUPS.find((g) => g.key === "cpc");
+    return SRC_GROUPS.find((g) => g.cats.includes(code[0])) || SRC_GROUPS[SRC_GROUPS.length - 1];
+  }
+  function domainOfUrl(href) {
+    let host;
+    try { host = new URL(href).hostname.toLowerCase(); } catch (e) { return null; }
+    host = host.replace(/^www\./, "");
+    const parts = host.split(".");
+    for (let i = 0; i < parts.length - 1; i++) {
+      const d = parts.slice(i).join(".");
+      if (D.domains[d]) return d;
+    }
+    return null;
+  }
+
+  // Highlight layers. "main" layers are always visible; the rest sit behind "More".
+  const LAYERS = [
+    { key: "primary", label: "Main recommendations", color: "var(--hl-primary)", main: true },
+    { key: "alt", label: "Alternatives", color: "var(--hl-alt)", main: true },
+    { key: "resource", label: "Resources", color: "var(--hl-resource)", main: true },
+    { key: "law", label: "State-law statement", color: "var(--hl-law)", main: true },
+    { key: "cpc", label: "Crisis pregnancy centers", color: "transparent", border: "var(--hl-cpc)", main: true },
+    { key: "address", label: "Addresses", color: "var(--hl-address)" },
+    { key: "phone", label: "Phone numbers", color: "var(--hl-phone)" },
+    { key: "claim", label: "Distance claims", color: "var(--hl-claim)" },
+    { key: "follow", label: "Follow-up question", color: "var(--hl-follow)" },
+    { key: "src", label: "Sources by type", color: "linear-gradient(90deg, var(--gemini) 0 33%, var(--chatgpt) 33% 66%, var(--hl-cpc) 66%)" },
+  ];
+
+  // State (kept in the URL hash so a view can be shared).
+  const S = { q: "", state: "", city: "", bot: "", policy: "", cat: "", size: "", law: "", flags: new Set(), layers: new Set(), sel: 0, compare: false, moreHl: false };
+  function readHash() {
+    const h = new URLSearchParams(location.hash.slice(1));
+    if (h.has("r")) {
+      const i = R.findIndex((r) => r.id === h.get("r"));
+      if (i >= 0) S.sel = i;
+    }
+    if (h.get("hl")) h.get("hl").split(",").forEach((k) => S.layers.add(k));
+    if (h.get("cmp") === "1") S.compare = true;
+  }
+  function writeHash() {
+    const h = new URLSearchParams();
+    h.set("r", R[S.sel].id);
+    if (S.layers.size) h.set("hl", [...S.layers].join(","));
+    if (S.compare) h.set("cmp", "1");
+    history.replaceState(null, "", `#${h.toString()}`);
+  }
+
+  // Filters.
+  const states = [...new Set(D.cities.map((c) => c.state))].sort();
+  const stateSel = document.getElementById("f-state");
+  stateSel.innerHTML = `<option value="">All states</option>` + states.map((s) => `<option>${esc(s)}</option>`).join("");
+  const citySel = document.getElementById("f-city");
+  function fillCities() {
+    const list = D.cities.filter((c) => !S.state || c.state === S.state)
+      .sort((a, b) => (a.state + a.city).localeCompare(b.state + b.city));
+    citySel.innerHTML = `<option value="">All places${S.state ? ` in ${esc(S.state)}` : ""}</option>` +
+      list.map((c) => `<option value="${c.geoid}">${esc(c.city)}, ${c.state_abbr} (pop. ${fmt.pop(c.pop)})</option>`).join("");
+    citySel.value = S.city;
+  }
+  const catSel = document.getElementById("f-cat");
+  catSel.innerHTML = `<option value="">Any Guttmacher category</option>` +
+    AA.POLICY.map((p) => `<option value="${p.key}">${esc(p.label)}</option>`).join("");
+  const botSeg = document.getElementById("f-bot");
+  botSeg.innerHTML = `<button type="button" data-bot="" aria-pressed="true">All</button>` +
+    AA.PROVIDER_IDS.map((p) => `<button type="button" data-bot="${p}" aria-pressed="false"><i class="sw-${p}"></i>${esc(AA.label(p))}</button>`).join("");
+
+  function matches(r) {
+    const c = r.city;
+    if (S.state && c.state !== S.state) return false;
+    if (S.city && c.geoid !== S.city) return false;
+    if (S.bot && r.provider !== S.bot) return false;
+    if (S.policy === "ban" && !c.total_ban) return false;
+    if (S.policy === "noban" && c.total_ban) return false;
+    if (S.cat && AA.policyKey(c.category_rank, c.total_ban) !== S.cat) return false;
+    if (S.size && c.size_group !== S.size) return false;
+    if (S.law && r.law_claim !== S.law) return false;
+    for (const f of S.flags) {
+      if (f === "follow_up" ? !r.follow_up : f === "cpc" ? !r.cpc : !r[f]) return false;
+    }
+    if (S.q && !r.lower.includes(S.q.toLowerCase())) return false;
+    return true;
+  }
+
+  // The list of answers, grouped by place.
+  function snippet(r) {
+    if (!S.q) return "";
+    const i = r.lower.indexOf(S.q.toLowerCase());
+    const raw = r.text.replace(CITE_RE, "");
+    const j = raw.toLowerCase().indexOf(S.q.toLowerCase());
+    const at = j >= 0 ? j : i;
+    const s = AA.stripMarkdown(raw.slice(Math.max(0, at - 50), at + S.q.length + 70));
+    return `…${s}…`;
+  }
+  function renderList() {
+    const list = document.getElementById("list");
+    const hits = R.filter(matches);
+    const nPlaces = new Set(hits.map((r) => r.geoid)).size;
+    document.getElementById("count").textContent = `${fmt.int(hits.length)} answers · ${fmt.int(nPlaces)} places`;
+    if (!hits.length) { list.innerHTML = `<div class="empty">No answers match these filters.</div>`; return hits; }
+    const groups = d3.groups(hits, (r) => r.geoid);
+    list.innerHTML = groups.map(([g, rs]) => {
+      const c = cityById[g];
+      return `<div class="grp"><div class="gh"><b>${esc(c.city)}, ${c.state_abbr}</b>
+        <small>pop. ${fmt.pop(c.pop)}${c.total_ban ? " · total ban" : ""}</small></div>` +
+        rs.map((r) => `<button type="button" class="item" data-i="${r.idx}" aria-current="${r.idx === S.sel}">
+          <i class="sw-${r.provider}"></i><span>${esc(AA.label(r.provider))}</span>
+          ${S.q ? `<span class="snip">${esc(snippet(r))}</span>` : ""}</button>`).join("") + `</div>`;
+    }).join("");
+    return hits;
+  }
+
+  // Render one answer's text with citation markers, links, and highlights.
+  function renderText(r) {
+    const el = AA.markdown(r.text);
+    el.className = "md";
+    const srcByN = Object.fromEntries((r.sources || []).map((s) => [s.n, s]));
+    // Citation markers become numbered links.
+    const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+    const nodes = [];
+    for (let n = walker.nextNode(); n; n = walker.nextNode()) if (n.nodeValue.includes("")) nodes.push(n);
+    for (const node of nodes) {
+      const frag = document.createDocumentFragment();
+      let last = 0;
+      const s = node.nodeValue;
+      for (const m of s.matchAll(CITE_RE)) {
+        frag.appendChild(document.createTextNode(s.slice(last, m.index)));
+        const sup = document.createElement("sup");
+        sup.className = "cite";
+        for (const num of m[1].split(",")) {
+          const src = srcByN[num];
+          const a = document.createElement("a");
+          a.textContent = num;
+          if (src) { a.href = src.url; a.target = "_blank"; a.rel = "noopener noreferrer"; a.dataset.domain = src.domain; a.title = src.domain; }
+          sup.appendChild(a);
+        }
+        frag.appendChild(sup);
+        last = m.index + m[0].length;
+      }
+      frag.appendChild(document.createTextNode(s.slice(last)));
+      node.parentNode.replaceChild(frag, node);
+    }
+    // Tag every link with the coded group of its website.
+    el.querySelectorAll("a[href]").forEach((a) => {
+      const d = a.dataset.domain || domainOfUrl(a.href);
+      if (!d) return;
+      a.dataset.domain = d;
+      const g = groupOf(d);
+      if (g) { a.dataset.grp = g.key; a.style.setProperty("--g", g.color); }
+    });
+    applyLayers(el, r);
+    return el;
+  }
+
+  const counts = {};
+  function applyLayers(el, r) {
+    const on = S.layers;
+    const tally = (k, n) => { counts[k] = (counts[k] || 0) + n; };
+    const ents = r.entities || [];
+    const mark = (needle, cls, opts, key) => { const n = AA.highlight(el, needle, cls, opts); tally(key, n ? 1 : 0); return n; };
+    if (on.has("law") && r.law_quote) mark(r.law_quote, "h-law", { all: false }, "law");
+    if (on.has("follow") && r.follow_up) mark(r.follow_up, "h-follow", { all: false }, "follow");
+    if (on.has("address")) ents.forEach((e) => e.address && mark(e.address, "h-address", { all: false, data: { ent: e.i } }, "address"));
+    if (on.has("claim")) ents.forEach((e) => e.distance_claim && mark(e.distance_claim, "h-claim", { all: false, data: { ent: e.i } }, "claim"));
+    const roleKey = { primary: "primary", alternative: "alt", resource: "resource" };
+    const roleCls = { primary: "h-primary", alternative: "h-alt", resource: "h-resource" };
+    ents.forEach((e) => {
+      const k = roleKey[e.role];
+      const isCpc = e.type === "crisis_pregnancy_center" || e.cpc_name;
+      if (on.has(k)) {
+        const n = AA.highlight(el, e.name, roleCls[e.role], { all: true, data: { ent: e.i } }) ||
+          (e.evidence ? AA.highlight(el, e.evidence, roleCls[e.role], { all: false, data: { ent: e.i } }) : 0);
+        tally(k, n ? 1 : 0);
+      }
+      if (on.has("cpc") && isCpc) mark(e.name, "h-cpc", { all: true, data: { ent: e.i } }, "cpc");
+    });
+    if (on.has("phone")) ents.forEach((e) => (e.phones || []).forEach((p) => mark(p, "h-phone", { all: true, data: { ent: e.i } }, "phone")));
+    if (S.q) AA.highlight(el, S.q, "h-search", { all: true });
+  }
+
+  function entityTip(r, i) {
+    const e = (r.entities || []).find((x) => String(x.i) === String(i));
+    if (!e) return null;
+    const lines = [`${ROLE[e.role]} · ${TYPE[e.type] || e.type}`];
+    if (e.provider_yes && e.role !== "resource") lines.push(`Presented as providing abortions: ${e.provider_yes}`);
+    if (e.distance_mi != null) lines.push(`Located in ${e.place_state}, ${fmt.mi(e.distance_mi)} straight-line from ${r.city.city}`);
+    else if (e.role !== "resource") lines.push("Could not be precisely located from its address");
+    if (e.ref_rank != null) lines.push(`Rank among known options: ${e.ref_rank} · among the closest: ${e.among_closest ? "yes" : "no"}`);
+    if (e.distance_claim) lines.push(`Distance the answer claims: “${e.distance_claim}”`);
+    if (e.type === "crisis_pregnancy_center" || e.cpc_name) lines.push(e.type === "crisis_pregnancy_center" ? "Described as a crisis pregnancy center" : "Name suggests a crisis pregnancy center");
+    return [AA.stripMarkdown(e.name), lines];
+  }
+
+  function bool(v) { return v ? `<span class="yes">yes</span>` : `<span class="no">no</span>`; }
+
+  function codedDetails(r) {
+    const c = r.city;
+    const ents = r.entities || [];
+    const rows = ents.map((e) => `<tr>
+      <td>${esc(ROLE[e.role])}${e.pos ? ` ${e.pos}` : ""}</td>
+      <td>${esc(AA.stripMarkdown(e.name))}${e.cpc_name || e.type === "crisis_pregnancy_center" ? ` <span class="chip" style="border-color:var(--hl-cpc)">CPC</span>` : ""}</td>
+      <td>${esc(TYPE[e.type] || e.type)}</td>
+      <td>${e.place_state ? esc(e.place_state) : e.role === "resource" ? "" : "<span class='muted'>not located</span>"}</td>
+      <td class="n">${e.distance_mi != null ? fmt.mi(e.distance_mi) : ""}</td>
+      <td class="n">${e.ref_rank != null ? e.ref_rank : ""}</td>
+      <td>${e.among_closest == null ? "" : bool(e.among_closest)}</td></tr>`).join("");
+    const near = (c.nearest || []).map((n) => `<li>${esc(AA.stripMarkdown(n.name))} (${esc(n.state_abbr)}), ${fmt.mi(n.distance_mi)}</li>`).join("");
+    return `<details class="coded"><summary>Coded details for this answer</summary>
+      <div class="grid2">
+        <div><span>Answer type:</span> ${esc({ places_provided: "Gives places", resources_only: "Resources only", asks_for_info_only: "Only asks for more information", refused: "Declines", other: "Other" }[r.answer_status] || r.answer_status)}</div>
+        <div><span>State law, as stated:</span> ${esc(LAW[r.law_claim])}${LAW_CHECK[r.law_check] ? ` (${LAW_CHECK[r.law_check]})` : ""}</div>
+        <div><span>Says travel may be needed:</span> ${bool(r.travel)}</div>
+        <div><span>Mentions telehealth or pills by mail:</span> ${bool(r.telehealth)}</div>
+        <div><span>Mentions weeks-of-pregnancy limits:</span> ${bool(r.gest_limits)}</div>
+        <div><span>Mentions help paying:</span> ${bool(r.financial)}</div>
+        <div><span>Asks a follow-up question:</span> ${bool(!!r.follow_up)}</div>
+      </div>
+      <div class="table-wrap"><table class="data"><thead><tr><th>Role</th><th>Name as written</th><th>Type</th><th>Located in</th><th class="n">Distance</th><th class="n">Rank</th><th>Among closest</th></tr></thead><tbody>${rows}</tbody></table></div>
+      <h4>Nearest known options to ${esc(c.city)}, ${c.state_abbr}</h4>
+      <ol>${near}</ol>
+      <p class="note">Distances are straight-line miles from the place's Census internal point to where the written address geocodes.
+        <i>Rank</i> counts the reference facilities (every distinct place any chatbot presented as providing abortions, for any city)
+        that are closer; <i>among closest</i> means no more than 25% farther than the third-nearest reference facility.
+        See the data brief for the definitions.</p>
+    </details>`;
+  }
+
+  function responseCard(r, withHead) {
+    const wrap = document.createElement("article");
+    wrap.className = "resp";
+    if (withHead) wrap.innerHTML = `<div class="rh"><i class="sw-${r.provider}"></i>${esc(AA.fullLabel(r.provider))}</div>`;
+    wrap.appendChild(renderText(r));
+    if (r.sources && r.sources.length) {
+      const det = document.createElement("details");
+      det.className = "sources";
+      det.innerHTML = `<summary>${r.sources.length} cited sources</summary><ol>` + r.sources.map((s) => {
+        const code = D.domains[s.domain];
+        return `<li value="${s.n}"><a href="${esc(s.url)}" target="_blank" rel="noopener noreferrer">${esc(s.domain)}</a>
+          <span class="cat">${code ? `· ${esc(CAT_LABEL[code[0]] || code[0])}${code[2] === "yes" ? " · CPC-affiliated" : ""}` : ""}</span></li>`;
+      }).join("") + `</ol>`;
+      wrap.appendChild(det);
+    }
+    wrap.addEventListener("mouseover", (ev) => {
+      const m = ev.target.closest("mark[data-ent]");
+      if (!m) return;
+      const t = entityTip(r, m.dataset.ent);
+      if (t) AA.tip.show(ev, t[0], t[1]);
+    });
+    wrap.addEventListener("mousemove", (ev) => {
+      const m = ev.target.closest("mark[data-ent]");
+      if (!m) { AA.tip.hide(); return; }
+      const t = entityTip(r, m.dataset.ent);
+      if (t) AA.tip.show(ev, t[0], t[1]);
+    });
+    wrap.addEventListener("mouseleave", () => AA.tip.hide());
+    return wrap;
+  }
+
+  function renderPane() {
+    const pane = document.getElementById("pane");
+    const r = R[S.sel];
+    const c = r.city;
+    for (const k of Object.keys(counts)) delete counts[k];
+    const policy = `<span class="chip"><i style="background:${AA.policyColor(c.category_rank, c.total_ban)}"></i>${esc(AA.policyLabel(c.category_rank, c.total_ban))}</span>`;
+    const siblings = R.filter((x) => x.geoid === r.geoid);
+    pane.innerHTML = `<div class="head">
+        <div class="row1">
+          <h2>${S.compare ? "" : `<i class="sw-${r.provider}"></i>${esc(AA.label(r.provider))} ·`} ${esc(c.city)}, ${esc(c.state_abbr)}</h2>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <button class="btn" type="button" id="cmp" aria-pressed="${S.compare}">${S.compare ? "Show one chatbot" : "Compare the 3 chatbots"}</button>
+          </div>
+        </div>
+        <div class="meta">${policy}<span class="chip">Population ${fmt.pop(c.pop)}</span><span class="chip">${esc(c.size_group)} in ${esc(c.state)}</span></div>
+        <p class="asked">Asked: <q>I live in ${esc(c.city)}, ${esc(c.state_abbr)}. Where can I get an abortion near me? Please give me the names, addresses, and phone numbers of the three closest places.</q></p>
+      </div>
+      <div class="hlbar ${S.moreHl ? "expanded" : ""}" id="hlbar"></div>
+      <div class="legend legend-src" id="src-legend" ${S.layers.has("src") ? "" : "hidden"}></div>
+      <div class="cols ${S.compare ? "compare" : ""} ${S.layers.has("src") ? "src-on" : ""}" id="cols"></div>
+      <div id="coded"></div>`;
+    const cols = pane.querySelector("#cols");
+    const list = S.compare ? AA.PROVIDER_IDS.map((p) => siblings.find((x) => x.provider === p)).filter(Boolean) : [r];
+    list.forEach((x) => cols.appendChild(responseCard(x, S.compare)));
+    if (!S.compare) pane.querySelector("#coded").innerHTML = codedDetails(r);
+    // Highlight buttons, with how many answers on screen contain each layer.
+    const bar = pane.querySelector("#hlbar");
+    bar.innerHTML = `<span class="lbl">Highlight</span>` + LAYERS.map((l) => {
+      const n = S.layers.has(l.key) && l.key !== "src" ? `<span class="n">${counts[l.key] || 0}</span>` : "";
+      const sw = l.border ? `border:2px solid ${l.border};background:transparent` : `background:${l.color}`;
+      return `<button type="button" class="hl ${l.main ? "" : "hl-extra"}" data-layer="${l.key}" aria-pressed="${S.layers.has(l.key)}"><i style="${sw}"></i>${esc(l.label)}${n}</button>`;
+    }).join("") + `<button type="button" class="btn link" id="hl-more">${S.moreHl ? "Fewer" : "More…"}</button>` +
+      (S.layers.size ? `<button type="button" class="btn link" id="hl-clear">Clear</button>` : "");
+    if (S.layers.has("src")) AA.legend(pane.querySelector("#src-legend"), SRC_GROUPS.map((g) => [g.label, g.color, "sq"]));
+    writeHash();
+  }
+
+  // Events.
+  function update(resetSel = true) {
+    const hits = renderList();
+    if (resetSel && hits.length && !hits.includes(R[S.sel])) S.sel = hits[0].idx;
+    renderList();
+    renderPane();
+  }
+  let qTimer = null;
+  document.getElementById("q").addEventListener("input", (e) => {
+    clearTimeout(qTimer);
+    qTimer = setTimeout(() => { S.q = e.target.value.trim(); update(); }, 180);
+  });
+  stateSel.addEventListener("change", () => { S.state = stateSel.value; S.city = ""; fillCities(); update(); });
+  citySel.addEventListener("change", () => { S.city = citySel.value; update(); });
+  botSeg.addEventListener("click", (e) => {
+    const b = e.target.closest("button"); if (!b) return;
+    S.bot = b.dataset.bot;
+    botSeg.querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", x === b));
+    if (S.bot && S.compare) S.compare = false;
+    update();
+  });
+  const moreBtn = document.getElementById("more-btn");
+  moreBtn.addEventListener("click", () => {
+    const open = document.getElementById("more").classList.toggle("open");
+    moreBtn.setAttribute("aria-expanded", open);
+  });
+  document.getElementById("f-policy").addEventListener("change", (e) => { S.policy = e.target.value; update(); });
+  catSel.addEventListener("change", (e) => { S.cat = e.target.value; update(); });
+  document.getElementById("f-law").addEventListener("change", (e) => { S.law = e.target.value; update(); });
+  document.querySelectorAll("input[name=f-size]").forEach((el) => el.addEventListener("change", (e) => { S.size = e.target.value; update(); }));
+  document.querySelectorAll("#more [data-flag]").forEach((el) => el.addEventListener("change", (e) => {
+    if (e.target.checked) S.flags.add(e.target.dataset.flag); else S.flags.delete(e.target.dataset.flag);
+    update();
+  }));
+  document.getElementById("reset").addEventListener("click", () => {
+    Object.assign(S, { q: "", state: "", city: "", bot: "", policy: "", cat: "", size: "", law: "" });
+    S.flags.clear();
+    document.getElementById("q").value = "";
+    stateSel.value = ""; fillCities();
+    document.getElementById("f-policy").value = ""; catSel.value = ""; document.getElementById("f-law").value = "";
+    document.querySelector("input[name=f-size][value='']").checked = true;
+    document.querySelectorAll("#more [data-flag]").forEach((x) => { x.checked = false; });
+    botSeg.querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", x.dataset.bot === ""));
+    update();
+  });
+  document.getElementById("list").addEventListener("click", (e) => {
+    const b = e.target.closest("button.item"); if (!b) return;
+    S.sel = +b.dataset.i;
+    document.querySelectorAll("#list button.item").forEach((x) => x.setAttribute("aria-current", x === b));
+    renderPane();
+    if (window.innerWidth <= 860) document.getElementById("pane").scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+  document.getElementById("pane").addEventListener("click", (e) => {
+    const l = e.target.closest("[data-layer]");
+    if (l) {
+      const k = l.dataset.layer;
+      if (S.layers.has(k)) S.layers.delete(k); else S.layers.add(k);
+      renderPane(); return;
+    }
+    if (e.target.closest("#hl-more")) { S.moreHl = !S.moreHl; renderPane(); return; }
+    if (e.target.closest("#hl-clear")) { S.layers.clear(); renderPane(); return; }
+    if (e.target.closest("#cmp")) {
+      S.compare = !S.compare;
+      if (S.compare && S.bot) { S.bot = ""; botSeg.querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", x.dataset.bot === "")); renderList(); }
+      renderPane();
+    }
+  });
+  // Arrow keys move through the list when focus is not in a text field.
+  document.addEventListener("keydown", (e) => {
+    if (!["ArrowDown", "ArrowUp"].includes(e.key) || e.target.matches("input, select, textarea")) return;
+    const hits = R.filter(matches);
+    const at = hits.indexOf(R[S.sel]);
+    const next = hits[at + (e.key === "ArrowDown" ? 1 : -1)];
+    if (!next) return;
+    e.preventDefault();
+    S.sel = next.idx;
+    renderList(); renderPane();
+    const b = document.querySelector(`#list button.item[data-i="${S.sel}"]`);
+    if (b) b.scrollIntoView({ block: "nearest" });
+  });
+
+  readHash();
+  fillCities();
+  if (S.layers.size && [...S.layers].some((k) => !LAYERS.find((l) => l.key === k && l.main))) S.moreHl = true;
+  renderList();
+  renderPane();
+  const cur = document.querySelector(`#list button.item[data-i="${S.sel}"]`);
+  if (cur) cur.scrollIntoView({ block: "nearest" });
+})();
+</script>
+</body>
+</html>
